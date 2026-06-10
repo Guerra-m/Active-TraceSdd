@@ -4,7 +4,14 @@ Importar desde este paquete para registrar todos los modelos
 en Base.metadata antes de ejecutar migraciones Alembic.
 """
 
+from app.models.asignacion import Asignacion
+from app.models.comunicacion import Comunicacion
+from app.models.lote_comunicacion import LoteComunicacion
 from app.models.audit_log import AuditLog
+from app.models.calificacion import Calificacion
+from app.models.umbral_materia import UmbralMateria
+from app.models.entrada_padron import EntradaPadron
+from app.models.version_padron import VersionPadron
 from app.models.base import TenantScopedBase
 from app.models.carrera import Carrera
 from app.models.cohorte import Cohorte
@@ -20,7 +27,14 @@ from app.models.usuario_rol import UsuarioRol
 
 __all__ = [
     "TenantScopedBase",
+    "Asignacion",
+    "Comunicacion",
+    "LoteComunicacion",
     "AuditLog",
+    "Calificacion",
+    "UmbralMateria",
+    "EntradaPadron",
+    "VersionPadron",
     "Carrera",
     "Cohorte",
     "Materia",

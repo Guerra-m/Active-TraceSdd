@@ -10,6 +10,7 @@ NO contiene logica de negocio. Sigue el flujo unidireccional:
   Routers → Services → Repositories → Models (regla #11).
 """
 
+import asyncio
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -50,10 +51,28 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     from app.core.observability import setup_telemetry
     setup_telemetry(app)
 
+    # 4. Worker de comunicaciones (asyncio background task)
+    from app.core.database import async_session_factory
+    from app.integrations.email_sender import get_sender
+    from app.workers.comunicacion_worker import ComunicacionWorker
+    from contextlib import asynccontextmanager as _acm
+
+    def _make_db():
+        return async_session_factory()
+
+    _worker = ComunicacionWorker(
+        db_factory=_make_db,
+        sender=get_sender(),
+        poll_interval_s=settings.worker_poll_interval_s,
+    )
+    _worker_task = asyncio.create_task(_worker.loop())
+
     yield  # La app esta lista para recibir requests
 
     # Shutdown
     logger.info("active-trace backend apagandose...")
+    _worker.stop()
+    _worker_task.cancel()
     await close_engine()
     logger.info("Engine async de DB cerrado.")
 
@@ -99,6 +118,24 @@ def create_app() -> FastAPI:
 
     from app.api.v1.routers.estructura import router as estructura_router
     application.include_router(estructura_router)
+
+    from app.api.v1.routers.usuarios import router as usuarios_router
+    application.include_router(usuarios_router)
+
+    from app.api.v1.routers.asignaciones import router as asignaciones_router
+    application.include_router(asignaciones_router)
+
+    from app.api.v1.routers.padron import router as padron_router
+    application.include_router(padron_router)
+
+    from app.api.v1.routers.calificaciones import router as calificaciones_router
+    application.include_router(calificaciones_router)
+
+    from app.api.v1.routers.analisis import router as analisis_router
+    application.include_router(analisis_router)
+
+    from app.api.v1.routers.comunicaciones import router as comunicaciones_router
+    application.include_router(comunicaciones_router)
 
     return application
 
