@@ -63,9 +63,10 @@ class AuditLog(Base):
         nullable=True,
     )
 
-    # Materia relacionada con la acción (nullable; FK añadida en C-06)
+    # Materia relacionada con la acción (nullable; FK hacia materias, ON DELETE SET NULL)
     materia_id = Column(
         SAUUID(as_uuid=True),
+        ForeignKey("materias.id", ondelete="SET NULL"),
         nullable=True,
     )
 

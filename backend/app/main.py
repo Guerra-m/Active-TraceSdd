@@ -97,6 +97,9 @@ def create_app() -> FastAPI:
     from app.api.v1.routers.impersonation import router as impersonation_router
     application.include_router(impersonation_router)
 
+    from app.api.v1.routers.estructura import router as estructura_router
+    application.include_router(estructura_router)
+
     return application
 
 

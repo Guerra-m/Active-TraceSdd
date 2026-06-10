@@ -6,6 +6,9 @@ en Base.metadata antes de ejecutar migraciones Alembic.
 
 from app.models.audit_log import AuditLog
 from app.models.base import TenantScopedBase
+from app.models.carrera import Carrera
+from app.models.cohorte import Cohorte
+from app.models.materia import Materia
 from app.models.password_reset_token import PasswordResetToken
 from app.models.permiso import Permiso
 from app.models.refresh_token import RefreshToken
@@ -18,6 +21,9 @@ from app.models.usuario_rol import UsuarioRol
 __all__ = [
     "TenantScopedBase",
     "AuditLog",
+    "Carrera",
+    "Cohorte",
+    "Materia",
     "Tenant",
     "User",
     "RefreshToken",
