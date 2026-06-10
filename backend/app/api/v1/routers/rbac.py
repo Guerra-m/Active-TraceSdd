@@ -23,7 +23,7 @@ from app.repositories.rol_permiso_repository import RolPermisoRepository
 from app.repositories.rol_repository import RolRepository
 from app.schemas.rbac import PermisoResponse, RolPermisoResponse, RolResponse
 
-router = APIRouter(prefix="/rbac", tags=["rbac"])
+router = APIRouter(prefix="/api/v1/rbac", tags=["rbac"])
 
 
 @router.get(

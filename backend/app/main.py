@@ -91,6 +91,9 @@ def create_app() -> FastAPI:
     from app.api.v1.routers.auth import router as auth_router
     application.include_router(auth_router)
 
+    from app.api.v1.routers.rbac import router as rbac_router
+    application.include_router(rbac_router)
+
     return application
 
 

@@ -61,7 +61,8 @@ class TestSettingsInvalidConfig:
         reload(cfg_module)
 
         with pytest.raises((ValidationError, Exception)):
-            cfg_module.Settings()
+            # _env_file=None evita leer del .env del entorno de desarrollo
+            cfg_module.Settings(_env_file=None)
 
     def test_secret_key_too_short_raises(self, monkeypatch):
         """SECRET_KEY con menos de 32 caracteres debe fallar la validacion."""
