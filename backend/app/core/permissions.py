@@ -91,4 +91,9 @@ def require_permission(code: str) -> Callable:
         )
         request.state.permission_is_own_resource = is_own
 
+        # actor_id ya fue seteado por get_current_user; si por algún motivo
+        # la dependency corre sin request (tests unitarios), garantizar el attr.
+        if not hasattr(request.state, "actor_id"):
+            request.state.actor_id = current_user.id
+
     return _check_permission

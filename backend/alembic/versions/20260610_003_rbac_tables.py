@@ -222,7 +222,7 @@ def upgrade() -> None:
         ("impersonacion:usar",          "Impersonar a otro usuario (soporte/ADMIN)"),
         # Módulo: roles (catálogo RBAC — este change)
         ("roles:ver",                   "Ver catálogo de roles y permisos"),
-    )
+    ]
 
     perm_id_map = {}
     for code, desc in permisos_seed:
@@ -325,6 +325,7 @@ def upgrade() -> None:
         ("ADMIN", "auditoria:ver",             False),
         ("ADMIN", "tenant:configurar",         False),
         ("ADMIN", "roles:ver",                 False),
+        ("ADMIN", "impersonacion:usar",        False),
 
         # FINANZAS
         ("FINANZAS", "avisos:confirmar",       False),

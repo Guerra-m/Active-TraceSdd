@@ -124,6 +124,7 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         ("ADMIN", "auditoria:ver",             False),
         ("ADMIN", "tenant:configurar",         False),
         ("ADMIN", "roles:ver",                 False),
+        ("ADMIN", "impersonacion:usar",        False),
 
         # FINANZAS
         ("FINANZAS", "avisos:confirmar",       False),
