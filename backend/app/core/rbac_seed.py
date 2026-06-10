@@ -56,6 +56,7 @@ def get_permisos_seed() -> list[dict]:
         ("tenant:configurar",           "Configurar el tenant"),
         ("impersonacion:usar",          "Impersonar a otro usuario (soporte/ADMIN)"),
         ("roles:ver",                   "Ver catálogo de roles y permisos"),
+        ("padron:importar",             "Importar/gestionar padrón de alumnos por materia"),
     ]
     return [
         {"id": _uid(f"perm:{code}"), "code": code, "description": desc}
@@ -86,6 +87,7 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         # PROFESOR
         ("PROFESOR", "avisos:confirmar",      False),
         ("PROFESOR", "calificaciones:importar", True), # (propio)
+        ("PROFESOR", "padron:importar",       True),   # (propio)
         ("PROFESOR", "atrasados:ver",         True),   # (propio)
         ("PROFESOR", "entregas:ver",          True),   # (propio)
         ("PROFESOR", "comunicacion:enviar",   True),   # (propio)
@@ -105,6 +107,7 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         ("COORDINADOR", "tareas:gestionar",        False),
         ("COORDINADOR", "avisos:publicar",         False),
         ("COORDINADOR", "equipos:asignar",         False),
+        ("COORDINADOR", "padron:importar",         False),
         ("COORDINADOR", "auditoria:ver",           True),  # (propio)
 
         # ADMIN
@@ -119,11 +122,13 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         ("ADMIN", "tareas:gestionar",          False),
         ("ADMIN", "avisos:publicar",           False),
         ("ADMIN", "equipos:asignar",           False),
+        ("ADMIN", "padron:importar",           False),
         ("ADMIN", "estructura:gestionar",      False),
         ("ADMIN", "usuarios:gestionar",        False),
         ("ADMIN", "auditoria:ver",             False),
         ("ADMIN", "tenant:configurar",         False),
         ("ADMIN", "roles:ver",                 False),
+        ("ADMIN", "impersonacion:usar",        False),
 
         # FINANZAS
         ("FINANZAS", "avisos:confirmar",       False),

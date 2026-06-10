@@ -16,6 +16,7 @@ Reglas duras aplicables (ver CLAUDE.md):
 import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
+from uuid import UUID
 
 import pyotp
 from argon2 import PasswordHasher
@@ -90,19 +91,30 @@ def hash_email(email: str) -> str:
 ALGORITHM = "HS256"
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(
+    data: dict,
+    expires_delta: timedelta | None = None,
+    impersonated_id: UUID | None = None,
+) -> str:
     """Genera un JWT access token firmado con HS256.
 
     Args:
         data: Claims a incluir en el payload. Debe contener al menos
-              'sub' (user_id como string), 'tenant_id', 'roles'.
+              'sub' (user_id como string), 'tenant_id'.
         expires_delta: Tiempo de vida. Si es None, usa ACCESS_TOKEN_EXPIRE_MINUTES.
+        impersonated_id: UUID del usuario impersonado. Si se provee, el payload
+              incluirá 'impersonated_id' y 'sub' será el actor real (data['sub']).
+              El receptor (get_current_user) tratará impersonated_id como la
+              identidad efectiva y sub como el actor real.
 
     Returns:
         JWT firmado como string.
     """
     settings = get_settings()
     to_encode = data.copy()
+
+    if impersonated_id is not None:
+        to_encode["impersonated_id"] = str(impersonated_id)
 
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)

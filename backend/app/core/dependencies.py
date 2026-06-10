@@ -17,7 +17,7 @@ from collections.abc import AsyncGenerator
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -50,27 +50,33 @@ _bearer = HTTPBearer(auto_error=True)
 
 
 async def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(_bearer),
     db: AsyncSession = Depends(get_db),
 ):
     """Dependency que resuelve el usuario autenticado desde el JWT verificado.
 
-    Flujo:
+    Flujo normal:
       1. Extrae el token del header Authorization: Bearer <token>
       2. Verifica firma y expiración con core/security.verify_token()
-      3. Extrae user_id y tenant_id del payload (NUNCA de parámetros del request)
+      3. Extrae user_id (sub) y tenant_id del payload
       4. Busca el User en la DB via UserRepository
-      5. Verifica que el usuario existe y está activo
+      5. Almacena actor_id = sub en request.state.actor_id
+
+    Bajo impersonación (token tiene 'impersonated_id'):
+      - sub es el actor real (quien ejecuta la acción)
+      - impersonated_id es la identidad efectiva (el usuario impersonado)
+      - La función retorna el usuario impersonado, pero request.state.actor_id
+        queda seteado al actor real para trazabilidad en el audit log.
 
     Returns:
-        Instancia User del usuario autenticado.
+        Instancia User de la identidad efectiva.
 
     Raises:
         401 Unauthorized: Si el token es inválido, expirado o el usuario no existe.
         403 Forbidden: Si el usuario está desactivado.
 
     REGLA DURA #8: identidad SIEMPRE del JWT verificado.
-    Nunca leer user_id de URL, body, headers arbitrarios ni ningún otro parámetro.
     """
     from app.models.user import User
     from app.repositories.user_repository import UserRepository
@@ -86,9 +92,9 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
 
-    # Extraer user_id del claim 'sub' — NUNCA de parámetros del request
-    user_id_raw = payload.get("sub")
-    if not user_id_raw:
+    # Extraer actor_id del claim 'sub' — NUNCA de parámetros del request
+    actor_id_raw = payload.get("sub")
+    if not actor_id_raw:
         raise credentials_exception
 
     # Verificar que el tipo de token es 'access' (no pre_auth ni refresh)
@@ -97,7 +103,7 @@ async def get_current_user(
         raise credentials_exception
 
     try:
-        user_id = UUID(str(user_id_raw))
+        actor_id = UUID(str(actor_id_raw))
     except (ValueError, AttributeError):
         raise credentials_exception
 
@@ -107,9 +113,25 @@ async def get_current_user(
     except ValueError:
         raise credentials_exception
 
-    # Buscar usuario en DB con scope de tenant
+    # Almacenar actor_id en request.state SIEMPRE (antes de resolver impersonación)
+    # Es el actor real independientemente de si hay impersonación activa.
+    request.state.actor_id = actor_id
+
+    # Determinar la identidad efectiva:
+    # - Sin impersonación: effective_user_id = sub (el propio actor)
+    # - Con impersonación: effective_user_id = impersonated_id del payload
+    impersonated_id_raw = payload.get("impersonated_id")
+    if impersonated_id_raw:
+        try:
+            effective_user_id = UUID(str(impersonated_id_raw))
+        except (ValueError, AttributeError):
+            raise credentials_exception
+    else:
+        effective_user_id = actor_id
+
+    # Buscar la identidad efectiva en DB con scope de tenant
     repo = UserRepository(db, tenant_id=tenant_id)
-    user: User | None = await repo.get_by_id(user_id)
+    user: User | None = await repo.get_by_id(effective_user_id)
 
     if user is None:
         raise credentials_exception

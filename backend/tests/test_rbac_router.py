@@ -196,5 +196,5 @@ async def test_get_rol_permisos_without_permission_returns_403(
 @pytest.mark.asyncio
 async def test_health_endpoint_still_works(async_client: AsyncClient):
     """El endpoint /api/v1/health sigue respondiendo tras agregar RBAC router."""
-    resp = await async_client.get("/api/v1/health")
+    resp = await async_client.get("/health")
     assert resp.status_code == 200

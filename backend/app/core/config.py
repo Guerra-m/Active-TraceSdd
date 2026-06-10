@@ -76,6 +76,37 @@ class Settings(BaseSettings):
         description="Endpoint OTLP para exportar trazas. Omitir para deshabilitar.",
     )
 
+    # ---- Moodle WS (opcional) ----
+    moodle_url: str = Field(
+        default="",
+        description="URL base de Moodle (e.g. https://moodle.example.com). Vacío = deshabilitado.",
+    )
+    moodle_token: str = Field(
+        default="",
+        description="Token de Moodle Web Services. Vacío = deshabilitado.",
+    )
+    moodle_timeout: int = Field(
+        default=30,
+        gt=0,
+        description="Timeout en segundos para requests al Moodle WS.",
+    )
+
+    # ---- Comunicaciones ----
+    email_backend: str = Field(
+        default="stub",
+        description="Backend de email: 'stub' (dev/test) | 'smtp' (prod).",
+    )
+    comunicacion_umbral_aprobacion: int = Field(
+        default=10,
+        gt=0,
+        description="Lotes con más destinatarios que este valor requieren aprobación (RN-17).",
+    )
+    worker_poll_interval_s: float = Field(
+        default=10.0,
+        gt=0,
+        description="Intervalo en segundos entre iteraciones del worker de comunicaciones.",
+    )
+
     @field_validator("secret_key")
     @classmethod
     def secret_key_min_length(cls, v: str) -> str:
