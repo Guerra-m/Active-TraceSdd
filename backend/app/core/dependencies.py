@@ -124,9 +124,9 @@ async def get_current_user(
 
 
 # ---------------------------------------------------------------------------
-# SLOTS RESERVADOS para C-04
+# C-04: require_permission — guard de autorización RBAC
 # ---------------------------------------------------------------------------
+# Importado desde core/permissions.py para mantener la dependency disponible
+# desde un único punto de importación para los routers.
 
-# require_permission(module, action): verifica que el usuario tiene el permiso
-#   "<module>:<action>" segun la matriz RBAC del tenant.
-#   RESERVADO → C-04 (RBAC fino). Fail-closed: sin permiso explicito → 403.
+from app.core.permissions import require_permission  # noqa: E402, F401
