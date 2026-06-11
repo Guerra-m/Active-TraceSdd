@@ -137,6 +137,34 @@ def create_app() -> FastAPI:
     from app.api.v1.routers.comunicaciones import router as comunicaciones_router
     application.include_router(comunicaciones_router)
 
+    from app.api.v1.routers.equipos import router as equipos_router
+    application.include_router(equipos_router)
+
+    from app.api.v1.routers.encuentros import router as encuentros_router
+    application.include_router(encuentros_router)
+
+    from app.api.v1.routers.guardias import router as guardias_router
+    application.include_router(guardias_router)
+
+    from app.api.v1.routers.coloquios import router as coloquios_router
+    application.include_router(coloquios_router)
+
+    from app.api.v1.routers.avisos import router as avisos_router
+    application.include_router(avisos_router)
+
+    from app.api.v1.routers.tareas import router as tareas_router
+    application.include_router(tareas_router)
+
+    from app.api.v1.routers.programas import programas_router, fechas_router
+    application.include_router(programas_router)
+    application.include_router(fechas_router)
+
+    from app.api.v1.routers.perfil import router as perfil_router
+    application.include_router(perfil_router)
+
+    from app.api.v1.routers.auditoria import router as auditoria_router
+    application.include_router(auditoria_router)
+
     return application
 
 

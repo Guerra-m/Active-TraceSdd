@@ -129,3 +129,19 @@ class UserRepository(BaseRepository[User]):
                 setattr(user, campo, valor)
 
         return await self.update(user)
+
+    async def search_by_name(self, q: str, *, limit: int = 50) -> list[User]:
+        """Búsqueda por nombre/apellidos con ILIKE. Solo usuarios activos del tenant."""
+        pattern = f"%{q}%"
+        stmt = (
+            select(User)
+            .where(User.tenant_id == self._tenant_id)
+            .where(User.deleted_at.is_(None))
+            .where(User.is_active.is_(True))
+            .where(
+                (User.nombre.ilike(pattern)) | (User.apellidos.ilike(pattern))
+            )
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())

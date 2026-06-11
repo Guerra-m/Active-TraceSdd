@@ -24,6 +24,14 @@ from app.models.rol_permiso import RolPermiso
 from app.models.tenant import Tenant
 from app.models.user import User
 from app.models.usuario_rol import UsuarioRol
+from app.models.slot_encuentro import SlotEncuentro
+from app.models.instancia_encuentro import InstanciaEncuentro
+from app.models.guardia import Guardia
+from app.models.evaluacion import Evaluacion, ReservaEvaluacion, ResultadoEvaluacion
+from app.models.aviso import Aviso, AcknowledgmentAviso
+from app.models.tarea import Tarea, ComentarioTarea
+from app.models.programa_materia import FechaAcademica, ProgramaMateria
+from app.models.mensaje_interno import HiloMensaje, MensajeInterno
 
 __all__ = [
     "TenantScopedBase",
@@ -46,4 +54,18 @@ __all__ = [
     "Permiso",
     "RolPermiso",
     "UsuarioRol",
+    "SlotEncuentro",
+    "InstanciaEncuentro",
+    "Guardia",
+    "Evaluacion",
+    "ReservaEvaluacion",
+    "ResultadoEvaluacion",
+    "Aviso",
+    "AcknowledgmentAviso",
+    "Tarea",
+    "ComentarioTarea",
+    "FechaAcademica",
+    "ProgramaMateria",
+    "HiloMensaje",
+    "MensajeInterno",
 ]

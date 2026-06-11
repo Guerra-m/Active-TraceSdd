@@ -36,6 +36,7 @@ def get_permisos_seed() -> list[dict]:
     permisos = [
         ("academico:ver_propio",        "Ver estado académico propio del alumno"),
         ("evaluacion:reservar",         "Reservar instancia de evaluación"),
+        ("coloquios:gestionar",         "Gestionar convocatorias, reservas y resultados de coloquios"),
         ("avisos:confirmar",            "Confirmar (acknowledge) avisos"),
         ("avisos:publicar",             "Publicar avisos para alumnos"),
         ("calificaciones:importar",     "Importar calificaciones desde Moodle"),
@@ -57,6 +58,8 @@ def get_permisos_seed() -> list[dict]:
         ("impersonacion:usar",          "Impersonar a otro usuario (soporte/ADMIN)"),
         ("roles:ver",                   "Ver catálogo de roles y permisos"),
         ("padron:importar",             "Importar/gestionar padrón de alumnos por materia"),
+        ("perfil:editar",               "Editar perfil propio (datos personales y bancarios)"),
+        ("inbox:usar",                  "Usar bandeja de mensajería interna"),
     ]
     return [
         {"id": _uid(f"perm:{code}"), "code": code, "description": desc}
@@ -85,6 +88,7 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         ("TUTOR", "guardias:registrar",       True),   # (propio)
 
         # PROFESOR
+        ("PROFESOR", "coloquios:gestionar",   True),   # (propio)
         ("PROFESOR", "avisos:confirmar",      False),
         ("PROFESOR", "calificaciones:importar", True), # (propio)
         ("PROFESOR", "padron:importar",       True),   # (propio)
@@ -96,6 +100,7 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         ("PROFESOR", "tareas:gestionar",      True),   # (propio)
 
         # COORDINADOR
+        ("COORDINADOR", "coloquios:gestionar",     False),
         ("COORDINADOR", "avisos:confirmar",       False),
         ("COORDINADOR", "calificaciones:importar", False),
         ("COORDINADOR", "atrasados:ver",           False),
@@ -108,9 +113,11 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         ("COORDINADOR", "avisos:publicar",         False),
         ("COORDINADOR", "equipos:asignar",         False),
         ("COORDINADOR", "padron:importar",         False),
+        ("COORDINADOR", "estructura:gestionar",      False),
         ("COORDINADOR", "auditoria:ver",           True),  # (propio)
 
         # ADMIN
+        ("ADMIN", "coloquios:gestionar",       False),
         ("ADMIN", "avisos:confirmar",          False),
         ("ADMIN", "calificaciones:importar",   False),
         ("ADMIN", "atrasados:ver",             False),
@@ -138,6 +145,22 @@ def get_matriz_seed() -> list[tuple[str, str, bool]]:
         ("FINANZAS", "facturas:gestionar",     False),
 
         # NEXO — sin permisos predefinidos (configurable por tenant)
+
+        # Perfil e inbox: cualquier usuario autenticado
+        ("ALUMNO",      "perfil:editar", False),
+        ("ALUMNO",      "inbox:usar",    False),
+        ("TUTOR",       "perfil:editar", False),
+        ("TUTOR",       "inbox:usar",    False),
+        ("PROFESOR",    "perfil:editar", False),
+        ("PROFESOR",    "inbox:usar",    False),
+        ("COORDINADOR", "perfil:editar", False),
+        ("COORDINADOR", "inbox:usar",    False),
+        ("NEXO",        "perfil:editar", False),
+        ("NEXO",        "inbox:usar",    False),
+        ("ADMIN",       "perfil:editar", False),
+        ("ADMIN",       "inbox:usar",    False),
+        ("FINANZAS",    "perfil:editar", False),
+        ("FINANZAS",    "inbox:usar",    False),
     ]
 
 
