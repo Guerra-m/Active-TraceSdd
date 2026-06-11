@@ -220,9 +220,12 @@ async def test_coordinador_calificaciones_importar_is_own_resource_false(
 
 
 @pytest.mark.asyncio
-async def test_nexo_has_no_predefined_permissions(db_session: AsyncSession):
-    """NEXO existe como rol pero no tiene permisos predefinidos."""
+async def test_nexo_has_only_baseline_permissions(db_session: AsyncSession):
+    """NEXO tiene únicamente los permisos base (perfil:editar, inbox:usar).
+    No tiene permisos de dominio de negocio (equipos, atrasados, comunicaciones, etc.).
+    Los permisos base fueron agregados en C-20 para todos los roles."""
     from app.models.rol import Rol
+    from app.models.permiso import Permiso
     from app.models.rol_permiso import RolPermiso
 
     r_result = await db_session.execute(select(Rol).where(Rol.code == "NEXO"))
@@ -233,6 +236,13 @@ async def test_nexo_has_no_predefined_permissions(db_session: AsyncSession):
         select(RolPermiso).where(RolPermiso.rol_id == nexo.id)
     )
     nexo_perms = rp_result.scalars().all()
-    assert len(nexo_perms) == 0, (
-        f"NEXO no debe tener permisos predefinidos, tiene: {len(nexo_perms)}"
+
+    perm_ids = [rp.permiso_id for rp in nexo_perms]
+    p_result = await db_session.execute(
+        select(Permiso).where(Permiso.id.in_(perm_ids))
+    )
+    perm_codes = {p.code for p in p_result.scalars().all()}
+
+    assert perm_codes == {"perfil:editar", "inbox:usar"}, (
+        f"NEXO debe tener solo los permisos base, tiene: {perm_codes}"
     )

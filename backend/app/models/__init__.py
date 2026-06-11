@@ -32,6 +32,9 @@ from app.models.aviso import Aviso, AcknowledgmentAviso
 from app.models.tarea import Tarea, ComentarioTarea
 from app.models.programa_materia import FechaAcademica, ProgramaMateria
 from app.models.mensaje_interno import HiloMensaje, MensajeInterno
+from app.models.salario import SalarioBase, SalarioPlus
+from app.models.liquidacion import Liquidacion
+from app.models.factura import Factura
 
 __all__ = [
     "TenantScopedBase",
@@ -68,4 +71,8 @@ __all__ = [
     "ProgramaMateria",
     "HiloMensaje",
     "MensajeInterno",
+    "SalarioBase",
+    "SalarioPlus",
+    "Liquidacion",
+    "Factura",
 ]

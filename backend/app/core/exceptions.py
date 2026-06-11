@@ -1,13 +1,28 @@
 """Excepciones y handlers estandarizados de la aplicacion.
 
-RESERVADO para C-02+ (handlers de errores de dominio y HTTP).
-
-Este modulo implementara:
-  - Excepciones de dominio base (DomainError, NotFoundError, ConflictError, etc.)
-  - Exception handlers de FastAPI para respuestas HTTP estandarizadas
-  - Handler para ValidationError de Pydantic → 422 con cuerpo estructurado
-  - Handler para errores de tenancy y RBAC → 403/404 sin revelar info de otros tenants
-  - Formato de error estandar: {"code": "...", "message": "...", "details": [...]}
+Excepciones de dominio usadas por los servicios para señalizar
+condiciones de error específicas del negocio.
 """
 
-# RESERVADO → C-02+
+
+class DomainError(Exception):
+    """Excepción base para errores de dominio."""
+    pass
+
+
+class LiquidacionCerradaError(DomainError):
+    """Se intenta modificar o cerrar una liquidación ya cerrada (RN-22)."""
+
+    def __init__(self, liquidacion_id=None):
+        msg = "La liquidación ya está cerrada y es inmutable."
+        if liquidacion_id:
+            msg = f"La liquidación {liquidacion_id} ya está cerrada y es inmutable."
+        super().__init__(msg)
+
+
+class SalarioNoEncontradoError(DomainError):
+    """No existe salario vigente para el rol y período solicitado."""
+
+    def __init__(self, rol: str = "", periodo: str = ""):
+        msg = f"No existe salario vigente para rol='{rol}' en período '{periodo}'."
+        super().__init__(msg)

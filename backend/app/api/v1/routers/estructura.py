@@ -280,6 +280,7 @@ async def create_materia(
         codigo=payload.codigo,
         nombre=payload.nombre,
         estado="Activa",
+        grupo_plus=payload.grupo_plus,
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
     )
@@ -323,6 +324,7 @@ async def update_materia(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Materia no encontrada")
     materia.codigo = payload.codigo
     materia.nombre = payload.nombre
+    materia.grupo_plus = payload.grupo_plus
     try:
         materia = await repo.update(materia)
         await db.commit()
