@@ -23,6 +23,9 @@ class Materia(TenantScopedBase, Base):
     nombre = Column(String(200), nullable=False)
     estado = Column(String(20), nullable=False, default="Activa", server_default="Activa")
 
+    # PA-22 resuelto: clave de Plus para esta materia; NULL = no genera Plus
+    grupo_plus = Column(String(50), nullable=True, default=None)
+
     __table_args__ = (
         UniqueConstraint("tenant_id", "codigo", name="uq_materias_tenant_codigo"),
         CheckConstraint("estado IN ('Activa', 'Inactiva')", name="ck_materias_estado"),

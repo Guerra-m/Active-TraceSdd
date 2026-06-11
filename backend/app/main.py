@@ -165,6 +165,15 @@ def create_app() -> FastAPI:
     from app.api.v1.routers.auditoria import router as auditoria_router
     application.include_router(auditoria_router)
 
+    from app.api.v1.routers.liquidaciones import router as liquidaciones_router
+    application.include_router(liquidaciones_router)
+
+    from app.api.v1.routers.salarios import router as salarios_router
+    application.include_router(salarios_router)
+
+    from app.api.v1.routers.facturas import router as facturas_router
+    application.include_router(facturas_router)
+
     return application
 
 

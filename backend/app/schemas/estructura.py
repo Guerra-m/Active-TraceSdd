@@ -90,6 +90,7 @@ class MateriaCreate(BaseModel):
 
     codigo: str
     nombre: str
+    grupo_plus: str | None = None
 
 
 class MateriaUpdate(BaseModel):
@@ -97,6 +98,7 @@ class MateriaUpdate(BaseModel):
 
     codigo: str
     nombre: str
+    grupo_plus: str | None = None
 
 
 class MateriaEstadoUpdate(BaseModel):
@@ -113,5 +115,6 @@ class MateriaResponse(BaseModel):
     codigo: str
     nombre: str
     estado: str
+    grupo_plus: str | None
     created_at: datetime
     updated_at: datetime
