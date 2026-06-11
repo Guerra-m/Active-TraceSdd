@@ -15,18 +15,12 @@ function createWrapper() {
 }
 
 const mockMetrics: MonitorMetrics = {
-  alumnos_atrasados: 5,
-  entregas_pendientes: 12,
+  total_alumnos: 25,
+  atrasados: 5,
+  al_dia: 20,
+  promedio_general: 8.5,
   comunicaciones_enviadas: 30,
-  tasa_contacto: 0.85,
-  resumen_por_materia: [
-    {
-      materia_id: 'mat-1',
-      materia_nombre: 'Matemática I',
-      atrasados: 3,
-      al_dia: 20,
-    },
-  ],
+  comunicaciones_pendientes: 12,
 }
 
 describe('useMonitor', () => {
@@ -41,8 +35,8 @@ describe('useMonitor', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(result.current.data?.alumnos_atrasados).toBe(5)
-    expect(result.current.data?.tasa_contacto).toBe(0.85)
+    expect(result.current.data?.atrasados).toBe(5)
+    expect(result.current.data?.promedio_general).toBe(8.5)
   })
 
   it('pasa filtros de fechas al servicio', async () => {

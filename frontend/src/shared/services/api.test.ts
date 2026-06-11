@@ -25,7 +25,7 @@ describe('api interceptors', () => {
 
   it('2.4 - instancia api existe y tiene baseURL configurada', () => {
     expect(api).toBeDefined()
-    expect(api.defaults.baseURL).toBe('/api')
+    expect(api.defaults.baseURL).toBe('/api/v1')
   })
 
   it('2.4 - api tiene withCredentials en true', () => {

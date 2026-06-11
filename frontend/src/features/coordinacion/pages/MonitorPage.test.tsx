@@ -26,13 +26,12 @@ function mockAuth(permissions: string[]) {
 }
 
 const mockMetrics: MonitorMetrics = {
-  alumnos_atrasados: 7,
-  entregas_pendientes: 15,
+  total_alumnos: 25,
+  atrasados: 7,
+  al_dia: 18,
+  promedio_general: 7.8,
   comunicaciones_enviadas: 42,
-  tasa_contacto: 0.78,
-  resumen_por_materia: [
-    { materia_id: 'm1', materia_nombre: 'Física I', atrasados: 4, al_dia: 18 },
-  ],
+  comunicaciones_pendientes: 15,
 }
 
 describe('MonitorPage', () => {
@@ -51,7 +50,7 @@ describe('MonitorPage', () => {
     })
     expect(screen.getByText('15')).toBeInTheDocument()
     expect(screen.getByText('42')).toBeInTheDocument()
-    expect(screen.getByText('78%')).toBeInTheDocument()
+    expect(screen.getByText('7.8')).toBeInTheDocument()
   })
 
   it('muestra fallback sin permiso atrasados:ver', () => {
@@ -80,14 +79,15 @@ describe('MonitorPage', () => {
     })
   })
 
-  it('muestra resumen por materia', async () => {
+  it('muestra total de alumnos y pendientes', async () => {
     mockAuth(['atrasados:ver'])
     vi.spyOn(monitorService, 'fetchMonitor').mockResolvedValue(mockMetrics)
 
     renderWithProviders(<MonitorPage />)
 
     await waitFor(() => {
-      expect(screen.getByText('Física I')).toBeInTheDocument()
+      expect(screen.getByText('25')).toBeInTheDocument()
     })
+    expect(screen.getByText('18')).toBeInTheDocument()
   })
 })

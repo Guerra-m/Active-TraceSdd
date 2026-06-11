@@ -10,23 +10,21 @@ import type {
   AsignacionMasivaPayload,
   ClonarEquipoPayload,
   VigenciaBulkPayload,
-  PageParams,
 } from '../types'
 
 export const EQUIPOS_KEY = 'coordinacion-equipos'
 
-export function useEquipos(params?: PageParams) {
+export function useEquipos() {
   return useQuery({
-    queryKey: [EQUIPOS_KEY, params],
-    queryFn: () => fetchEquipos(params),
+    queryKey: [EQUIPOS_KEY],
+    queryFn: () => fetchEquipos(),
   })
 }
 
 export function useAsignacionMasiva() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ equipoId, payload }: { equipoId: string; payload: AsignacionMasivaPayload }) =>
-      asignacionMasiva(equipoId, payload),
+    mutationFn: (payload: AsignacionMasivaPayload) => asignacionMasiva(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [EQUIPOS_KEY] })
     },
@@ -36,8 +34,7 @@ export function useAsignacionMasiva() {
 export function useClonarEquipo() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ equipoId, payload }: { equipoId: string; payload: ClonarEquipoPayload }) =>
-      clonarEquipo(equipoId, payload),
+    mutationFn: (payload: ClonarEquipoPayload) => clonarEquipo(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [EQUIPOS_KEY] })
     },

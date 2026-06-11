@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { AvisosPage } from './AvisosPage'
 import * as AuthContextModule from '@/features/auth/context/AuthContext'
 import * as avisosService from '../services/avisosService'
-import type { PagedResponse, Aviso } from '../types'
+import type { Aviso } from '../types'
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -27,23 +27,22 @@ function mockAuth(permissions: string[]) {
 
 const mockAviso: Aviso = {
   id: 'av-1',
+  tenant_id: 't1',
+  alcance: 'Global',
+  materia_id: null,
+  cohorte_id: null,
+  rol_destino: null,
+  severidad: 'Info',
   titulo: 'Aviso de prueba',
   cuerpo: 'Cuerpo del aviso',
-  scope: 'Global',
-  estado: 'publicado',
-  fecha_publicacion: '2024-06-01',
-  fecha_expiracion: null,
+  inicio_en: '2024-06-01T00:00:00Z',
+  fin_en: null,
+  orden: 0,
+  activo: true,
   requiere_ack: false,
-  leido_por_mi: false,
-  tenant_id: 't1',
 }
 
-const mockAvisoList: PagedResponse<Aviso> = {
-  items: [mockAviso],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
+const mockAvisos: Aviso[] = [mockAviso]
 
 describe('AvisosPage', () => {
   beforeEach(() => {
@@ -52,7 +51,7 @@ describe('AvisosPage', () => {
 
   it('muestra listado de avisos con permiso avisos:publicar', async () => {
     mockAuth(['avisos:publicar'])
-    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisoList)
+    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisos)
 
     renderWithProviders(<AvisosPage />)
 
@@ -73,7 +72,7 @@ describe('AvisosPage', () => {
   it('abre modal de nuevo aviso al hacer clic', async () => {
     const user = userEvent.setup()
     mockAuth(['avisos:publicar'])
-    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisoList)
+    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisos)
 
     renderWithProviders(<AvisosPage />)
 
@@ -87,7 +86,7 @@ describe('AvisosPage', () => {
   it('valida título vacío al crear aviso', async () => {
     const user = userEvent.setup()
     mockAuth(['avisos:publicar'])
-    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisoList)
+    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisos)
 
     renderWithProviders(<AvisosPage />)
 

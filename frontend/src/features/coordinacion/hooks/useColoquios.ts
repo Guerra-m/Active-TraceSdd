@@ -5,42 +5,41 @@ import {
   importarAlumnos,
   fetchMetricas,
 } from '../services/coloquiosService'
-import type { CreateConvocatoriaPayload, ImportarAlumnosPayload, PageParams } from '../types'
+import type { CreateEvaluacionPayload, ImportarAlumnosPayload } from '../types'
 
 export const CONVOCATORIAS_KEY = 'coordinacion-convocatorias'
-export const METRICAS_KEY = 'coordinacion-metricas'
+export const METRICAS_KEY = 'coordinacion-coloquios-metricas'
 
-export function useConvocatorias(params?: PageParams) {
+export function useConvocatorias() {
   return useQuery({
-    queryKey: [CONVOCATORIAS_KEY, params],
-    queryFn: () => fetchConvocatorias(params),
+    queryKey: [CONVOCATORIAS_KEY],
+    queryFn: () => fetchConvocatorias(),
   })
 }
 
 export function useCreateConvocatoria() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (payload: CreateConvocatoriaPayload) => createConvocatoria(payload),
+    mutationFn: (payload: CreateEvaluacionPayload) => createConvocatoria(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [CONVOCATORIAS_KEY] })
     },
   })
 }
 
-export function useImportarAlumnos(convocatoriaId: string) {
+export function useImportarAlumnos(evaluacionId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (payload: ImportarAlumnosPayload) => importarAlumnos(convocatoriaId, payload),
+    mutationFn: (payload: ImportarAlumnosPayload) => importarAlumnos(evaluacionId, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [CONVOCATORIAS_KEY] })
     },
   })
 }
 
-export function useMetricasColoquio(convocatoriaId: string) {
+export function useMetricasColoquios() {
   return useQuery({
-    queryKey: [METRICAS_KEY, convocatoriaId],
-    queryFn: () => fetchMetricas(convocatoriaId),
-    enabled: !!convocatoriaId,
+    queryKey: [METRICAS_KEY],
+    queryFn: () => fetchMetricas(),
   })
 }

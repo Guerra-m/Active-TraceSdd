@@ -6,30 +6,41 @@ import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
 import {
   useEncuentrosAdmin,
-  useCrearSlotsRecurrentes,
+  useCrearSlot,
   useUpdateEncuentro,
 } from '../hooks/useEncuentrosAdmin'
 import type { EncuentroAdmin, EncuentroEstado } from '../types'
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
-const slotSchema = z.object({
-  dia_semana: z.number({ invalid_type_error: 'Seleccione un día' }).min(0).max(6),
-  hora: z.string().min(1, 'La hora es requerida'),
-  recurrencia: z.enum(['semanal', 'quincenal']),
-  periodo: z.string().min(1, 'El período es requerido'),
-  tutor_id: z.string().min(1, 'El tutor es requerido'),
-})
+const slotSchema = z
+  .object({
+    materia_id: z.string().min(1, 'La materia es requerida'),
+    titulo: z.string().min(1, 'El título es requerido'),
+    hora: z.string().min(1, 'La hora es requerida'),
+    modo: z.enum(['recurrente', 'unico']),
+    dia_semana: z.string().optional(),
+    fecha_inicio: z.string().optional(),
+    cant_semanas: z.coerce.number().optional(),
+    fecha_unica: z.string().optional(),
+    meet_url: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.modo === 'recurrente') {
+      if (!data.dia_semana) ctx.addIssue({ code: 'custom', path: ['dia_semana'], message: 'Requerido' })
+      if (!data.fecha_inicio) ctx.addIssue({ code: 'custom', path: ['fecha_inicio'], message: 'Requerido' })
+      if (!data.cant_semanas) ctx.addIssue({ code: 'custom', path: ['cant_semanas'], message: 'Requerido' })
+    } else {
+      if (!data.fecha_unica) ctx.addIssue({ code: 'custom', path: ['fecha_unica'], message: 'Requerida' })
+    }
+  })
 
 type SlotForm = z.infer<typeof slotSchema>
 
-const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
-
 const ESTADO_LABELS: Record<EncuentroEstado, string> = {
-  programado: 'Programado',
-  realizado: 'Realizado',
-  cancelado: 'Cancelado',
-  ausente: 'Ausente',
+  Programado: 'Programado',
+  Realizado: 'Realizado',
+  Cancelado: 'Cancelado',
 }
 
 // ─── EditEncuentroModal ───────────────────────────────────────────────────────
@@ -42,13 +53,13 @@ function EditEncuentroModal({
   onClose: () => void
 }) {
   const updateMutation = useUpdateEncuentro()
-  const [fecha, setFecha] = useState(encuentro.fecha)
-  const [hora, setHora] = useState(encuentro.hora)
   const [estado, setEstado] = useState<EncuentroEstado>(encuentro.estado)
+  const [meetUrl, setMeetUrl] = useState(encuentro.meet_url ?? '')
+  const [comentario, setComentario] = useState(encuentro.comentario ?? '')
 
   const handleSave = () => {
     updateMutation.mutate(
-      { id: encuentro.id, payload: { fecha, hora, estado } },
+      { id: encuentro.id, payload: { estado, meet_url: meetUrl || undefined, comentario: comentario || undefined } },
       { onSuccess: onClose },
     )
   }
@@ -57,31 +68,10 @@ function EditEncuentroModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <h2 className="mb-4 text-lg font-semibold">Editar encuentro</h2>
+        <p className="mb-3 text-sm text-gray-500">
+          {encuentro.titulo} — {encuentro.fecha} {encuentro.hora}
+        </p>
         <div className="space-y-3">
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="enc-fecha">
-              Fecha
-            </label>
-            <input
-              id="enc-fecha"
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              className="w-full rounded border border-border p-2"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="enc-hora">
-              Hora
-            </label>
-            <input
-              id="enc-hora"
-              type="time"
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-              className="w-full rounded border border-border p-2"
-            />
-          </div>
           <div>
             <label className="mb-1 block text-sm font-medium" htmlFor="enc-estado">
               Estado
@@ -92,12 +82,35 @@ function EditEncuentroModal({
               onChange={(e) => setEstado(e.target.value as EncuentroEstado)}
               className="w-full rounded border border-border p-2"
             >
-              {Object.entries(ESTADO_LABELS).map(([v, l]) => (
+              {(Object.keys(ESTADO_LABELS) as EncuentroEstado[]).map((v) => (
                 <option key={v} value={v}>
-                  {l}
+                  {ESTADO_LABELS[v]}
                 </option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium" htmlFor="enc-meet">
+              URL Meet (opcional)
+            </label>
+            <input
+              id="enc-meet"
+              value={meetUrl}
+              onChange={(e) => setMeetUrl(e.target.value)}
+              className="w-full rounded border border-border p-2"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium" htmlFor="enc-comentario">
+              Comentario (opcional)
+            </label>
+            <textarea
+              id="enc-comentario"
+              value={comentario}
+              onChange={(e) => setComentario(e.target.value)}
+              rows={3}
+              className="w-full rounded border border-border p-2"
+            />
           </div>
           {updateMutation.isError && (
             <p role="alert" className="text-sm text-red-600">
@@ -128,107 +141,175 @@ function EditEncuentroModal({
 // ─── SlotModal ────────────────────────────────────────────────────────────────
 
 function SlotModal({ onClose }: { onClose: () => void }) {
-  const slotMutation = useCrearSlotsRecurrentes()
+  const slotMutation = useCrearSlot()
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
-  } = useForm<SlotForm>({ resolver: zodResolver(slotSchema) })
+  } = useForm<SlotForm>({
+    resolver: zodResolver(slotSchema),
+    defaultValues: { modo: 'recurrente' },
+  })
+
+  const modo = watch('modo')
 
   const onSubmit = (data: SlotForm) => {
-    slotMutation.mutate(data, { onSuccess: onClose })
+    const payload = {
+      materia_id: data.materia_id,
+      titulo: data.titulo,
+      hora: data.hora,
+      meet_url: data.meet_url || undefined,
+      ...(data.modo === 'recurrente'
+        ? { dia_semana: data.dia_semana, fecha_inicio: data.fecha_inicio, cant_semanas: data.cant_semanas }
+        : { fecha_unica: data.fecha_unica }),
+    }
+    slotMutation.mutate(payload, { onSuccess: onClose })
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-lg font-semibold">Crear slots recurrentes</h2>
+        <h2 className="mb-4 text-lg font-semibold">Crear slot</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="dia_semana">
-              Día de la semana
-            </label>
-            <select
-              id="dia_semana"
-              {...register('dia_semana', { valueAsNumber: true })}
-              className="w-full rounded border border-border p-2"
-            >
-              <option value="">Seleccionar día</option>
-              {DIAS.map((dia, idx) => (
-                <option key={dia} value={idx}>
-                  {dia}
-                </option>
-              ))}
-            </select>
-            {errors.dia_semana && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.dia_semana.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="slot-hora">
-              Hora
+            <label className="mb-1 block text-sm font-medium" htmlFor="sl-materia">
+              ID Materia
             </label>
             <input
-              id="slot-hora"
-              type="time"
-              {...register('hora')}
+              id="sl-materia"
+              {...register('materia_id')}
               className="w-full rounded border border-border p-2"
             />
-            {errors.hora && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.hora.message}
-              </p>
+            {errors.materia_id && (
+              <p role="alert" className="mt-1 text-sm text-red-600">{errors.materia_id.message}</p>
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="recurrencia">
-              Recurrencia
-            </label>
-            <select
-              id="recurrencia"
-              {...register('recurrencia')}
-              className="w-full rounded border border-border p-2"
-            >
-              <option value="semanal">Semanal</option>
-              <option value="quincenal">Quincenal</option>
-            </select>
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="slot-periodo">
-              Período
+            <label className="mb-1 block text-sm font-medium" htmlFor="sl-titulo">
+              Título
             </label>
             <input
-              id="slot-periodo"
-              {...register('periodo')}
-              placeholder="Ej: 2024-1"
+              id="sl-titulo"
+              {...register('titulo')}
               className="w-full rounded border border-border p-2"
             />
-            {errors.periodo && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.periodo.message}
-              </p>
+            {errors.titulo && (
+              <p role="alert" className="mt-1 text-sm text-red-600">{errors.titulo.message}</p>
             )}
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="sl-hora">
+                Hora
+              </label>
+              <input
+                id="sl-hora"
+                type="time"
+                {...register('hora')}
+                className="w-full rounded border border-border p-2"
+              />
+              {errors.hora && (
+                <p role="alert" className="mt-1 text-sm text-red-600">{errors.hora.message}</p>
+              )}
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="sl-modo">
+                Modo
+              </label>
+              <select
+                id="sl-modo"
+                {...register('modo')}
+                className="w-full rounded border border-border p-2"
+              >
+                <option value="recurrente">Recurrente</option>
+                <option value="unico">Único</option>
+              </select>
+            </div>
+          </div>
+
+          {modo === 'recurrente' ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="sl-dia">
+                  Día semana
+                </label>
+                <select
+                  id="sl-dia"
+                  {...register('dia_semana')}
+                  className="w-full rounded border border-border p-2"
+                >
+                  <option value="">Seleccionar</option>
+                  {['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'].map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                {errors.dia_semana && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errors.dia_semana.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="sl-semanas">
+                  Semanas
+                </label>
+                <input
+                  id="sl-semanas"
+                  type="number"
+                  min={1}
+                  max={52}
+                  {...register('cant_semanas')}
+                  className="w-full rounded border border-border p-2"
+                />
+                {errors.cant_semanas && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errors.cant_semanas.message}</p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <label className="mb-1 block text-sm font-medium" htmlFor="sl-inicio">
+                  Fecha inicio
+                </label>
+                <input
+                  id="sl-inicio"
+                  type="date"
+                  {...register('fecha_inicio')}
+                  className="w-full rounded border border-border p-2"
+                />
+                {errors.fecha_inicio && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errors.fecha_inicio.message}</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="sl-fecha-unica">
+                Fecha
+              </label>
+              <input
+                id="sl-fecha-unica"
+                type="date"
+                {...register('fecha_unica')}
+                className="w-full rounded border border-border p-2"
+              />
+              {errors.fecha_unica && (
+                <p role="alert" className="mt-1 text-sm text-red-600">{errors.fecha_unica.message}</p>
+              )}
+            </div>
+          )}
+
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="tutor_id">
-              ID Tutor
+            <label className="mb-1 block text-sm font-medium" htmlFor="sl-meet">
+              URL Meet (opcional)
             </label>
             <input
-              id="tutor_id"
-              {...register('tutor_id')}
+              id="sl-meet"
+              {...register('meet_url')}
               className="w-full rounded border border-border p-2"
             />
-            {errors.tutor_id && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.tutor_id.message}
-              </p>
-            )}
           </div>
+
           {slotMutation.isError && (
             <p role="alert" className="text-sm text-red-600">
-              Error al crear slots. Intentá de nuevo.
+              Error al crear slot. Intentá de nuevo.
             </p>
           )}
           <div className="flex justify-end gap-2">
@@ -244,7 +325,7 @@ function SlotModal({ onClose }: { onClose: () => void }) {
               disabled={slotMutation.isPending}
               className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {slotMutation.isPending ? 'Creando...' : 'Crear slots'}
+              {slotMutation.isPending ? 'Creando...' : 'Crear slot'}
             </button>
           </div>
         </form>
@@ -259,6 +340,7 @@ function EncuentrosAdminContent() {
   const { data, isLoading, isError } = useEncuentrosAdmin()
   const [editTarget, setEditTarget] = useState<EncuentroAdmin | null>(null)
   const [showSlotModal, setShowSlotModal] = useState(false)
+  const items = data ?? []
 
   if (isLoading) {
     return (
@@ -284,46 +366,52 @@ function EncuentrosAdminContent() {
           onClick={() => setShowSlotModal(true)}
           className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
         >
-          Crear slots recurrentes
+          Crear slot
         </button>
       </div>
 
-      {data?.items.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-gray-500">No hay encuentros registrados.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="p-3 text-left">Alumno</th>
-                <th className="p-3 text-left">Tutor</th>
+                <th className="p-3 text-left">Título</th>
                 <th className="p-3 text-left">Fecha</th>
                 <th className="p-3 text-left">Hora</th>
-                <th className="p-3 text-left">Tipo</th>
                 <th className="p-3 text-left">Estado</th>
+                <th className="p-3 text-left">Meet</th>
                 <th className="p-3 text-left">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {data?.items.map((enc) => (
+              {items.map((enc) => (
                 <tr key={enc.id} className="border-b border-border">
-                  <td className="p-3">{enc.alumno_nombre}</td>
-                  <td className="p-3">{enc.tutor_nombre}</td>
+                  <td className="p-3 font-medium">{enc.titulo}</td>
                   <td className="p-3">{enc.fecha}</td>
                   <td className="p-3">{enc.hora}</td>
-                  <td className="p-3 capitalize">{enc.tipo}</td>
                   <td className="p-3">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        enc.estado === 'realizado'
+                        enc.estado === 'Realizado'
                           ? 'bg-green-100 text-green-700'
-                          : enc.estado === 'cancelado' || enc.estado === 'ausente'
+                          : enc.estado === 'Cancelado'
                             ? 'bg-red-100 text-red-700'
                             : 'bg-blue-100 text-blue-700'
                       }`}
                     >
                       {ESTADO_LABELS[enc.estado]}
                     </span>
+                  </td>
+                  <td className="p-3">
+                    {enc.meet_url ? (
+                      <a href={enc.meet_url} target="_blank" rel="noreferrer" className="text-blue-600 underline text-xs">
+                        Meet
+                      </a>
+                    ) : (
+                      '—'
+                    )}
                   </td>
                   <td className="p-3">
                     <button

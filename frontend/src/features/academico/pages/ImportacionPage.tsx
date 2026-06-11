@@ -1,41 +1,43 @@
-import { useState } from 'react'
-import { usePreviewCalificaciones, useImportarCalificaciones } from '../hooks/useImportacion'
+import { useRef, useState } from 'react'
+import { useImportarCalificaciones } from '../hooks/useImportacion'
 
 interface ImportacionPageProps {
-  comisionId: string
+  asignacionId: string
+  materiaId: string
 }
 
-export function ImportacionPage({ comisionId }: ImportacionPageProps) {
-  const [seleccionadas, setSeleccionadas] = useState<string[]>([])
-  const [errorSeleccion, setErrorSeleccion] = useState<string | null>(null)
-  const [mensajeExito, setMensajeExito] = useState<string | null>(null)
+export function ImportacionPage({ asignacionId, materiaId }: ImportacionPageProps) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [archivo, setArchivo] = useState<File | null>(null)
+  const [resultado, setResultado] = useState<{ filas: number; actividades: string[] } | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  const { data: actividades, isLoading } = usePreviewCalificaciones(comisionId)
   const importar = useImportarCalificaciones()
 
-  function toggleActividad(id: string) {
-    setErrorSeleccion(null)
-    setSeleccionadas((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    )
+  const sinContexto = !asignacionId || !materiaId
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setResultado(null)
+    setErrorMsg(null)
+    setArchivo(e.target.files?.[0] ?? null)
   }
 
   function handleImportar() {
-    if (seleccionadas.length === 0) {
-      setErrorSeleccion('Seleccioná al menos una actividad')
+    if (!archivo) {
+      setErrorMsg('Seleccioná un archivo xlsx o csv')
       return
     }
-    setMensajeExito(null)
+    setErrorMsg(null)
+    setResultado(null)
     importar.mutate(
-      { comision_id: comisionId, actividad_ids: seleccionadas },
+      { asignacionId, materiaId, archivo },
       {
-        onSuccess: (result) => {
-          setMensajeExito(result.mensaje)
-          setSeleccionadas([])
+        onSuccess: (res) => {
+          setResultado({ filas: res.filas_importadas, actividades: res.actividades_detectadas })
+          setArchivo(null)
+          if (fileRef.current) fileRef.current.value = ''
         },
-        onError: () => {
-          setErrorSeleccion('Error al importar. Intentá de nuevo.')
-        },
+        onError: () => setErrorMsg('Error al importar. Verificá el formato del archivo.'),
       },
     )
   }
@@ -44,41 +46,32 @@ export function ImportacionPage({ comisionId }: ImportacionPageProps) {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-text">Importar calificaciones</h1>
 
-      {isLoading && <p className="text-text-muted">Cargando actividades...</p>}
-
-      {actividades && actividades.length === 0 && (
-        <p className="text-text-muted">No hay actividades disponibles para importar</p>
+      {sinContexto && (
+        <p className="text-text-muted">No hay asignación seleccionada.</p>
       )}
 
-      {actividades && actividades.length > 0 && (
-        <div className="space-y-4">
+      {!sinContexto && (
+        <div className="max-w-md space-y-4">
           <p className="text-sm text-text-muted">
-            Seleccioná las actividades cuyas calificaciones querés importar desde Moodle.
+            Subí el archivo de calificaciones exportado desde Moodle (xlsx o csv).
           </p>
 
-          <div className="space-y-2 rounded-lg border border-surface-subtle p-4">
-            {actividades.map((act) => (
-              <label key={act.id} className="flex cursor-pointer items-center gap-3 hover:bg-surface-subtle rounded p-2">
-                <input
-                  type="checkbox"
-                  id={act.id}
-                  aria-label={act.nombre}
-                  checked={seleccionadas.includes(act.id)}
-                  onChange={() => toggleActividad(act.id)}
-                  className="h-4 w-4"
-                />
-                <span className="text-sm text-text">{act.nombre}</span>
-                <span className="ml-auto text-xs text-text-muted">{act.tipo} · {act.fecha}</span>
-              </label>
-            ))}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="archivo" className="text-sm font-medium text-text">
+              Archivo de calificaciones
+            </label>
+            <input
+              id="archivo"
+              ref={fileRef}
+              type="file"
+              accept=".xlsx,.csv"
+              onChange={handleFileChange}
+              className="text-sm text-text"
+            />
           </div>
 
-          {errorSeleccion && (
-            <p className="text-sm text-red-600" role="alert">{errorSeleccion}</p>
-          )}
-
-          {mensajeExito && (
-            <p className="text-sm text-green-600" role="status">{mensajeExito}</p>
+          {errorMsg && (
+            <p className="text-sm text-red-600" role="alert">{errorMsg}</p>
           )}
 
           <button
@@ -87,8 +80,21 @@ export function ImportacionPage({ comisionId }: ImportacionPageProps) {
             disabled={importar.isPending}
             className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
           >
-            {importar.isPending ? 'Importando...' : 'Importar seleccionadas'}
+            {importar.isPending ? 'Importando...' : 'Importar'}
           </button>
+
+          {resultado && (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4 space-y-1">
+              <p className="text-sm font-medium text-green-800">
+                Importación exitosa: {resultado.filas} filas procesadas
+              </p>
+              {resultado.actividades.length > 0 && (
+                <p className="text-xs text-green-700">
+                  Actividades detectadas: {resultado.actividades.join(', ')}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

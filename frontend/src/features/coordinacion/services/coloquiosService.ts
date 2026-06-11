@@ -1,35 +1,33 @@
 import { api } from '@/shared/services/api'
 import type {
-  Convocatoria,
-  ConvocatoriaMetrics,
-  CreateConvocatoriaPayload,
+  EvaluacionItem,
+  MetricasColoquio,
+  CreateEvaluacionPayload,
   ImportarAlumnosPayload,
-  PageParams,
-  PagedResponse,
 } from '../types'
 
-export async function fetchConvocatorias(
-  params?: PageParams,
-): Promise<PagedResponse<Convocatoria>> {
-  const { data } = await api.get<PagedResponse<Convocatoria>>('/coloquios', { params })
+export async function fetchConvocatorias(): Promise<EvaluacionItem[]> {
+  const { data } = await api.get<EvaluacionItem[]>('/coloquios')
   return data
 }
 
-export async function createConvocatoria(
-  payload: CreateConvocatoriaPayload,
-): Promise<Convocatoria> {
-  const { data } = await api.post<Convocatoria>('/coloquios', payload)
+export async function createConvocatoria(payload: CreateEvaluacionPayload): Promise<EvaluacionItem> {
+  const { data } = await api.post<EvaluacionItem>('/coloquios', payload)
   return data
 }
 
 export async function importarAlumnos(
-  convocatoriaId: string,
+  evaluacionId: string,
   payload: ImportarAlumnosPayload,
-): Promise<void> {
-  await api.post(`/coloquios/${convocatoriaId}/alumnos`, payload)
+): Promise<{ importados: number; total_enviados: number }> {
+  const { data } = await api.post<{ importados: number; total_enviados: number }>(
+    `/coloquios/${evaluacionId}/alumnos`,
+    payload,
+  )
+  return data
 }
 
-export async function fetchMetricas(convocatoriaId: string): Promise<ConvocatoriaMetrics> {
-  const { data } = await api.get<ConvocatoriaMetrics>(`/coloquios/${convocatoriaId}/metricas`)
+export async function fetchMetricas(): Promise<MetricasColoquio> {
+  const { data } = await api.get<MetricasColoquio>('/coloquios/metricas')
   return data
 }

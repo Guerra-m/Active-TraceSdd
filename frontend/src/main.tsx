@@ -9,7 +9,12 @@ import './index.css'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: (failureCount, error) => {
+        const status = (error as { response?: { status?: number } })?.response?.status
+        // No reintentar en errores de auth — el interceptor de Axios ya los maneja
+        if (status === 401 || status === 403) return false
+        return failureCount < 1
+      },
       staleTime: 5 * 60 * 1000,
     },
   },

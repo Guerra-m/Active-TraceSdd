@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { api, setAccessToken, registerForceLogout } from '@/shared/services/api'
+import { api, setAccessToken, setRefreshToken, getRefreshToken, registerForceLogout } from '@/shared/services/api'
 import { Spinner } from '@/shared/components/Spinner'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -41,6 +41,7 @@ interface AuthProviderProps {
 
 interface RefreshResponse {
   access_token: string
+  refresh_token?: string
   user: AuthUser
   permissions: string[]
 }
@@ -60,10 +61,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = useCallback(async () => {
     try {
-      await api.post('/auth/logout')
+      const rt = getRefreshToken()
+      if (rt) {
+        await api.post('/auth/logout', { refresh_token: rt })
+      }
     } catch {
       // ignorar errores del logout remoto
     } finally {
+      setRefreshToken(null)
       setAuth({ user: null, permissions: [], accessToken: null })
       window.location.href = '/login'
     }
@@ -72,6 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Registrar logout forzado en el cliente API
   useEffect(() => {
     registerForceLogout(() => {
+      setRefreshToken(null)
       setAuthState({ user: null, permissions: [], accessToken: null })
       setAccessToken(null)
     })
@@ -82,9 +88,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     let cancelled = false
 
     const silentRefresh = async () => {
+      const storedToken = getRefreshToken()
+      if (!storedToken) {
+        setIsLoading(false)
+        return
+      }
       try {
-        const { data } = await api.post<RefreshResponse>('/auth/refresh')
+        const { data } = await api.post<RefreshResponse>('/auth/refresh', { refresh_token: storedToken })
         if (!cancelled) {
+          if (data.refresh_token) {
+            setRefreshToken(data.refresh_token)
+          }
           setAuth({
             user: data.user,
             permissions: data.permissions,

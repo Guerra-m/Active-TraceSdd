@@ -14,6 +14,7 @@ export function useLiquidaciones(filtros?: LiquidacionFiltros) {
   return useQuery({
     queryKey: [LIQUIDACIONES_KEY, filtros],
     queryFn: () => fetchLiquidaciones(filtros),
+    enabled: !!filtros?.periodo,
   })
 }
 
@@ -21,6 +22,7 @@ export function useLiquidacionKPIs(filtros?: { cohorte_id?: string; periodo?: st
   return useQuery({
     queryKey: [LIQUIDACION_KPIS_KEY, filtros],
     queryFn: () => fetchLiquidacionKPIs(filtros),
+    enabled: !!filtros?.periodo && !!filtros?.cohorte_id,
   })
 }
 

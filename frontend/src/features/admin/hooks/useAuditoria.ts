@@ -12,7 +12,7 @@ export function useAuditLogs(filtros?: AuditLogFiltros) {
   })
 }
 
-export function useAuditPanel(params?: { desde?: string; hasta?: string }) {
+export function useAuditPanel(params?: { fecha_desde?: string; fecha_hasta?: string }) {
   return useQuery({
     queryKey: [AUDIT_PANEL_KEY, params],
     queryFn: () => fetchAuditPanel(params),

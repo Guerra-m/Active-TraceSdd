@@ -2,33 +2,35 @@ import { useState, useEffect } from 'react'
 import { useUmbral, useActualizarUmbral } from '../hooks/useUmbral'
 
 interface UmbralPageProps {
-  comisionId: string
+  asignacionId: string
+  materiaId: string
 }
 
-export function UmbralPage({ comisionId }: UmbralPageProps) {
-  const { data: umbral, isLoading } = useUmbral(comisionId)
+export function UmbralPage({ asignacionId, materiaId }: UmbralPageProps) {
+  const { data: umbral, isLoading } = useUmbral(asignacionId, materiaId)
   const [porcentaje, setPorcentaje] = useState<number>(60)
   const [error, setError] = useState<string | null>(null)
   const [exito, setExito] = useState<string | null>(null)
 
-  const umbralId = umbral?.id ?? ''
-  const actualizar = useActualizarUmbral(umbralId, comisionId)
+  const actualizar = useActualizarUmbral(asignacionId, materiaId)
 
   useEffect(() => {
     if (umbral) {
-      setPorcentaje(umbral.porcentaje)
+      setPorcentaje(umbral.umbral_pct)
     }
   }, [umbral])
+
+  const sinContexto = !asignacionId || !materiaId
 
   function handleGuardar() {
     setError(null)
     setExito(null)
-    if (porcentaje < 0 || porcentaje > 100) {
-      setError('El valor debe estar entre 0 y 100')
+    if (porcentaje < 1 || porcentaje > 100) {
+      setError('El valor debe estar entre 1 y 100')
       return
     }
     actualizar.mutate(
-      { porcentaje },
+      { umbral_pct: porcentaje },
       {
         onSuccess: () => setExito('Umbral guardado correctamente'),
         onError: () => setError('Error al guardar el umbral'),
@@ -40,12 +42,16 @@ export function UmbralPage({ comisionId }: UmbralPageProps) {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-text">Configuración de umbral</h1>
 
-      {isLoading && <p className="text-text-muted">Cargando configuración...</p>}
+      {sinContexto && (
+        <p className="text-text-muted">No hay asignación seleccionada.</p>
+      )}
+
+      {isLoading && !sinContexto && <p className="text-text-muted">Cargando configuración...</p>}
 
       {umbral && (
         <div className="max-w-sm space-y-4 rounded-lg border border-surface-subtle p-6">
           <p className="text-sm text-text-muted">
-            Porcentaje mínimo de aprobación para la comisión.
+            Porcentaje mínimo de aprobación ({umbral.es_default ? 'valor por defecto' : 'configurado'}).
           </p>
 
           <div className="flex flex-col gap-1">
@@ -55,7 +61,7 @@ export function UmbralPage({ comisionId }: UmbralPageProps) {
             <input
               id="porcentaje"
               type="number"
-              min={0}
+              min={1}
               max={100}
               value={porcentaje}
               onChange={(e) => {
@@ -65,6 +71,12 @@ export function UmbralPage({ comisionId }: UmbralPageProps) {
               className="rounded-lg border border-surface-subtle px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
+
+          {umbral.valores_aprobatorios.length > 0 && (
+            <p className="text-xs text-text-muted">
+              Valores aprobatorios: {umbral.valores_aprobatorios.join(', ')}
+            </p>
+          )}
 
           {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
           {exito && <p className="text-sm text-green-600" role="status">{exito}</p>}

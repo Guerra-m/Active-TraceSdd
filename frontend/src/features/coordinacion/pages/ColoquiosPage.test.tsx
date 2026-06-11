@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { ColoquiosPage } from './ColoquiosPage'
 import * as AuthContextModule from '@/features/auth/context/AuthContext'
 import * as coloquiosService from '../services/coloquiosService'
-import type { PagedResponse, Convocatoria } from '../types'
+import type { EvaluacionItem, MetricasColoquio } from '../types'
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -25,23 +25,27 @@ function mockAuth(permissions: string[]) {
   })
 }
 
-const mockConvocatoria: Convocatoria = {
-  id: 'conv-1',
-  materia_id: 'mat-1',
-  materia_nombre: 'Química Orgánica',
-  fecha: '2024-09-15',
-  cupo: 25,
-  inscriptos: 10,
-  descripcion: 'Coloquio regular',
-  estado: 'abierta',
+const mockEvaluacion: EvaluacionItem = {
+  id: 'ev-1',
   tenant_id: 't1',
+  materia_id: 'mat-1',
+  cohorte_id: 'coh-1',
+  tipo: 'Coloquio',
+  instancia: 'Coloquio Regular 2024',
+  dias_disponibles: 3,
+  cupos_por_dia: 10,
 }
 
-const mockConvList: PagedResponse<Convocatoria> = {
-  items: [mockConvocatoria],
-  total: 1,
-  page: 1,
-  page_size: 20,
+const mockMetricas: MetricasColoquio = {
+  total_convocados: 30,
+  instancias_activas: 1,
+  reservas_activas: 5,
+  notas_registradas: 20,
+}
+
+function setupDefaultMocks() {
+  vi.spyOn(coloquiosService, 'fetchConvocatorias').mockResolvedValue([mockEvaluacion])
+  vi.spyOn(coloquiosService, 'fetchMetricas').mockResolvedValue(mockMetricas)
 }
 
 describe('ColoquiosPage', () => {
@@ -51,14 +55,14 @@ describe('ColoquiosPage', () => {
 
   it('muestra listado de convocatorias con permiso coloquios:read', async () => {
     mockAuth(['coloquios:read'])
-    vi.spyOn(coloquiosService, 'fetchConvocatorias').mockResolvedValue(mockConvList)
+    setupDefaultMocks()
 
     renderWithProviders(<ColoquiosPage />)
 
     await waitFor(() => {
-      expect(screen.getByText('Química Orgánica')).toBeInTheDocument()
+      expect(screen.getByText('Coloquio Regular 2024')).toBeInTheDocument()
     })
-    expect(screen.getByText('Abierta')).toBeInTheDocument()
+    expect(screen.getByText('Coloquio')).toBeInTheDocument()
   })
 
   it('muestra fallback sin permiso coloquios:read', () => {
@@ -69,17 +73,16 @@ describe('ColoquiosPage', () => {
     expect(screen.getByText(/no tenés permiso/i)).toBeInTheDocument()
   })
 
-  it('valida cupo inválido (0) al crear convocatoria', async () => {
+  it('valida campos requeridos al crear convocatoria', async () => {
     const user = userEvent.setup()
     mockAuth(['coloquios:read'])
-    vi.spyOn(coloquiosService, 'fetchConvocatorias').mockResolvedValue(mockConvList)
+    setupDefaultMocks()
 
     renderWithProviders(<ColoquiosPage />)
 
-    await waitFor(() => screen.getByText('Química Orgánica'))
+    await waitFor(() => screen.getByText('Coloquio Regular 2024'))
     await user.click(screen.getByRole('button', { name: /nueva convocatoria/i }))
 
-    // Click submit without filling any field — should trigger validation on all required fields
     await user.click(screen.getByRole('button', { name: /crear convocatoria/i }))
 
     await waitFor(() => {
@@ -89,12 +92,8 @@ describe('ColoquiosPage', () => {
 
   it('muestra mensaje cuando no hay convocatorias', async () => {
     mockAuth(['coloquios:read'])
-    vi.spyOn(coloquiosService, 'fetchConvocatorias').mockResolvedValue({
-      items: [],
-      total: 0,
-      page: 1,
-      page_size: 20,
-    })
+    vi.spyOn(coloquiosService, 'fetchConvocatorias').mockResolvedValue([])
+    vi.spyOn(coloquiosService, 'fetchMetricas').mockResolvedValue(mockMetricas)
 
     renderWithProviders(<ColoquiosPage />)
 

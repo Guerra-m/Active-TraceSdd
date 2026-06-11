@@ -1,7 +1,8 @@
 import { useMonitor } from '../hooks/useMonitor'
 
 interface MonitorPageProps {
-  comisionId: string
+  asignacionId: string
+  materiaId: string
 }
 
 interface MetricCardProps {
@@ -18,16 +19,19 @@ function MetricCard({ label, value }: MetricCardProps) {
   )
 }
 
-export function MonitorPage({ comisionId }: MonitorPageProps) {
-  const { data, isLoading, isError, refetch } = useMonitor(comisionId)
+export function MonitorPage({ asignacionId, materiaId }: MonitorPageProps) {
+  const { data, isLoading, isError, refetch } = useMonitor(asignacionId, materiaId)
+
+  const sinContexto = !asignacionId || !materiaId
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-text">Monitor de seguimiento</h1>
 
-      {isLoading && <p className="text-text-muted">Cargando datos del monitor...</p>}
+      {sinContexto && <p className="text-text-muted">No hay asignación seleccionada.</p>}
+      {!sinContexto && isLoading && <p className="text-text-muted">Cargando datos del monitor...</p>}
 
-      {isError && (
+      {!sinContexto && isError && (
         <div className="space-y-2">
           <p className="text-red-600">Error al cargar los datos del monitor.</p>
           <button
@@ -45,7 +49,10 @@ export function MonitorPage({ comisionId }: MonitorPageProps) {
           <MetricCard label="Total alumnos" value={data.total_alumnos} />
           <MetricCard label="Atrasados" value={data.atrasados} />
           <MetricCard label="Al día" value={data.al_dia} />
-          <MetricCard label="Promedio general" value={data.promedio_general} />
+          <MetricCard
+            label="Promedio general"
+            value={data.promedio_general !== null ? data.promedio_general : '—'}
+          />
           <MetricCard label="Comunicaciones enviadas" value={data.comunicaciones_enviadas} />
           <MetricCard label="Comunicaciones pendientes" value={data.comunicaciones_pendientes} />
         </div>

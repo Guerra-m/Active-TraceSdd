@@ -1,26 +1,26 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchAtrasados, fetchRanking, fetchNotasFinales } from '../services/academicoService'
 
-export function useAtrasados(comision_id: string) {
+export function useAtrasados(asignacionId: string, materiaId: string) {
   return useQuery({
-    queryKey: ['atrasados', comision_id],
-    queryFn: () => fetchAtrasados(comision_id),
-    enabled: !!comision_id,
+    queryKey: ['atrasados', asignacionId, materiaId],
+    queryFn: () => fetchAtrasados(asignacionId, materiaId),
+    enabled: !!asignacionId && !!materiaId,
   })
 }
 
-export function useRanking(comision_id: string) {
+export function useRanking(asignacionId: string, materiaId: string) {
   return useQuery({
-    queryKey: ['ranking', comision_id],
-    queryFn: () => fetchRanking(comision_id),
-    enabled: !!comision_id,
+    queryKey: ['ranking', asignacionId, materiaId],
+    queryFn: () => fetchRanking(asignacionId, materiaId),
+    enabled: !!asignacionId && !!materiaId,
   })
 }
 
-export function useNotasFinales(comision_id: string) {
+export function useNotasFinales(asignacionId: string, materiaId: string) {
   return useQuery({
-    queryKey: ['notas-finales', comision_id],
-    queryFn: () => fetchNotasFinales(comision_id),
-    enabled: !!comision_id,
+    queryKey: ['notas-finales', asignacionId, materiaId],
+    queryFn: () => fetchNotasFinales(asignacionId, materiaId),
+    enabled: !!asignacionId && !!materiaId,
   })
 }

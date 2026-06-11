@@ -8,13 +8,19 @@ import { useClonarEquipo, useAsignacionMasiva } from '../hooks/useEquipos'
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const paso1Schema = z.object({
-  equipo_id: z.string().min(1, 'El ID del equipo es requerido'),
-  periodo_destino: z.string().min(1, 'El período destino es requerido'),
+  materia_id: z.string().min(1, 'La materia es requerida'),
+  carrera_id: z.string().min(1, 'La carrera es requerida'),
+  cohorte_origen_id: z.string().min(1, 'La cohorte de origen es requerida'),
+  cohorte_destino_id: z.string().min(1, 'La cohorte de destino es requerida'),
+  desde: z.string().min(1, 'La fecha de inicio es requerida'),
+  hasta: z.string().optional(),
 })
 
 const paso2Schema = z.object({
-  tutor_id: z.string().min(1, 'El tutor es requerido'),
-  alumno_ids_raw: z.string().min(1, 'Se requiere al menos un alumno'),
+  usuario_ids_raw: z.string().min(1, 'Se requiere al menos un usuario'),
+  rol: z.string().min(1, 'El rol es requerido'),
+  materia_id: z.string().optional(),
+  desde: z.string().min(1, 'La fecha de inicio es requerida'),
 })
 
 type Paso1Form = z.infer<typeof paso1Schema>
@@ -49,7 +55,7 @@ function StepIndicator({ paso, totalPasos }: { paso: number; totalPasos: number 
 
 function SetupCuatrimestreContent() {
   const [paso, setPaso] = useState(1)
-  const [nuevoEquipoId, setNuevoEquipoId] = useState<string | null>(null)
+  const [, setNuevoEquipoId] = useState<string | null>(null)
   const [completado, setCompletado] = useState(false)
 
   const clonarMutation = useClonarEquipo()
@@ -71,10 +77,17 @@ function SetupCuatrimestreContent() {
 
   const onPaso1Submit = (data: Paso1Form) => {
     clonarMutation.mutate(
-      { equipoId: data.equipo_id, payload: { periodo_destino: data.periodo_destino } },
       {
-        onSuccess: (nuevoEquipo) => {
-          setNuevoEquipoId(nuevoEquipo.id)
+        materia_id: data.materia_id,
+        carrera_id: data.carrera_id,
+        cohorte_origen_id: data.cohorte_origen_id,
+        cohorte_destino_id: data.cohorte_destino_id,
+        desde: data.desde,
+        hasta: data.hasta || undefined,
+      },
+      {
+        onSuccess: () => {
+          setNuevoEquipoId('clonado')
           setPaso(2)
         },
       },
@@ -82,13 +95,17 @@ function SetupCuatrimestreContent() {
   }
 
   const onPaso2Submit = (data: Paso2Form) => {
-    if (!nuevoEquipoId) return
-    const alumno_ids = data.alumno_ids_raw
+    const usuario_ids = data.usuario_ids_raw
       .split('\n')
       .map((s) => s.trim())
       .filter(Boolean)
     asignacionMutation.mutate(
-      { equipoId: nuevoEquipoId, payload: { tutor_id: data.tutor_id, alumno_ids } },
+      {
+        usuario_ids,
+        rol: data.rol,
+        materia_id: data.materia_id || undefined,
+        desde: data.desde,
+      },
       { onSuccess: () => setCompletado(true) },
     )
   }
@@ -124,41 +141,92 @@ function SetupCuatrimestreContent() {
         <div className="rounded-lg border border-border p-6">
           <h2 className="mb-4 text-lg font-semibold">Paso 1: Clonar equipo docente</h2>
           <form onSubmit={handlePaso1(onPaso1Submit)} className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="equipo_id">
-                ID del equipo a clonar
-              </label>
-              <input
-                id="equipo_id"
-                {...registerPaso1('equipo_id')}
-                className="w-full rounded border border-border p-2"
-                placeholder="UUID del equipo"
-              />
-              {errorsPaso1.equipo_id && (
-                <p role="alert" className="mt-1 text-sm text-red-600">
-                  {errorsPaso1.equipo_id.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="periodo_destino">
-                Período destino
-              </label>
-              <input
-                id="periodo_destino"
-                {...registerPaso1('periodo_destino')}
-                className="w-full rounded border border-border p-2"
-                placeholder="Ej: 2024-2"
-              />
-              {errorsPaso1.periodo_destino && (
-                <p role="alert" className="mt-1 text-sm text-red-600">
-                  {errorsPaso1.periodo_destino.message}
-                </p>
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="materia_id">
+                  ID Materia
+                </label>
+                <input
+                  id="materia_id"
+                  {...registerPaso1('materia_id')}
+                  className="w-full rounded border border-border p-2"
+                  placeholder="UUID"
+                />
+                {errorsPaso1.materia_id && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errorsPaso1.materia_id.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="carrera_id">
+                  ID Carrera
+                </label>
+                <input
+                  id="carrera_id"
+                  {...registerPaso1('carrera_id')}
+                  className="w-full rounded border border-border p-2"
+                  placeholder="UUID"
+                />
+                {errorsPaso1.carrera_id && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errorsPaso1.carrera_id.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="cohorte_origen_id">
+                  Cohorte origen (ID)
+                </label>
+                <input
+                  id="cohorte_origen_id"
+                  {...registerPaso1('cohorte_origen_id')}
+                  className="w-full rounded border border-border p-2"
+                  placeholder="UUID"
+                />
+                {errorsPaso1.cohorte_origen_id && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errorsPaso1.cohorte_origen_id.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="cohorte_destino_id">
+                  Cohorte destino (ID)
+                </label>
+                <input
+                  id="cohorte_destino_id"
+                  {...registerPaso1('cohorte_destino_id')}
+                  className="w-full rounded border border-border p-2"
+                  placeholder="UUID"
+                />
+                {errorsPaso1.cohorte_destino_id && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errorsPaso1.cohorte_destino_id.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="p1-desde">
+                  Vigencia desde
+                </label>
+                <input
+                  id="p1-desde"
+                  type="date"
+                  {...registerPaso1('desde')}
+                  className="w-full rounded border border-border p-2"
+                />
+                {errorsPaso1.desde && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errorsPaso1.desde.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="p1-hasta">
+                  Vigencia hasta (opcional)
+                </label>
+                <input
+                  id="p1-hasta"
+                  type="date"
+                  {...registerPaso1('hasta')}
+                  className="w-full rounded border border-border p-2"
+                />
+              </div>
             </div>
             {clonarMutation.isError && (
               <p role="alert" className="text-sm text-red-600">
-                Error al clonar el equipo. Verificá el ID e intentá de nuevo.
+                Error al clonar el equipo. Verificá los datos e intentá de nuevo.
               </p>
             )}
             <button
@@ -174,41 +242,66 @@ function SetupCuatrimestreContent() {
 
       {paso === 2 && (
         <div className="rounded-lg border border-border p-6">
-          <h2 className="mb-4 text-lg font-semibold">Paso 2: Asignación masiva de alumnos</h2>
+          <h2 className="mb-4 text-lg font-semibold">Paso 2: Asignación masiva de usuarios</h2>
           <p className="mb-4 text-sm text-green-600">
-            Equipo clonado exitosamente. ID del nuevo equipo: {nuevoEquipoId}
+            Equipo clonado exitosamente. Ahora asigná los usuarios al nuevo equipo.
           </p>
           <form onSubmit={handlePaso2(onPaso2Submit)} className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="tutor_id">
-                ID del tutor
-              </label>
-              <input
-                id="tutor_id"
-                {...registerPaso2('tutor_id')}
-                className="w-full rounded border border-border p-2"
-                placeholder="UUID del tutor"
-              />
-              {errorsPaso2.tutor_id && (
-                <p role="alert" className="mt-1 text-sm text-red-600">
-                  {errorsPaso2.tutor_id.message}
-                </p>
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="rol">
+                  Rol a asignar
+                </label>
+                <input
+                  id="rol"
+                  {...registerPaso2('rol')}
+                  className="w-full rounded border border-border p-2"
+                  placeholder="TUTOR, PROFESOR..."
+                />
+                {errorsPaso2.rol && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errorsPaso2.rol.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="p2-desde">
+                  Vigencia desde
+                </label>
+                <input
+                  id="p2-desde"
+                  type="date"
+                  {...registerPaso2('desde')}
+                  className="w-full rounded border border-border p-2"
+                />
+                {errorsPaso2.desde && (
+                  <p role="alert" className="mt-1 text-sm text-red-600">{errorsPaso2.desde.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="p2-materia">
+                  ID Materia (opcional)
+                </label>
+                <input
+                  id="p2-materia"
+                  {...registerPaso2('materia_id')}
+                  className="w-full rounded border border-border p-2"
+                  placeholder="UUID"
+                />
+              </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="alumno_ids_raw">
-                IDs de alumnos (uno por línea)
+              <label className="mb-1 block text-sm font-medium" htmlFor="usuario_ids_raw">
+                IDs de usuarios (uno por línea)
               </label>
               <textarea
-                id="alumno_ids_raw"
-                {...registerPaso2('alumno_ids_raw')}
+                id="usuario_ids_raw"
+                {...registerPaso2('usuario_ids_raw')}
                 rows={6}
-                placeholder="alumno-uuid-1&#10;alumno-uuid-2&#10;..."
+                placeholder="uuid-1&#10;uuid-2&#10;..."
                 className="w-full rounded border border-border p-2 font-mono text-sm"
               />
-              {errorsPaso2.alumno_ids_raw && (
+              {errorsPaso2.usuario_ids_raw && (
                 <p role="alert" className="mt-1 text-sm text-red-600">
-                  {errorsPaso2.alumno_ids_raw.message}
+                  {errorsPaso2.usuario_ids_raw.message}
                 </p>
               )}
             </div>

@@ -1,24 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   fetchEncuentrosAdmin,
-  crearSlotsRecurrentes,
+  crearSlot,
   updateEncuentro,
 } from '../services/encuentrosAdminService'
-import type { SlotRecurrente, UpdateEncuentroPayload, PageParams } from '../types'
+import type { SlotEncuentroCreate, UpdateEncuentroPayload } from '../types'
 
 export const ENCUENTROS_ADMIN_KEY = 'coordinacion-encuentros-admin'
 
-export function useEncuentrosAdmin(params?: PageParams) {
+export function useEncuentrosAdmin() {
   return useQuery({
-    queryKey: [ENCUENTROS_ADMIN_KEY, params],
-    queryFn: () => fetchEncuentrosAdmin(params),
+    queryKey: [ENCUENTROS_ADMIN_KEY],
+    queryFn: () => fetchEncuentrosAdmin(),
   })
 }
 
-export function useCrearSlotsRecurrentes() {
+export function useCrearSlot() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (payload: SlotRecurrente) => crearSlotsRecurrentes(payload),
+    mutationFn: (payload: SlotEncuentroCreate) => crearSlot(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [ENCUENTROS_ADMIN_KEY] })
     },

@@ -2,26 +2,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   fetchTareas,
   createTarea,
-  delegarTarea,
   cambiarEstadoTarea,
   fetchComentarios,
   createComentario,
 } from '../services/tareasService'
-import type {
-  CreateTareaPayload,
-  DelegarTareaPayload,
-  CambiarEstadoPayload,
-  CreateComentarioPayload,
-  PageParams,
-} from '../types'
+import type { CreateTareaPayload, CambiarEstadoPayload, CreateComentarioPayload } from '../types'
 
 export const TAREAS_KEY = 'coordinacion-tareas'
 export const COMENTARIOS_KEY = 'coordinacion-comentarios'
 
-export function useTareas(params?: PageParams) {
+export function useTareas() {
   return useQuery({
-    queryKey: [TAREAS_KEY, params],
-    queryFn: () => fetchTareas(params),
+    queryKey: [TAREAS_KEY],
+    queryFn: () => fetchTareas(),
   })
 }
 
@@ -29,17 +22,6 @@ export function useCreateTarea() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: CreateTareaPayload) => createTarea(payload),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [TAREAS_KEY] })
-    },
-  })
-}
-
-export function useDelegarTarea() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: DelegarTareaPayload }) =>
-      delegarTarea(id, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [TAREAS_KEY] })
     },

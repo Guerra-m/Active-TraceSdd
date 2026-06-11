@@ -24,11 +24,15 @@ import { GrillaSalarialPage } from '@/features/finanzas/pages/GrillaSalarialPage
 import { FacturasPage } from '@/features/finanzas/pages/FacturasPage'
 // Admin (C-24)
 import { EstructuraAcademicaPage } from '@/features/admin/pages/EstructuraAcademicaPage'
+import { MateriasPage } from '@/features/admin/pages/MateriasPage'
+import { AlumnosPage } from '@/features/admin/pages/AlumnosPage'
 import { UsuariosAdminPage } from '@/features/admin/pages/UsuariosAdminPage'
 import { AuditoriaPage } from '@/features/admin/pages/AuditoriaPage'
+import { ComisionesPage } from '@/features/coordinacion/pages/ComisionesPage'
 
-// Comision ID placeholder — en producción viene del contexto del usuario (sesión)
-const DEFAULT_COMISION_ID = ''
+// IDs del docente admin seeded (Programacion I - Cohorte 2024-A)
+const DEFAULT_ASIGNACION_ID = '094c9029-321d-41a4-8f00-9f99437c0581'
+const DEFAULT_MATERIA_ID    = '9a1ac748-7387-49dd-a1dd-4f06c2d2181b'
 
 export const router = createBrowserRouter([
   // Rutas públicas
@@ -49,32 +53,47 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
       {
         path: 'dashboard',
-        element: <div className="p-6"><h1 className="text-2xl font-bold">Dashboard</h1></div>,
+        element: (
+          <div className="p-6 space-y-4">
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-gray-500">Bienvenido a activia-trace. Seleccioná un módulo desde el menú lateral.</p>
+          </div>
+        ),
       },
+      // Páginas implementadas
+      { path: 'alumnos', element: <AlumnosPage /> },
+      { path: 'materias', element: <MateriasPage /> },
+      { path: 'comisiones', element: <ComisionesPage /> },
+      { path: 'comunicacion', element: <ComunicacionesPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} /> },
+      // Alias de rutas cortas → páginas ya implementadas
+      { path: 'encuentros', element: <EncuentrosAdminPage /> },
+      { path: 'liquidaciones', element: <LiquidacionesPage /> },
+      { path: 'auditoria', element: <AuditoriaPage /> },
+      { path: 'usuarios', element: <UsuariosAdminPage /> },
       // Módulo académico docente (C-22)
       {
         path: 'profesor/atrasados',
-        element: <AtrasadosPage comisionId={DEFAULT_COMISION_ID} />,
+        element: <AtrasadosPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
       },
       {
         path: 'profesor/importar',
-        element: <ImportacionPage comisionId={DEFAULT_COMISION_ID} />,
+        element: <ImportacionPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
       },
       {
         path: 'profesor/umbral',
-        element: <UmbralPage comisionId={DEFAULT_COMISION_ID} />,
+        element: <UmbralPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
       },
       {
         path: 'profesor/entregas',
-        element: <EntregasPage comisionId={DEFAULT_COMISION_ID} />,
+        element: <EntregasPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
       },
       {
         path: 'profesor/comunicaciones',
-        element: <ComunicacionesPage comisionId={DEFAULT_COMISION_ID} />,
+        element: <ComunicacionesPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
       },
       {
         path: 'profesor/monitor',
-        element: <MonitorPage comisionId={DEFAULT_COMISION_ID} />,
+        element: <MonitorPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
       },
       // Módulo coordinación (C-23)
       { path: 'equipos', element: <EquiposPage /> },

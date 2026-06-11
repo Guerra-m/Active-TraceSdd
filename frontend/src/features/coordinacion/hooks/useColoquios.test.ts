@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createElement } from 'react'
-import { useConvocatorias, useCreateConvocatoria, useMetricasColoquio } from './useColoquios'
+import { useConvocatorias, useCreateConvocatoria, useMetricasColoquios } from './useColoquios'
 import * as coloquiosService from '../services/coloquiosService'
-import type { PagedResponse, Convocatoria, ConvocatoriaMetrics } from '../types'
+import type { EvaluacionItem, MetricasColoquio } from '../types'
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -14,31 +14,22 @@ function createWrapper() {
     createElement(QueryClientProvider, { client: queryClient }, children)
 }
 
-const mockConvocatoria: Convocatoria = {
-  id: 'conv-1',
-  materia_id: 'mat-1',
-  materia_nombre: 'Matemática I',
-  fecha: '2024-07-20',
-  cupo: 30,
-  inscriptos: 15,
-  descripcion: 'Coloquio primer cuatrimestre',
-  estado: 'abierta',
+const mockEvaluacion: EvaluacionItem = {
+  id: 'ev-1',
   tenant_id: 'tenant-1',
+  materia_id: 'mat-1',
+  cohorte_id: 'coh-1',
+  tipo: 'Coloquio',
+  instancia: 'Coloquio 1er Cuatrimestre',
+  dias_disponibles: 3,
+  cupos_por_dia: 10,
 }
 
-const mockConvList: PagedResponse<Convocatoria> = {
-  items: [mockConvocatoria],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
-
-const mockMetricas: ConvocatoriaMetrics = {
-  convocatoria_id: 'conv-1',
-  aprobados: 10,
-  desaprobados: 3,
-  ausentes: 2,
-  nota_promedio: 7.5,
+const mockMetricas: MetricasColoquio = {
+  total_convocados: 30,
+  instancias_activas: 2,
+  reservas_activas: 15,
+  notas_registradas: 25,
 }
 
 describe('useConvocatorias', () => {
@@ -47,14 +38,14 @@ describe('useConvocatorias', () => {
   })
 
   it('retorna convocatorias exitosamente', async () => {
-    vi.spyOn(coloquiosService, 'fetchConvocatorias').mockResolvedValue(mockConvList)
+    vi.spyOn(coloquiosService, 'fetchConvocatorias').mockResolvedValue([mockEvaluacion])
 
     const { result } = renderHook(() => useConvocatorias(), { wrapper: createWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(result.current.data?.items).toHaveLength(1)
-    expect(result.current.data?.items[0].materia_nombre).toBe('Matemática I')
+    expect(result.current.data).toHaveLength(1)
+    expect(result.current.data?.[0].instancia).toBe('Coloquio 1er Cuatrimestre')
   })
 
   it('expone error si el servicio falla', async () => {
@@ -72,15 +63,17 @@ describe('useCreateConvocatoria', () => {
   })
 
   it('crea convocatoria exitosamente', async () => {
-    const spy = vi.spyOn(coloquiosService, 'createConvocatoria').mockResolvedValue(mockConvocatoria)
+    const spy = vi.spyOn(coloquiosService, 'createConvocatoria').mockResolvedValue(mockEvaluacion)
 
     const { result } = renderHook(() => useCreateConvocatoria(), { wrapper: createWrapper() })
 
     result.current.mutate({
       materia_id: 'mat-1',
-      fecha: '2024-07-20',
-      cupo: 30,
-      descripcion: 'Coloquio primer cuatrimestre',
+      cohorte_id: 'coh-1',
+      tipo: 'Coloquio',
+      instancia: 'Coloquio 1er Cuatrimestre',
+      dias_disponibles: 3,
+      cupos_por_dia: 10,
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
@@ -89,21 +82,21 @@ describe('useCreateConvocatoria', () => {
   })
 })
 
-describe('useMetricasColoquio', () => {
+describe('useMetricasColoquios', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('retorna métricas cuando convocatoriaId es válido', async () => {
+  it('retorna métricas globales exitosamente', async () => {
     vi.spyOn(coloquiosService, 'fetchMetricas').mockResolvedValue(mockMetricas)
 
-    const { result } = renderHook(() => useMetricasColoquio('conv-1'), {
+    const { result } = renderHook(() => useMetricasColoquios(), {
       wrapper: createWrapper(),
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(result.current.data?.aprobados).toBe(10)
-    expect(result.current.data?.nota_promedio).toBe(7.5)
+    expect(result.current.data?.instancias_activas).toBe(2)
+    expect(result.current.data?.total_convocados).toBe(30)
   })
 })

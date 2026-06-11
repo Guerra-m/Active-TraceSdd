@@ -3,15 +3,12 @@ import type {
   Tarea,
   Comentario,
   CreateTareaPayload,
-  DelegarTareaPayload,
   CambiarEstadoPayload,
   CreateComentarioPayload,
-  PageParams,
-  PagedResponse,
 } from '../types'
 
-export async function fetchTareas(params?: PageParams): Promise<PagedResponse<Tarea>> {
-  const { data } = await api.get<PagedResponse<Tarea>>('/tareas', { params })
+export async function fetchTareas(): Promise<Tarea[]> {
+  const { data } = await api.get<Tarea[]>('/tareas')
   return data
 }
 
@@ -20,16 +17,11 @@ export async function createTarea(payload: CreateTareaPayload): Promise<Tarea> {
   return data
 }
 
-export async function delegarTarea(id: string, payload: DelegarTareaPayload): Promise<Tarea> {
-  const { data } = await api.patch<Tarea>(`/tareas/${id}/delegar`, payload)
-  return data
-}
-
 export async function cambiarEstadoTarea(
   id: string,
   payload: CambiarEstadoPayload,
 ): Promise<Tarea> {
-  const { data } = await api.patch<Tarea>(`/tareas/${id}/estado`, payload)
+  const { data } = await api.patch<Tarea>(`/tareas/${id}`, payload)
   return data
 }
 

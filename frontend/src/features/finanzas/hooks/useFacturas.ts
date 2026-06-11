@@ -24,7 +24,8 @@ export function useCreateFactura() {
 export function useAbonarFactura() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => abonarFactura(id),
+    mutationFn: ({ id, fecha_pago }: { id: string; fecha_pago: string }) =>
+      abonarFactura(id, fecha_pago),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [FACTURAS_KEY] })
     },

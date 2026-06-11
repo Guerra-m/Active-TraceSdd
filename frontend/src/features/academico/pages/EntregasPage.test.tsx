@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { EntregasPage } from './EntregasPage'
 import * as academicoService from '../services/academicoService'
-import type { EntregaSinCorregir } from '../types'
+import type { EntregasSinCorregirResponse } from '../types'
 
 function wrapper(ui: React.ReactElement) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -15,43 +15,53 @@ function wrapper(ui: React.ReactElement) {
   )
 }
 
-const ENTREGAS: EntregaSinCorregir[] = [
-  { id: 'e1', alumno_nombre: 'Pedro García', alumno_legajo: 'L010', actividad: 'TP 1', fecha_entrega: '2024-05-20', estado: 'pendiente' },
-  { id: 'e2', alumno_nombre: 'Laura Díaz', alumno_legajo: 'L011', actividad: 'TP 2', fecha_entrega: '2024-06-01', estado: 'pendiente' },
-]
+const RESP: EntregasSinCorregirResponse = {
+  total: 2,
+  items: [
+    { entrada_padron_id: 'ep1', nombre: 'Pedro', apellidos: 'García', actividad: 'TP 1', importado_at: '2024-05-20T00:00:00Z' },
+    { entrada_padron_id: 'ep2', nombre: 'Laura', apellidos: 'Díaz', actividad: 'TP 2', importado_at: '2024-06-01T00:00:00Z' },
+  ],
+}
+
+const RESP_VACIO: EntregasSinCorregirResponse = { total: 0, items: [] }
 
 beforeEach(() => {
-  vi.spyOn(academicoService, 'fetchEntregasSinCorregir').mockResolvedValue(ENTREGAS)
+  vi.spyOn(academicoService, 'fetchEntregasSinCorregir').mockResolvedValue(RESP)
 })
 
 describe('EntregasPage', () => {
   it('muestra el título de la página', () => {
-    wrapper(<EntregasPage comisionId="c1" />)
+    wrapper(<EntregasPage asignacionId="a1" materiaId="m1" />)
     expect(screen.getByText('Entregas sin corregir')).toBeInTheDocument()
   })
 
+  it('muestra mensaje cuando no hay asignación seleccionada', () => {
+    wrapper(<EntregasPage asignacionId="" materiaId="" />)
+    expect(screen.getByText('No hay asignación seleccionada.')).toBeInTheDocument()
+  })
+
   it('muestra las entregas cargadas', async () => {
-    wrapper(<EntregasPage comisionId="c1" />)
-    expect(await screen.findByText('Pedro García')).toBeInTheDocument()
-    expect(screen.getByText('Laura Díaz')).toBeInTheDocument()
+    wrapper(<EntregasPage asignacionId="a1" materiaId="m1" />)
+    expect(await screen.findByText('García')).toBeInTheDocument()
+    expect(screen.getByText('Díaz')).toBeInTheDocument()
   })
 
   it('muestra mensaje cuando no hay entregas pendientes', async () => {
-    vi.spyOn(academicoService, 'fetchEntregasSinCorregir').mockResolvedValue([])
-    wrapper(<EntregasPage comisionId="c1" />)
+    vi.spyOn(academicoService, 'fetchEntregasSinCorregir').mockResolvedValue(RESP_VACIO)
+    wrapper(<EntregasPage asignacionId="a1" materiaId="m1" />)
     expect(await screen.findByText('No hay entregas pendientes de corrección')).toBeInTheDocument()
   })
 
   it('el botón exportar CSV está habilitado cuando hay entregas', async () => {
-    wrapper(<EntregasPage comisionId="c1" />)
-    await screen.findByText('Pedro García')
+    wrapper(<EntregasPage asignacionId="a1" materiaId="m1" />)
+    await screen.findByText('García')
     const btn = screen.getByRole('button', { name: /exportar csv/i })
     expect(btn).not.toBeDisabled()
   })
 
   it('el botón exportar CSV está deshabilitado cuando no hay entregas', async () => {
-    vi.spyOn(academicoService, 'fetchEntregasSinCorregir').mockResolvedValue([])
-    wrapper(<EntregasPage comisionId="c1" />)
+    vi.spyOn(academicoService, 'fetchEntregasSinCorregir').mockResolvedValue(RESP_VACIO)
+    wrapper(<EntregasPage asignacionId="a1" materiaId="m1" />)
     await screen.findByText('No hay entregas pendientes de corrección')
     const btn = screen.getByRole('button', { name: /exportar csv/i })
     expect(btn).toBeDisabled()
@@ -63,8 +73,8 @@ describe('EntregasPage', () => {
     URL.createObjectURL = createObjectURL
     URL.revokeObjectURL = revokeObjectURL
 
-    wrapper(<EntregasPage comisionId="c1" />)
-    await screen.findByText('Pedro García')
+    wrapper(<EntregasPage asignacionId="a1" materiaId="m1" />)
+    await screen.findByText('García')
     const btn = screen.getByRole('button', { name: /exportar csv/i })
     fireEvent.click(btn)
     expect(createObjectURL).toHaveBeenCalled()

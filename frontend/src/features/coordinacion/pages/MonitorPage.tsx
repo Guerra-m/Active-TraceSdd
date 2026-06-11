@@ -118,45 +118,20 @@ function MonitorContent() {
         <div role="alert" className="rounded bg-red-50 p-4 text-red-700">
           Error al cargar el monitor. Intentá de nuevo.
         </div>
+      ) : data ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <MetricCard label="Total alumnos" value={data.total_alumnos} />
+          <MetricCard label="Atrasados" value={data.atrasados} />
+          <MetricCard label="Al día" value={data.al_dia} />
+          <MetricCard label="Comunicaciones enviadas" value={data.comunicaciones_enviadas} />
+          <MetricCard label="Comunicaciones pendientes" value={data.comunicaciones_pendientes} />
+          <MetricCard
+            label="Promedio general"
+            value={data.promedio_general != null ? data.promedio_general.toFixed(1) : '—'}
+          />
+        </div>
       ) : (
-        <>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <MetricCard label="Alumnos atrasados" value={data?.alumnos_atrasados ?? 0} />
-            <MetricCard label="Entregas pendientes" value={data?.entregas_pendientes ?? 0} />
-            <MetricCard label="Comunicaciones enviadas" value={data?.comunicaciones_enviadas ?? 0} />
-            <MetricCard
-              label="Tasa de contacto"
-              value={`${Math.round((data?.tasa_contacto ?? 0) * 100)}%`}
-            />
-          </div>
-
-          {/* Resumen por materia */}
-          {data && data.resumen_por_materia.length > 0 && (
-            <div>
-              <h2 className="mb-3 text-lg font-semibold">Resumen por materia</h2>
-              <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="p-3 text-left">Materia</th>
-                      <th className="p-3 text-left">Atrasados</th>
-                      <th className="p-3 text-left">Al día</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.resumen_por_materia.map((row) => (
-                      <tr key={row.materia_id} className="border-b border-border">
-                        <td className="p-3 font-medium">{row.materia_nombre}</td>
-                        <td className="p-3 text-red-600">{row.atrasados}</td>
-                        <td className="p-3 text-green-600">{row.al_dia}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </>
+        <p className="text-gray-500">Aplicá un filtro para ver las métricas.</p>
       )}
     </div>
   )

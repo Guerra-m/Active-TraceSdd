@@ -9,34 +9,30 @@ import {
   useCreateAviso,
   useUpdateAviso,
   useDeleteAviso,
-  usePublicarAviso,
   useAckAviso,
 } from '../hooks/useAvisos'
-import type { Aviso, AvisoEstado, AvisoScope } from '../types'
+import type { Aviso, AvisoAlcance } from '../types'
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const avisoSchema = z.object({
   titulo: z.string().min(1, 'El título es requerido'),
   cuerpo: z.string().min(1, 'El cuerpo es requerido'),
-  scope: z.enum(['Global', 'PorMateria', 'PorCohorte', 'PorRol']),
-  fecha_expiracion: z.string().optional(),
+  alcance: z.enum(['Global', 'PorMateria', 'PorCohorte', 'PorRol']),
+  severidad: z.enum(['Info', 'Advertencia', 'Crítico']),
+  inicio_en: z.string().min(1, 'La fecha de inicio es requerida'),
+  fin_en: z.string().optional(),
+  activo: z.boolean(),
   requiere_ack: z.boolean(),
 })
 
 type AvisoForm = z.infer<typeof avisoSchema>
 
-const SCOPE_LABELS: Record<AvisoScope, string> = {
+const ALCANCE_LABELS: Record<AvisoAlcance, string> = {
   Global: 'Global',
   PorMateria: 'Por materia',
   PorCohorte: 'Por cohorte',
   PorRol: 'Por rol',
-}
-
-const ESTADO_LABELS: Record<AvisoEstado, string> = {
-  borrador: 'Borrador',
-  publicado: 'Publicado',
-  expirado: 'Expirado',
 }
 
 // ─── AvisoRow ─────────────────────────────────────────────────────────────────
@@ -48,46 +44,55 @@ function AvisoRow({
   aviso: Aviso
   onEdit: (aviso: Aviso) => void
 }) {
-  const publicarMutation = usePublicarAviso()
+  const updateMutation = useUpdateAviso()
   const deleteMutation = useDeleteAviso()
   const ackMutation = useAckAviso()
 
   return (
     <tr className="border-b border-border">
       <td className="p-3 font-medium">{aviso.titulo}</td>
-      <td className="p-3">{SCOPE_LABELS[aviso.scope]}</td>
-      <td className="p-3">{aviso.fecha_publicacion ?? '—'}</td>
+      <td className="p-3">{ALCANCE_LABELS[aviso.alcance]}</td>
+      <td className="p-3 text-xs text-gray-500">{aviso.inicio_en.slice(0, 10)}</td>
       <td className="p-3">
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-            aviso.estado === 'publicado'
-              ? 'bg-green-100 text-green-700'
-              : aviso.estado === 'expirado'
-                ? 'bg-gray-100 text-gray-600'
-                : 'bg-yellow-100 text-yellow-700'
+            aviso.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
           }`}
         >
-          {ESTADO_LABELS[aviso.estado]}
+          {aviso.activo ? 'Activo' : 'Inactivo'}
         </span>
       </td>
       <td className="p-3">
         <div className="flex gap-1">
-          {aviso.estado === 'borrador' && (
+          {!aviso.activo && (
             <button
-              onClick={() => publicarMutation.mutate(aviso.id)}
-              disabled={publicarMutation.isPending}
+              onClick={() =>
+                updateMutation.mutate({ id: aviso.id, payload: { activo: true } })
+              }
+              disabled={updateMutation.isPending}
               className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
             >
-              Publicar
+              Activar
+            </button>
+          )}
+          {aviso.activo && (
+            <button
+              onClick={() =>
+                updateMutation.mutate({ id: aviso.id, payload: { activo: false } })
+              }
+              disabled={updateMutation.isPending}
+              className="rounded bg-yellow-600 px-2 py-1 text-xs text-white hover:bg-yellow-700 disabled:opacity-50"
+            >
+              Desactivar
             </button>
           )}
           {aviso.requiere_ack && (
             <button
               onClick={() => ackMutation.mutate(aviso.id)}
-              disabled={aviso.leido_por_mi || ackMutation.isPending}
-              className="rounded bg-indigo-600 px-2 py-1 text-xs text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={ackMutation.isPending}
+              className="rounded bg-indigo-600 px-2 py-1 text-xs text-white hover:bg-indigo-700 disabled:opacity-50"
             >
-              {aviso.leido_por_mi ? 'Leído' : 'Confirmar lectura'}
+              Confirmar lectura
             </button>
           )}
           <button
@@ -132,11 +137,14 @@ function AvisoModal({
       ? {
           titulo: aviso.titulo,
           cuerpo: aviso.cuerpo,
-          scope: aviso.scope,
-          fecha_expiracion: aviso.fecha_expiracion ?? undefined,
+          alcance: aviso.alcance,
+          severidad: aviso.severidad,
+          inicio_en: aviso.inicio_en.slice(0, 16),
+          fin_en: aviso.fin_en?.slice(0, 16) ?? undefined,
+          activo: aviso.activo,
           requiere_ack: aviso.requiere_ack,
         }
-      : { scope: 'Global', requiere_ack: false },
+      : { alcance: 'Global', severidad: 'Info', activo: true, requiere_ack: false },
   })
 
   const isEditing = !!aviso
@@ -159,11 +167,11 @@ function AvisoModal({
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="titulo">
+            <label className="mb-1 block text-sm font-medium" htmlFor="av-titulo">
               Título
             </label>
             <input
-              id="titulo"
+              id="av-titulo"
               {...register('titulo')}
               className="w-full rounded border border-border p-2"
             />
@@ -174,11 +182,11 @@ function AvisoModal({
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="cuerpo">
+            <label className="mb-1 block text-sm font-medium" htmlFor="av-cuerpo">
               Cuerpo
             </label>
             <textarea
-              id="cuerpo"
+              id="av-cuerpo"
               {...register('cuerpo')}
               rows={4}
               className="w-full rounded border border-border p-2"
@@ -189,38 +197,80 @@ function AvisoModal({
               </p>
             )}
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="scope">
-              Alcance
-            </label>
-            <select
-              id="scope"
-              {...register('scope')}
-              className="w-full rounded border border-border p-2"
-            >
-              {Object.entries(SCOPE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="av-alcance">
+                Alcance
+              </label>
+              <select
+                id="av-alcance"
+                {...register('alcance')}
+                className="w-full rounded border border-border p-2"
+              >
+                {Object.entries(ALCANCE_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="av-severidad">
+                Severidad
+              </label>
+              <select
+                id="av-severidad"
+                {...register('severidad')}
+                className="w-full rounded border border-border p-2"
+              >
+                <option value="Info">Info</option>
+                <option value="Advertencia">Advertencia</option>
+                <option value="Crítico">Crítico</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="fecha_expiracion">
-              Fecha de expiración (opcional)
-            </label>
-            <input
-              id="fecha_expiracion"
-              type="date"
-              {...register('fecha_expiracion')}
-              className="w-full rounded border border-border p-2"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="av-inicio">
+                Desde
+              </label>
+              <input
+                id="av-inicio"
+                type="datetime-local"
+                {...register('inicio_en')}
+                className="w-full rounded border border-border p-2"
+              />
+              {errors.inicio_en && (
+                <p role="alert" className="mt-1 text-sm text-red-600">
+                  {errors.inicio_en.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="av-fin">
+                Hasta (opcional)
+              </label>
+              <input
+                id="av-fin"
+                type="datetime-local"
+                {...register('fin_en')}
+                className="w-full rounded border border-border p-2"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <input id="requiere_ack" type="checkbox" {...register('requiere_ack')} />
-            <label className="text-sm" htmlFor="requiere_ack">
-              Requiere confirmación de lectura
-            </label>
+          <div className="flex gap-4">
+            <div className="flex items-center gap-2">
+              <input id="av-activo" type="checkbox" {...register('activo')} />
+              <label className="text-sm" htmlFor="av-activo">
+                Activo
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input id="av-ack" type="checkbox" {...register('requiere_ack')} />
+              <label className="text-sm" htmlFor="av-ack">
+                Requiere confirmación
+              </label>
+            </div>
           </div>
           {isError && (
             <p role="alert" className="text-sm text-red-600">
@@ -252,13 +302,11 @@ function AvisoModal({
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 function AvisosContent() {
-  const [filtroEstado, setFiltroEstado] = useState<AvisoEstado | undefined>(undefined)
   const [showModal, setShowModal] = useState(false)
   const [editTarget, setEditTarget] = useState<Aviso | null>(null)
 
-  const { data, isLoading, isError } = useAvisos(
-    filtroEstado ? { estado: filtroEstado } : undefined,
-  )
+  const { data, isLoading, isError } = useAvisos()
+  const items = data ?? []
 
   if (isLoading) {
     return (
@@ -291,25 +339,7 @@ function AvisosContent() {
         </button>
       </div>
 
-      <div className="flex gap-2">
-        {([undefined, 'publicado', 'borrador', 'expirado'] as (AvisoEstado | undefined)[]).map(
-          (estado) => (
-            <button
-              key={String(estado)}
-              onClick={() => setFiltroEstado(estado)}
-              className={`rounded-full px-3 py-1 text-sm ${
-                filtroEstado === estado
-                  ? 'bg-blue-600 text-white'
-                  : 'border border-border hover:bg-gray-50'
-              }`}
-            >
-              {estado ? ESTADO_LABELS[estado] : 'Todos'}
-            </button>
-          ),
-        )}
-      </div>
-
-      {data?.items.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-gray-500">No hay avisos.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
@@ -318,13 +348,13 @@ function AvisosContent() {
               <tr>
                 <th className="p-3 text-left">Título</th>
                 <th className="p-3 text-left">Alcance</th>
-                <th className="p-3 text-left">Publicación</th>
+                <th className="p-3 text-left">Desde</th>
                 <th className="p-3 text-left">Estado</th>
                 <th className="p-3 text-left">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {data?.items.map((aviso) => (
+              {items.map((aviso) => (
                 <AvisoRow
                   key={aviso.id}
                   aviso={aviso}

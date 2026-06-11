@@ -10,17 +10,22 @@ import {
   useModificarVigenciaBulk,
   useExportarEquipos,
 } from '../hooks/useEquipos'
-import type { Equipo } from '../types'
+import type { AsignacionItem } from '../types'
 
 // ─── Schemas Zod ─────────────────────────────────────────────────────────────
 
 const clonarSchema = z.object({
-  periodo_destino: z.string().min(1, 'El período destino es requerido'),
+  cohorte_destino_id: z.string().min(1, 'El ID de cohorte destino es requerido'),
+  desde: z.string().min(1, 'La fecha de inicio es requerida'),
+  hasta: z.string().optional(),
 })
 
 const vigenciaBulkSchema = z.object({
-  fecha_inicio: z.string().min(1, 'Fecha inicio requerida'),
-  fecha_fin: z.string().min(1, 'Fecha fin requerida'),
+  desde: z.string().optional(),
+  hasta: z.string().optional(),
+}).refine((d) => d.desde || d.hasta, {
+  message: 'Especificá al menos desde o hasta',
+  path: ['desde'],
 })
 
 type ClonarForm = z.infer<typeof clonarSchema>
@@ -28,14 +33,20 @@ type VigenciaBulkForm = z.infer<typeof vigenciaBulkSchema>
 
 // ─── Subcomponents ───────────────────────────────────────────────────────────
 
-function EquipoRow({
-  equipo,
+const ESTADO_BADGE: Record<string, string> = {
+  vigente: 'bg-green-100 text-green-800',
+  vencida: 'bg-red-100 text-red-800',
+  futura: 'bg-blue-100 text-blue-800',
+}
+
+function AsignacionRow({
+  item,
   onClonar,
   isSelected,
   onToggle,
 }: {
-  equipo: Equipo
-  onClonar: (equipo: Equipo) => void
+  item: AsignacionItem
+  onClonar: (item: AsignacionItem) => void
   isSelected: boolean
   onToggle: (id: string) => void
 }) {
@@ -45,18 +56,25 @@ function EquipoRow({
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={() => onToggle(equipo.id)}
-          aria-label={`Seleccionar ${equipo.nombre}`}
+          onChange={() => onToggle(item.id)}
+          aria-label={`Seleccionar ${item.usuario_id}`}
         />
       </td>
-      <td className="p-3 font-medium">{equipo.nombre}</td>
-      <td className="p-3">{equipo.periodo}</td>
-      <td className="p-3">{equipo.fecha_inicio}</td>
-      <td className="p-3">{equipo.fecha_fin}</td>
-      <td className="p-3">{equipo.tutores_count}</td>
+      <td className="p-3 font-mono text-xs">{item.usuario_id}</td>
+      <td className="p-3 font-medium">{item.rol}</td>
+      <td className="p-3">{item.desde}</td>
+      <td className="p-3">{item.hasta ?? '—'}</td>
+      <td className="p-3">{item.comisiones.join(', ') || '—'}</td>
+      <td className="p-3">
+        <span
+          className={`rounded px-2 py-0.5 text-xs font-medium ${ESTADO_BADGE[item.estado_vigencia] ?? 'bg-gray-100 text-gray-700'}`}
+        >
+          {item.estado_vigencia}
+        </span>
+      </td>
       <td className="p-3">
         <button
-          onClick={() => onClonar(equipo)}
+          onClick={() => onClonar(item)}
           className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
         >
           Clonar
@@ -69,10 +87,10 @@ function EquipoRow({
 // ─── Modal Clonar ─────────────────────────────────────────────────────────────
 
 function ClonarModal({
-  equipo,
+  item,
   onClose,
 }: {
-  equipo: Equipo
+  item: AsignacionItem
   onClose: () => void
 }) {
   const clonarMutation = useClonarEquipo()
@@ -83,8 +101,16 @@ function ClonarModal({
   } = useForm<ClonarForm>({ resolver: zodResolver(clonarSchema) })
 
   const onSubmit = (data: ClonarForm) => {
+    if (!item.materia_id || !item.carrera_id || !item.cohorte_id) return
     clonarMutation.mutate(
-      { equipoId: equipo.id, payload: data },
+      {
+        materia_id: item.materia_id,
+        carrera_id: item.carrera_id,
+        cohorte_origen_id: item.cohorte_id,
+        cohorte_destino_id: data.cohorte_destino_id,
+        desde: data.desde,
+        hasta: data.hasta ?? undefined,
+      },
       { onSuccess: onClose },
     )
   }
@@ -92,27 +118,57 @@ function ClonarModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-lg font-semibold">Clonar equipo: {equipo.nombre}</h2>
+        <h2 className="mb-1 text-lg font-semibold">
+          Clonar equipo: {item.rol}
+        </h2>
+        <p className="mb-4 text-xs text-gray-500">Cohorte origen: {item.cohorte_id ?? '—'}</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="periodo_destino">
-              Período destino
+            <label className="mb-1 block text-sm font-medium" htmlFor="cohorte_destino_id">
+              ID Cohorte destino
             </label>
             <input
-              id="periodo_destino"
-              {...register('periodo_destino')}
+              id="cohorte_destino_id"
+              {...register('cohorte_destino_id')}
               className="w-full rounded border border-border p-2"
-              placeholder="Ej: 2024-2"
+              placeholder="UUID de la cohorte destino"
             />
-            {errors.periodo_destino && (
+            {errors.cohorte_destino_id && (
               <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.periodo_destino.message}
+                {errors.cohorte_destino_id.message}
               </p>
             )}
           </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium" htmlFor="desde">
+              Fecha inicio
+            </label>
+            <input
+              id="desde"
+              type="date"
+              {...register('desde')}
+              className="w-full rounded border border-border p-2"
+            />
+            {errors.desde && (
+              <p role="alert" className="mt-1 text-sm text-red-600">
+                {errors.desde.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium" htmlFor="hasta">
+              Fecha fin (opcional)
+            </label>
+            <input
+              id="hasta"
+              type="date"
+              {...register('hasta')}
+              className="w-full rounded border border-border p-2"
+            />
+          </div>
           {clonarMutation.isError && (
             <p role="alert" className="text-sm text-red-600">
-              Error al clonar el equipo. Intentá de nuevo.
+              Error al clonar el equipo. Verificá los datos.
             </p>
           )}
           <div className="flex justify-end gap-2">
@@ -140,10 +196,10 @@ function ClonarModal({
 // ─── Modal Vigencia Bulk ──────────────────────────────────────────────────────
 
 function VigenciaBulkModal({
-  equipoIds,
+  items,
   onClose,
 }: {
-  equipoIds: string[]
+  items: AsignacionItem[]
   onClose: () => void
 }) {
   const vigenciaMutation = useModificarVigenciaBulk()
@@ -153,9 +209,18 @@ function VigenciaBulkModal({
     formState: { errors },
   } = useForm<VigenciaBulkForm>({ resolver: zodResolver(vigenciaBulkSchema) })
 
+  const firstItem = items[0]
+
   const onSubmit = (data: VigenciaBulkForm) => {
+    if (!firstItem?.materia_id || !firstItem?.carrera_id || !firstItem?.cohorte_id) return
     vigenciaMutation.mutate(
-      { equipo_ids: equipoIds, ...data },
+      {
+        materia_id: firstItem.materia_id,
+        carrera_id: firstItem.carrera_id,
+        cohorte_id: firstItem.cohorte_id,
+        desde: data.desde ?? undefined,
+        hasta: data.hasta ?? undefined,
+      },
       { onSuccess: onClose },
     )
   }
@@ -163,39 +228,36 @@ function VigenciaBulkModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-lg font-semibold">Modificar vigencia ({equipoIds.length} equipos)</h2>
+        <h2 className="mb-4 text-lg font-semibold">
+          Modificar vigencia ({items.length} asignaciones)
+        </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="fecha_inicio">
+            <label className="mb-1 block text-sm font-medium" htmlFor="desde">
               Fecha inicio
             </label>
             <input
-              id="fecha_inicio"
+              id="desde"
               type="date"
-              {...register('fecha_inicio')}
+              {...register('desde')}
               className="w-full rounded border border-border p-2"
             />
-            {errors.fecha_inicio && (
+            {errors.desde && (
               <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.fecha_inicio.message}
+                {errors.desde.message}
               </p>
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="fecha_fin">
+            <label className="mb-1 block text-sm font-medium" htmlFor="hasta">
               Fecha fin
             </label>
             <input
-              id="fecha_fin"
+              id="hasta"
               type="date"
-              {...register('fecha_fin')}
+              {...register('hasta')}
               className="w-full rounded border border-border p-2"
             />
-            {errors.fecha_fin && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.fecha_fin.message}
-              </p>
-            )}
           </div>
           {vigenciaMutation.isError && (
             <p role="alert" className="text-sm text-red-600">
@@ -230,7 +292,7 @@ function EquiposContent() {
   const { data, isLoading, isError } = useEquipos()
   const exportMutation = useExportarEquipos()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [clonarTarget, setClonarTarget] = useState<Equipo | null>(null)
+  const [clonarTarget, setClonarTarget] = useState<AsignacionItem | null>(null)
   const [showVigenciaModal, setShowVigenciaModal] = useState(false)
 
   const toggleSelect = (id: string) => {
@@ -268,6 +330,9 @@ function EquiposContent() {
     )
   }
 
+  const items = data ?? []
+  const selectedItems = items.filter((i) => selectedIds.includes(i.id))
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -291,29 +356,30 @@ function EquiposContent() {
         </div>
       </div>
 
-      {data?.items.length === 0 ? (
-        <p className="text-gray-500">No hay equipos registrados.</p>
+      {items.length === 0 ? (
+        <p className="text-gray-500">No hay asignaciones registradas.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="p-3 text-left"></th>
-                <th className="p-3 text-left">Nombre</th>
-                <th className="p-3 text-left">Período</th>
-                <th className="p-3 text-left">Inicio</th>
-                <th className="p-3 text-left">Fin</th>
-                <th className="p-3 text-left">Tutores</th>
+                <th className="p-3 text-left">Usuario ID</th>
+                <th className="p-3 text-left">Rol</th>
+                <th className="p-3 text-left">Desde</th>
+                <th className="p-3 text-left">Hasta</th>
+                <th className="p-3 text-left">Comisiones</th>
+                <th className="p-3 text-left">Estado</th>
                 <th className="p-3 text-left">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {data?.items.map((equipo) => (
-                <EquipoRow
-                  key={equipo.id}
-                  equipo={equipo}
+              {items.map((item) => (
+                <AsignacionRow
+                  key={item.id}
+                  item={item}
                   onClonar={setClonarTarget}
-                  isSelected={selectedIds.includes(equipo.id)}
+                  isSelected={selectedIds.includes(item.id)}
                   onToggle={toggleSelect}
                 />
               ))}
@@ -323,12 +389,12 @@ function EquiposContent() {
       )}
 
       {clonarTarget && (
-        <ClonarModal equipo={clonarTarget} onClose={() => setClonarTarget(null)} />
+        <ClonarModal item={clonarTarget} onClose={() => setClonarTarget(null)} />
       )}
 
       {showVigenciaModal && (
         <VigenciaBulkModal
-          equipoIds={selectedIds}
+          items={selectedItems}
           onClose={() => {
             setShowVigenciaModal(false)
             setSelectedIds([])

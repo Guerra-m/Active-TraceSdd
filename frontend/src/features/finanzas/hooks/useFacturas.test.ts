@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createElement } from 'react'
 import { useFacturas, useCreateFactura, useAbonarFactura } from './useFacturas'
 import * as facturasService from '../services/facturasService'
-import type { Factura, PagedResponse } from '../types'
+import type { Factura } from '../types'
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -16,23 +16,20 @@ function createWrapper() {
 
 const mockFactura: Factura = {
   id: 'fac-1',
-  docente_id: 'doc-1',
-  docente_nombre: 'María García',
-  monto: 95000,
-  periodo: '2024-03',
-  numero_factura: 'A-00001',
-  estado: 'pendiente',
-  fecha_emision: '2024-03-31',
-  fecha_pago: null,
   tenant_id: 'tenant-1',
+  usuario_id: 'usr-1',
+  periodo: '2024-03',
+  monto: 95000,
+  detalle: 'Honorarios marzo',
+  archivo_ref: null,
+  estado: 'Pendiente',
+  fecha_carga: '2024-03-31T00:00:00Z',
+  fecha_pago: null,
+  created_at: '2024-03-31T00:00:00Z',
+  updated_at: '2024-03-31T00:00:00Z',
 }
 
-const mockPagedFacturas: PagedResponse<Factura> = {
-  items: [mockFactura],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
+const mockFacturas: Factura[] = [mockFactura]
 
 describe('useFacturas', () => {
   beforeEach(() => {
@@ -40,14 +37,14 @@ describe('useFacturas', () => {
   })
 
   it('retorna la lista de facturas exitosamente', async () => {
-    vi.spyOn(facturasService, 'fetchFacturas').mockResolvedValue(mockPagedFacturas)
+    vi.spyOn(facturasService, 'fetchFacturas').mockResolvedValue(mockFacturas)
 
     const { result } = renderHook(() => useFacturas(), { wrapper: createWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(result.current.data?.items).toHaveLength(1)
-    expect(result.current.data?.items[0].numero_factura).toBe('A-00001')
+    expect(result.current.data).toHaveLength(1)
+    expect(result.current.data?.[0].periodo).toBe('2024-03')
   })
 
   it('expone error cuando el servicio falla', async () => {
@@ -70,21 +67,17 @@ describe('useCreateFactura', () => {
     const { result } = renderHook(() => useCreateFactura(), { wrapper: createWrapper() })
 
     result.current.mutate({
-      docente_id: 'doc-1',
+      usuario_id: 'usr-1',
       monto: 95000,
       periodo: '2024-03',
-      numero_factura: 'A-00001',
-      fecha_emision: '2024-03-31',
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     expect(spy).toHaveBeenCalledWith({
-      docente_id: 'doc-1',
+      usuario_id: 'usr-1',
       monto: 95000,
       periodo: '2024-03',
-      numero_factura: 'A-00001',
-      fecha_emision: '2024-03-31',
     })
   })
 
@@ -94,11 +87,9 @@ describe('useCreateFactura', () => {
     const { result } = renderHook(() => useCreateFactura(), { wrapper: createWrapper() })
 
     result.current.mutate({
-      docente_id: 'doc-1',
+      usuario_id: 'usr-1',
       monto: 95000,
       periodo: '2024-03',
-      numero_factura: 'A-00001',
-      fecha_emision: '2024-03-31',
     })
 
     await waitFor(() => expect(result.current.isError).toBe(true))
@@ -110,17 +101,17 @@ describe('useAbonarFactura', () => {
     vi.restoreAllMocks()
   })
 
-  it('llama a abonarFactura con el id correcto', async () => {
-    const abonada: Factura = { ...mockFactura, estado: 'abonada', fecha_pago: '2024-04-05' }
+  it('llama a abonarFactura con id y fecha_pago', async () => {
+    const abonada: Factura = { ...mockFactura, estado: 'Abonada', fecha_pago: '2024-04-05' }
     const spy = vi.spyOn(facturasService, 'abonarFactura').mockResolvedValue(abonada)
 
     const { result } = renderHook(() => useAbonarFactura(), { wrapper: createWrapper() })
 
-    result.current.mutate('fac-1')
+    result.current.mutate({ id: 'fac-1', fecha_pago: '2024-04-05' })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(spy).toHaveBeenCalledWith('fac-1')
+    expect(spy).toHaveBeenCalledWith('fac-1', '2024-04-05')
   })
 
   it('expone error si abonar falla', async () => {
@@ -128,7 +119,7 @@ describe('useAbonarFactura', () => {
 
     const { result } = renderHook(() => useAbonarFactura(), { wrapper: createWrapper() })
 
-    result.current.mutate('fac-1')
+    result.current.mutate({ id: 'fac-1', fecha_pago: '2024-04-05' })
 
     await waitFor(() => expect(result.current.isError).toBe(true))
   })

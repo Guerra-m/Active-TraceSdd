@@ -10,7 +10,7 @@ import {
   useCalcularLiquidacion,
   useCerrarLiquidacion,
 } from '../hooks/useLiquidaciones'
-import type { Liquidacion, LiquidacionPreview, TipoDocente } from '../types'
+import type { Liquidacion, LiquidacionEstado, LiquidacionFiltros } from '../types'
 
 // ─── Schemas Zod ──────────────────────────────────────────────────────────────
 
@@ -33,16 +33,12 @@ function KPICards({
   total_general,
   total_nexo,
   total_facturantes,
-  count_general,
-  count_nexo,
-  count_facturantes,
+  cantidad_liquidaciones,
 }: {
   total_general: number
   total_nexo: number
   total_facturantes: number
-  count_general: number
-  count_nexo: number
-  count_facturantes: number
+  cantidad_liquidaciones: number
 }) {
   const fmt = (n: number) =>
     n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
@@ -50,15 +46,15 @@ function KPICards({
   return (
     <div className="grid grid-cols-3 gap-4">
       <div className="rounded-lg border border-border bg-white p-4">
-        <p className="text-sm text-gray-500">General ({count_general})</p>
+        <p className="text-sm text-gray-500">General</p>
         <p className="text-xl font-bold">{fmt(total_general)}</p>
       </div>
       <div className="rounded-lg border border-border bg-white p-4">
-        <p className="text-sm text-gray-500">NEXO ({count_nexo})</p>
+        <p className="text-sm text-gray-500">NEXO</p>
         <p className="text-xl font-bold">{fmt(total_nexo)}</p>
       </div>
       <div className="rounded-lg border border-border bg-white p-4">
-        <p className="text-sm text-gray-500">Facturantes ({count_facturantes})</p>
+        <p className="text-sm text-gray-500">Facturantes ({cantidad_liquidaciones})</p>
         <p className="text-xl font-bold">{fmt(total_facturantes)}</p>
       </div>
     </div>
@@ -77,29 +73,34 @@ function LiquidacionRow({
   const fmt = (n: number) =>
     n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
 
-  const estadoBadge: Record<Liquidacion['estado'], string> = {
-    borrador: 'bg-yellow-100 text-yellow-800',
-    cerrada: 'bg-green-100 text-green-800',
-    anulada: 'bg-red-100 text-red-800',
+  const estadoBadge: Record<LiquidacionEstado, string> = {
+    Abierta: 'bg-yellow-100 text-yellow-800',
+    Cerrada: 'bg-green-100 text-green-800',
   }
 
-  const tipoBadge: Record<TipoDocente, string> = {
-    general: 'bg-blue-100 text-blue-800',
-    nexo: 'bg-purple-100 text-purple-800',
-    facturante: 'bg-orange-100 text-orange-800',
-  }
+  const tipoBadge = liquidacion.es_nexo
+    ? 'bg-purple-100 text-purple-800'
+    : liquidacion.excluido_por_factura
+      ? 'bg-orange-100 text-orange-800'
+      : 'bg-blue-100 text-blue-800'
+
+  const tipoLabel = liquidacion.es_nexo
+    ? 'NEXO'
+    : liquidacion.excluido_por_factura
+      ? 'Facturante'
+      : 'General'
 
   return (
     <tr className="border-b border-border">
-      <td className="p-3 font-medium">{liquidacion.docente_nombre}</td>
+      <td className="p-3 font-mono text-xs text-gray-500">{liquidacion.usuario_id.slice(0, 8)}</td>
       <td className="p-3">
-        <span className={`rounded px-2 py-0.5 text-xs font-medium ${tipoBadge[liquidacion.tipo]}`}>
-          {liquidacion.tipo}
+        <span className={`rounded px-2 py-0.5 text-xs font-medium ${tipoBadge}`}>
+          {tipoLabel}
         </span>
       </td>
       <td className="p-3">{fmt(liquidacion.monto_base)}</td>
       <td className="p-3">{fmt(liquidacion.monto_plus)}</td>
-      <td className="p-3 font-semibold">{fmt(liquidacion.monto_total)}</td>
+      <td className="p-3 font-semibold">{fmt(liquidacion.total)}</td>
       <td className="p-3">
         <span
           className={`rounded px-2 py-0.5 text-xs font-medium ${estadoBadge[liquidacion.estado]}`}
@@ -108,7 +109,7 @@ function LiquidacionRow({
         </span>
       </td>
       <td className="p-3">
-        {liquidacion.estado === 'borrador' && (
+        {liquidacion.estado === 'Abierta' && (
           <button
             onClick={() => onCerrar(liquidacion.id)}
             className="rounded bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700"
@@ -124,7 +125,7 @@ function LiquidacionRow({
 // ─── Modal Calcular ───────────────────────────────────────────────────────────
 
 function CalcularModal({ onClose }: { onClose: () => void }) {
-  const [preview, setPreview] = useState<LiquidacionPreview | null>(null)
+  const [resultado, setResultado] = useState<Liquidacion[] | null>(null)
   const calcularMutation = useCalcularLiquidacion()
 
   const {
@@ -135,14 +136,8 @@ function CalcularModal({ onClose }: { onClose: () => void }) {
 
   const onSubmit = (data: CalcularForm) => {
     calcularMutation.mutate(data, {
-      onSuccess: (result) => {
-        setPreview(result)
-      },
+      onSuccess: (liquidaciones) => setResultado(liquidaciones),
     })
-  }
-
-  const handleConfirmar = () => {
-    onClose()
   }
 
   const fmt = (n: number) =>
@@ -153,7 +148,7 @@ function CalcularModal({ onClose }: { onClose: () => void }) {
       <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
         <h2 className="mb-4 text-lg font-semibold">Calcular liquidación</h2>
 
-        {!preview ? (
+        {!resultado ? (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="mb-1 block text-sm font-medium" htmlFor="cohorte_id">
@@ -212,36 +207,42 @@ function CalcularModal({ onClose }: { onClose: () => void }) {
         ) : (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Preview de la liquidación ({preview.items.length} docentes):
+              Liquidación calculada: {resultado.length} registros.
             </p>
             <div className="grid grid-cols-3 gap-2 text-sm">
               <div className="rounded bg-gray-50 p-3">
-                <p className="text-gray-500">General</p>
-                <p className="font-bold">{fmt(preview.kpis.total_general)}</p>
+                <p className="text-gray-500">Total general</p>
+                <p className="font-bold">
+                  {fmt(resultado.reduce((s, l) => s + l.total, 0))}
+                </p>
               </div>
               <div className="rounded bg-gray-50 p-3">
                 <p className="text-gray-500">NEXO</p>
-                <p className="font-bold">{fmt(preview.kpis.total_nexo)}</p>
+                <p className="font-bold">
+                  {fmt(resultado.filter((l) => l.es_nexo).reduce((s, l) => s + l.total, 0))}
+                </p>
               </div>
               <div className="rounded bg-gray-50 p-3">
                 <p className="text-gray-500">Facturantes</p>
-                <p className="font-bold">{fmt(preview.kpis.total_facturantes)}</p>
+                <p className="font-bold">
+                  {fmt(resultado.filter((l) => l.excluido_por_factura).reduce((s, l) => s + l.total, 0))}
+                </p>
               </div>
             </div>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setPreview(null)}
+                onClick={() => setResultado(null)}
                 className="rounded border border-border px-4 py-2 text-sm"
               >
                 Volver
               </button>
               <button
                 type="button"
-                onClick={handleConfirmar}
+                onClick={onClose}
                 className="rounded bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700"
               >
-                Confirmar
+                Cerrar
               </button>
             </div>
           </div>
@@ -253,30 +254,34 @@ function CalcularModal({ onClose }: { onClose: () => void }) {
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 
+const DEFAULT_PERIODO = new Date().toISOString().slice(0, 7)
+
 function LiquidacionesContent() {
-  const [filtros, setFiltros] = useState<FiltrosForm>({})
+  const [filtros, setFiltros] = useState<LiquidacionFiltros>({ periodo: DEFAULT_PERIODO })
   const [showCalcular, setShowCalcular] = useState(false)
 
   const { data, isLoading, isError } = useLiquidaciones(filtros)
   const { data: kpis } = useLiquidacionKPIs(filtros)
   const cerrarMutation = useCerrarLiquidacion()
+  const items = data ?? []
 
   const { register, handleSubmit } = useForm<FiltrosForm>({
     resolver: zodResolver(filtrosSchema),
+    defaultValues: { periodo: DEFAULT_PERIODO },
   })
 
-  const onFiltrar = (data: FiltrosForm) => {
-    setFiltros(data)
+  const onFiltrar = (formData: FiltrosForm) => {
+    setFiltros(formData)
   }
 
   const handleCerrar = (id: string) => {
     cerrarMutation.mutate(id)
   }
 
-  const secciones: { titulo: string; tipo: TipoDocente }[] = [
-    { titulo: 'General', tipo: 'general' },
-    { titulo: 'NEXO', tipo: 'nexo' },
-    { titulo: 'Facturantes', tipo: 'facturante' },
+  const secciones = [
+    { titulo: 'General', filtro: (l: Liquidacion) => !l.es_nexo && !l.excluido_por_factura },
+    { titulo: 'NEXO', filtro: (l: Liquidacion) => l.es_nexo },
+    { titulo: 'Facturantes', filtro: (l: Liquidacion) => l.excluido_por_factura },
   ]
 
   if (isLoading) {
@@ -307,7 +312,6 @@ function LiquidacionesContent() {
         </button>
       </div>
 
-      {/* Filtros */}
       <form onSubmit={handleSubmit(onFiltrar)} className="flex gap-4 rounded-lg border border-border p-4">
         <div>
           <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="f-cohorte">
@@ -341,32 +345,28 @@ function LiquidacionesContent() {
         </div>
       </form>
 
-      {/* KPIs */}
       {kpis && (
         <KPICards
           total_general={kpis.total_general}
           total_nexo={kpis.total_nexo}
           total_facturantes={kpis.total_facturantes}
-          count_general={kpis.count_general}
-          count_nexo={kpis.count_nexo}
-          count_facturantes={kpis.count_facturantes}
+          cantidad_liquidaciones={kpis.cantidad_liquidaciones}
         />
       )}
 
-      {/* Tabla por sección */}
-      {secciones.map(({ titulo, tipo }) => {
-        const items = data?.items.filter((l) => l.tipo === tipo) ?? []
-        if (items.length === 0) return null
+      {secciones.map(({ titulo, filtro }) => {
+        const seccionItems = items.filter(filtro)
+        if (seccionItems.length === 0) return null
 
         return (
-          <div key={tipo} className="overflow-x-auto rounded-lg border border-border">
+          <div key={titulo} className="overflow-x-auto rounded-lg border border-border">
             <h2 className="border-b border-border bg-gray-50 px-4 py-2 text-sm font-semibold">
               {titulo}
             </h2>
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="p-3 text-left">Docente</th>
+                  <th className="p-3 text-left">Usuario (ID)</th>
                   <th className="p-3 text-left">Tipo</th>
                   <th className="p-3 text-left">Base</th>
                   <th className="p-3 text-left">Plus</th>
@@ -376,7 +376,7 @@ function LiquidacionesContent() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((liq) => (
+                {seccionItems.map((liq) => (
                   <LiquidacionRow key={liq.id} liquidacion={liq} onCerrar={handleCerrar} />
                 ))}
               </tbody>
@@ -385,7 +385,7 @@ function LiquidacionesContent() {
         )
       })}
 
-      {data?.items.length === 0 && (
+      {items.length === 0 && (
         <p className="text-gray-500">No hay liquidaciones para los filtros seleccionados.</p>
       )}
 
@@ -402,7 +402,7 @@ function LiquidacionesContent() {
 
 export function LiquidacionesPage() {
   return (
-    <RequirePermission permission="liquidaciones:ver">
+    <RequirePermission permission="liquidaciones:operar">
       <LiquidacionesContent />
     </RequirePermission>
   )

@@ -7,7 +7,6 @@ import { Spinner } from '@/shared/components/Spinner'
 import {
   useTareas,
   useCreateTarea,
-  useDelegarTarea,
   useCambiarEstadoTarea,
   useComentarios,
   useCreateComentario,
@@ -17,31 +16,29 @@ import type { Tarea, TareaEstado } from '../types'
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const createTareaSchema = z.object({
-  titulo: z.string().min(1, 'El título es requerido'),
   descripcion: z.string().min(1, 'La descripción es requerida'),
-  asignado_a: z.string().min(1, 'Debe seleccionar un asignado'),
-  fecha_limite: z.string().optional(),
+  asignado_a: z.string().min(1, 'Debe ingresar el ID del usuario'),
 })
 
 const comentarioSchema = z.object({
-  contenido: z.string().min(1, 'El comentario no puede estar vacío'),
+  texto: z.string().min(1, 'El comentario no puede estar vacío'),
 })
 
 type CreateTareaForm = z.infer<typeof createTareaSchema>
 type ComentarioForm = z.infer<typeof comentarioSchema>
 
 const ESTADO_LABELS: Record<TareaEstado, string> = {
-  pendiente: 'Pendiente',
-  en_progreso: 'En progreso',
-  completada: 'Completada',
-  cancelada: 'Cancelada',
+  Pendiente: 'Pendiente',
+  'En progreso': 'En progreso',
+  Resuelta: 'Resuelta',
+  Cancelada: 'Cancelada',
 }
 
 const ESTADO_COLORS: Record<TareaEstado, string> = {
-  pendiente: 'bg-yellow-100 text-yellow-700',
-  en_progreso: 'bg-blue-100 text-blue-700',
-  completada: 'bg-green-100 text-green-700',
-  cancelada: 'bg-gray-100 text-gray-600',
+  Pendiente: 'bg-yellow-100 text-yellow-700',
+  'En progreso': 'bg-blue-100 text-blue-700',
+  Resuelta: 'bg-green-100 text-green-700',
+  Cancelada: 'bg-gray-100 text-gray-600',
 }
 
 // ─── Comentarios Panel ────────────────────────────────────────────────────────
@@ -69,14 +66,15 @@ function ComentariosPanel({ tareaId }: { tareaId: string }) {
         <div className="space-y-2">
           {comentarios?.map((c) => (
             <div key={c.id} className="rounded bg-gray-50 p-2 text-sm">
-              <span className="font-medium">{c.autor_nombre}:</span> {c.contenido}
+              <span className="font-mono text-xs text-gray-500">{c.autor_id.slice(0, 8)}:</span>{' '}
+              {c.texto}
             </div>
           ))}
         </div>
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="mt-3 flex gap-2">
         <input
-          {...register('contenido')}
+          {...register('texto')}
           placeholder="Escribir comentario..."
           className="flex-1 rounded border border-border p-2 text-sm"
         />
@@ -88,9 +86,9 @@ function ComentariosPanel({ tareaId }: { tareaId: string }) {
           Enviar
         </button>
       </form>
-      {errors.contenido && (
+      {errors.texto && (
         <p role="alert" className="mt-1 text-sm text-red-600">
-          {errors.contenido.message}
+          {errors.texto.message}
         </p>
       )}
     </div>
@@ -102,18 +100,14 @@ function ComentariosPanel({ tareaId }: { tareaId: string }) {
 function TareaCard({ tarea }: { tarea: Tarea }) {
   const [expanded, setExpanded] = useState(false)
   const cambiarEstadoMutation = useCambiarEstadoTarea()
-  const delegarMutation = useDelegarTarea()
-  const [delegarTarget, setDelegarTarget] = useState('')
 
   return (
     <div className="rounded-lg border border-border p-4">
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="font-medium">{tarea.titulo}</h3>
-          <p className="mt-1 text-sm text-gray-500">{tarea.descripcion}</p>
-          <p className="mt-1 text-xs text-gray-400">
-            Asignado a: {tarea.asignado_a_nombre}
-            {tarea.fecha_limite && ` · Vence: ${tarea.fecha_limite}`}
+          <p className="font-medium">{tarea.descripcion}</p>
+          <p className="mt-1 font-mono text-xs text-gray-400">
+            Asignado a: {tarea.asignado_a}
           </p>
         </div>
         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ESTADO_COLORS[tarea.estado]}`}>
@@ -130,36 +124,12 @@ function TareaCard({ tarea }: { tarea: Tarea }) {
           className="rounded border border-border p-1 text-sm"
           aria-label="Cambiar estado"
         >
-          {Object.entries(ESTADO_LABELS).map(([value, label]) => (
+          {(Object.keys(ESTADO_LABELS) as TareaEstado[]).map((value) => (
             <option key={value} value={value}>
-              {label}
+              {ESTADO_LABELS[value]}
             </option>
           ))}
         </select>
-
-        <div className="flex gap-1">
-          <input
-            type="text"
-            value={delegarTarget}
-            onChange={(e) => setDelegarTarget(e.target.value)}
-            placeholder="ID usuario para delegar"
-            className="rounded border border-border p-1 text-sm"
-            aria-label="Usuario para delegar"
-          />
-          <button
-            onClick={() => {
-              if (delegarTarget) {
-                delegarMutation.mutate(
-                  { id: tarea.id, payload: { nuevo_asignado: delegarTarget } },
-                  { onSuccess: () => setDelegarTarget('') },
-                )
-              }
-            }}
-            className="rounded border border-border px-2 py-1 text-sm hover:bg-gray-50"
-          >
-            Delegar
-          </button>
-        </div>
 
         <button
           onClick={() => setExpanded((p) => !p)}
@@ -180,6 +150,7 @@ function TareasContent() {
   const { data, isLoading, isError } = useTareas()
   const createMutation = useCreateTarea()
   const [showForm, setShowForm] = useState(false)
+  const items = data ?? []
 
   const {
     register,
@@ -188,8 +159,8 @@ function TareasContent() {
     formState: { errors },
   } = useForm<CreateTareaForm>({ resolver: zodResolver(createTareaSchema) })
 
-  const onSubmit = (data: CreateTareaForm) => {
-    createMutation.mutate(data, {
+  const onSubmit = (formData: CreateTareaForm) => {
+    createMutation.mutate(formData, {
       onSuccess: () => {
         reset()
         setShowForm(false)
@@ -232,26 +203,11 @@ function TareasContent() {
         >
           <h2 className="font-medium">Nueva tarea</h2>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="titulo">
-              Título
-            </label>
-            <input
-              id="titulo"
-              {...register('titulo')}
-              className="w-full rounded border border-border p-2"
-            />
-            {errors.titulo && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.titulo.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="descripcion">
+            <label className="mb-1 block text-sm font-medium" htmlFor="t-desc">
               Descripción
             </label>
             <textarea
-              id="descripcion"
+              id="t-desc"
               {...register('descripcion')}
               rows={3}
               className="w-full rounded border border-border p-2"
@@ -263,11 +219,11 @@ function TareasContent() {
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="asignado_a">
+            <label className="mb-1 block text-sm font-medium" htmlFor="t-asignado">
               Asignado a (ID usuario)
             </label>
             <input
-              id="asignado_a"
+              id="t-asignado"
               {...register('asignado_a')}
               className="w-full rounded border border-border p-2"
             />
@@ -276,17 +232,6 @@ function TareasContent() {
                 {errors.asignado_a.message}
               </p>
             )}
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="fecha_limite">
-              Fecha límite (opcional)
-            </label>
-            <input
-              id="fecha_limite"
-              type="date"
-              {...register('fecha_limite')}
-              className="w-full rounded border border-border p-2"
-            />
           </div>
           {createMutation.isError && (
             <p role="alert" className="text-sm text-red-600">
@@ -303,11 +248,11 @@ function TareasContent() {
         </form>
       )}
 
-      {data?.items.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-gray-500">No hay tareas asignadas.</p>
       ) : (
         <div className="space-y-3">
-          {data?.items.map((tarea) => (
+          {items.map((tarea) => (
             <TareaCard key={tarea.id} tarea={tarea} />
           ))}
         </div>

@@ -1,91 +1,115 @@
-// ─── Calificaciones / Importación ────────────────────────────────────────────
+// ─── Atrasados ────────────────────────────────────────────────────────────────
 
-export interface ActividadPreview {
-  id: string
+export interface AlumnoAtrasado {
+  entrada_padron_id: string
   nombre: string
-  tipo: string
-  fecha: string
+  apellidos: string
+  faltantes: string[]
+  reprobadas: string[]
 }
 
-export interface ImportacionPayload {
-  comision_id: string
-  actividad_ids: string[]
+export interface AtrasadosResponse {
+  total_atrasados: number
+  alumnos: AlumnoAtrasado[]
 }
 
-export interface ImportacionResult {
-  importadas: number
-  mensaje: string
+// ─── Ranking ─────────────────────────────────────────────────────────────────
+
+export interface AlumnoRanking {
+  posicion: number
+  entrada_padron_id: string
+  nombre: string
+  apellidos: string
+  aprobadas: number
+  total: number
+}
+
+export interface RankingResponse {
+  total_alumnos: number
+  ranking: AlumnoRanking[]
+}
+
+// ─── Notas finales ────────────────────────────────────────────────────────────
+
+export interface AlumnoNotaFinal {
+  entrada_padron_id: string
+  nombre: string
+  apellidos: string
+  promedio_numerico: number | null
+  aprobadas: number
+  total: number
+}
+
+export interface NotasFinalesResponse {
+  total_alumnos: number
+  alumnos: AlumnoNotaFinal[]
 }
 
 // ─── Umbral ───────────────────────────────────────────────────────────────────
 
-export interface Umbral {
-  id: string
-  comision_id: string
-  porcentaje: number
+export interface UmbralResponse {
+  umbral_pct: number
+  valores_aprobatorios: string[]
+  es_default: boolean
 }
 
 export interface UmbralPayload {
-  porcentaje: number
+  umbral_pct: number
+  valores_aprobatorios?: string[]
 }
 
-// ─── Atrasados ────────────────────────────────────────────────────────────────
+// ─── Importación ──────────────────────────────────────────────────────────────
 
-export interface AlumnoAtrasado {
-  id: string
-  nombre: string
-  legajo: string
-  entregas_atrasadas: number
-  ultimo_atraso: string
-}
-
-export interface AlumnoRanking {
-  posicion: number
-  nombre: string
-  legajo: string
-  promedio: number
-}
-
-export interface AlumnoNotaFinal {
-  id: string
-  nombre: string
-  legajo: string
-  nota_final: number | null
+export interface ImportarCalificacionesResponse {
+  asignacion_id: string
+  materia_id: string
+  filas_importadas: number
+  actividades_detectadas: string[]
 }
 
 // ─── Entregas sin corregir ────────────────────────────────────────────────────
 
 export interface EntregaSinCorregir {
-  id: string
-  alumno_nombre: string
-  alumno_legajo: string
+  entrada_padron_id: string
+  nombre: string
+  apellidos: string
   actividad: string
-  fecha_entrega: string
-  estado: string
+  importado_at: string
+}
+
+export interface EntregasSinCorregirResponse {
+  total: number
+  items: EntregaSinCorregir[]
 }
 
 // ─── Comunicaciones ───────────────────────────────────────────────────────────
 
-export type EstadoComunicacion = 'PENDIENTE' | 'ENVIANDO' | 'ENVIADO' | 'FALLIDO' | 'CANCELADO'
+export type EstadoLote =
+  | 'Pendiente'
+  | 'PendienteAprobacion'
+  | 'Aprobado'
+  | 'Despachando'
+  | 'Completado'
+  | 'Cancelado'
 
-export interface ComunicacionPayload {
-  comision_id: string
-  asunto: string
-  cuerpo: string
-  destinatarios: 'atrasados' | 'todos'
+export interface ComunicacionPorCriterioPayload {
+  asignacion_id: string
+  materia_id: string
+  criterio: 'atrasados' | 'todos'
+  asunto_template: string
+  cuerpo_template: string
 }
 
-export interface ComunicacionResponse {
+export interface LoteComunicacionResponse {
   id: string
-  estado: EstadoComunicacion
-  mensaje: string
-}
-
-export interface ComunicacionEstado {
-  id: string
-  estado: EstadoComunicacion
-  motivo_fallo?: string
-  enviado_at?: string
+  estado: EstadoLote
+  requiere_aprobacion: boolean
+  total_mensajes: number
+  enviados: number
+  errores: number
+  materia_id: string | null
+  aprobado_at: string | null
+  created_at: string
 }
 
 // ─── Monitor ─────────────────────────────────────────────────────────────────
@@ -94,7 +118,7 @@ export interface MonitorData {
   total_alumnos: number
   atrasados: number
   al_dia: number
-  promedio_general: number
+  promedio_general: number | null
   comunicaciones_enviadas: number
   comunicaciones_pendientes: number
 }

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate, Link } from 'react-router-dom'
-import { api } from '@/shared/services/api'
+import { api, setRefreshToken } from '@/shared/services/api'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import type { AuthUser } from '@/features/auth/context/AuthContext'
 
@@ -18,6 +18,7 @@ interface LoginResponse {
   requires_2fa: boolean
   temp_token?: string
   access_token?: string
+  refresh_token?: string
   user?: AuthUser
   permissions?: string[]
 }
@@ -50,6 +51,9 @@ export function LoginPage() {
       }
 
       if (result.access_token && result.user && result.permissions) {
+        if (result.refresh_token) {
+          setRefreshToken(result.refresh_token)
+        }
         setAuth({
           user: result.user,
           permissions: result.permissions,

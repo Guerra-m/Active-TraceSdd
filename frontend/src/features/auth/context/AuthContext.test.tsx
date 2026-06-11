@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { AuthProvider, useAuth } from './AuthContext'
 import * as apiModule from '@/shared/services/api'
+import { setRefreshToken } from '@/shared/services/api'
 
 // Componente auxiliar para testear el hook
 function TestConsumer() {
@@ -17,9 +18,12 @@ function TestConsumer() {
 describe('AuthContext', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    sessionStorage.clear()
   })
 
   it('3.4 - silent refresh exitoso rehidrata la sesión', async () => {
+    setRefreshToken('stored-refresh-token')
+
     const mockUser = {
       id: '1',
       email: 'user@test.com',

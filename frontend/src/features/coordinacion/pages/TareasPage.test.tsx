@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { TareasPage } from './TareasPage'
 import * as AuthContextModule from '@/features/auth/context/AuthContext'
 import * as tareasService from '../services/tareasService'
-import type { PagedResponse, Tarea } from '../types'
+import type { Tarea } from '../types'
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -27,29 +27,19 @@ function mockAuth(permissions: string[]) {
 
 const mockTarea: Tarea = {
   id: 'tar-1',
-  titulo: 'Revisar notas',
-  descripcion: 'Revisión de notas finales',
-  estado: 'pendiente',
-  asignado_a: 'user-1',
-  asignado_a_nombre: 'Juan Pérez',
-  creado_por: 'admin-1',
-  fecha_limite: '2024-07-01',
   tenant_id: 't1',
+  materia_id: null,
+  asignado_a: 'user-1',
+  asignado_por: 'admin-1',
+  estado: 'Pendiente',
+  descripcion: 'Revisión de notas finales',
+  contexto_id: null,
+  created_at: '2024-01-01T00:00:00Z',
 }
 
-const mockTareaList: PagedResponse<Tarea> = {
-  items: [mockTarea],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
+const mockTareas: Tarea[] = [mockTarea]
 
-const emptyList: PagedResponse<Tarea> = {
-  items: [],
-  total: 0,
-  page: 1,
-  page_size: 20,
-}
+const emptyTareas: Tarea[] = []
 
 describe('TareasPage', () => {
   beforeEach(() => {
@@ -58,19 +48,19 @@ describe('TareasPage', () => {
 
   it('muestra listado de tareas con permiso tareas:gestionar', async () => {
     mockAuth(['tareas:gestionar'])
-    vi.spyOn(tareasService, 'fetchTareas').mockResolvedValue(mockTareaList)
+    vi.spyOn(tareasService, 'fetchTareas').mockResolvedValue(mockTareas)
 
     renderWithProviders(<TareasPage />)
 
     await waitFor(() => {
-      expect(screen.getByText('Revisar notas')).toBeInTheDocument()
+      expect(screen.getByText('Revisión de notas finales')).toBeInTheDocument()
     })
-    expect(screen.getByText('Juan Pérez', { exact: false })).toBeInTheDocument()
+    expect(screen.getByText(/user-1/i, { exact: false })).toBeInTheDocument()
   })
 
   it('muestra mensaje cuando no hay tareas asignadas', async () => {
     mockAuth(['tareas:gestionar'])
-    vi.spyOn(tareasService, 'fetchTareas').mockResolvedValue(emptyList)
+    vi.spyOn(tareasService, 'fetchTareas').mockResolvedValue(emptyTareas)
 
     renderWithProviders(<TareasPage />)
 
@@ -90,7 +80,7 @@ describe('TareasPage', () => {
   it('valida campos requeridos al crear tarea', async () => {
     const user = userEvent.setup()
     mockAuth(['tareas:gestionar'])
-    vi.spyOn(tareasService, 'fetchTareas').mockResolvedValue(emptyList)
+    vi.spyOn(tareasService, 'fetchTareas').mockResolvedValue(emptyTareas)
 
     renderWithProviders(<TareasPage />)
 

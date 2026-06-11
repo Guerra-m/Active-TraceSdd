@@ -2,6 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 
 // ─── Token store en memoria (D-01) ───────────────────────────────────────────
 let _accessToken: string | null = null
+let _refreshToken: string | null = sessionStorage.getItem('_rt')
 
 export function setAccessToken(token: string | null): void {
   _accessToken = token
@@ -9,6 +10,19 @@ export function setAccessToken(token: string | null): void {
 
 export function getAccessToken(): string | null {
   return _accessToken
+}
+
+export function setRefreshToken(token: string | null): void {
+  _refreshToken = token
+  if (token) {
+    sessionStorage.setItem('_rt', token)
+  } else {
+    sessionStorage.removeItem('_rt')
+  }
+}
+
+export function getRefreshToken(): string | null {
+  return _refreshToken
 }
 
 // ─── Cola de reintentos (D-02) ────────────────────────────────────────────────
@@ -49,7 +63,7 @@ function forceLogout(): void {
 
 // ─── Instancia Axios ───────────────────────────────────────────────────────────
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: '/api/v1',
   withCredentials: true, // envía la cookie httpOnly del refresh token
 })
 
@@ -93,11 +107,20 @@ api.interceptors.response.use(
     _isRefreshing = true
 
     try {
-      const { data } = await axios.post<{ access_token: string }>(
-        '/api/auth/refresh',
-        {},
+      const rt = _refreshToken
+      if (!rt) {
+        processQueue(new Error('No refresh token'), null)
+        forceLogout()
+        return Promise.reject(new Error('No refresh token'))
+      }
+      const { data } = await axios.post<{ access_token: string; refresh_token?: string }>(
+        '/api/v1/auth/refresh',
+        { refresh_token: rt },
         { withCredentials: true },
       )
+      if (data.refresh_token) {
+        setRefreshToken(data.refresh_token)
+      }
       const newToken = data.access_token
       setAccessToken(newToken)
       processQueue(null, newToken)

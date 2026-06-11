@@ -1,13 +1,60 @@
-# Build output intermedio (regenerable con `npm run pdf` desde .build/)
+# ─── Dependencias ────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build / dist ────────────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
 .build/node_modules/
 .build/activia-trace-doc.html
 .build/package-lock.json
 
-# PDF generado (es regenerable; descomentar si NO querés versionarlo)
-# activia-trace-documentacion.pdf
+# ─── Variables de entorno / secretos ─────────────────────────────────────────
+.env
+.env.*
+!.env.example
 
-# OS / IDE
+# ─── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# ─── Virtual environments ─────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ─── Vite / frontend tooling ──────────────────────────────────────────────────
+.vite/
+
+# ─── OS / IDE ────────────────────────────────────────────────────────────────
 Thumbs.db
 .DS_Store
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Docker ──────────────────────────────────────────────────────────────────
+# (los archivos docker sí se suben, solo ignorar volumenes locales)
+
+# ─── PDF generado (regenerable) ───────────────────────────────────────────────
+# activia-trace-documentacion.pdf

@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { SetupCuatrimestrePage } from './SetupCuatrimestrePage'
 import * as AuthContextModule from '@/features/auth/context/AuthContext'
 import * as equiposService from '../services/equiposService'
-import type { Equipo } from '../types'
+import type { ClonarEquipoResponse } from '../services/equiposService'
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -25,14 +25,11 @@ function mockAuth(permissions: string[]) {
   })
 }
 
-const mockEquipo: Equipo = {
-  id: 'eq-nuevo',
-  nombre: 'Equipo 2024-2',
-  periodo: '2024-2',
-  fecha_inicio: '2024-08-01',
-  fecha_fin: '2024-12-31',
-  tutores_count: 0,
-  tenant_id: 't1',
+const mockClonarResponse: ClonarEquipoResponse = {
+  creadas: 3,
+  conflictos: 0,
+  asignaciones: [],
+  omitidos: [],
 }
 
 describe('SetupCuatrimestrePage', () => {
@@ -54,7 +51,7 @@ describe('SetupCuatrimestrePage', () => {
     renderWithProviders(<SetupCuatrimestrePage />)
 
     expect(screen.getByText(/paso 1/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/id del equipo a clonar/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/ID Materia/i)).toBeInTheDocument()
   })
 
   it('valida campos vacíos en paso 1', async () => {
@@ -73,12 +70,15 @@ describe('SetupCuatrimestrePage', () => {
   it('avanza a paso 2 después de clonar exitosamente', async () => {
     const user = userEvent.setup()
     mockAuth(['equipos:asignar'])
-    vi.spyOn(equiposService, 'clonarEquipo').mockResolvedValue(mockEquipo)
+    vi.spyOn(equiposService, 'clonarEquipo').mockResolvedValue(mockClonarResponse)
 
     renderWithProviders(<SetupCuatrimestrePage />)
 
-    await user.type(screen.getByLabelText(/id del equipo a clonar/i), 'eq-1')
-    await user.type(screen.getByLabelText(/período destino/i), '2024-2')
+    await user.type(screen.getByLabelText(/ID Materia/i), 'mat-1')
+    await user.type(screen.getByLabelText(/ID Carrera/i), 'carr-1')
+    await user.type(screen.getByLabelText(/Cohorte origen/i), 'coh-1')
+    await user.type(screen.getByLabelText(/Cohorte destino/i), 'coh-2')
+    await user.type(screen.getByLabelText(/Vigencia desde/i), '2024-08-01')
     await user.click(screen.getByRole('button', { name: /clonar y continuar/i }))
 
     await waitFor(() => {

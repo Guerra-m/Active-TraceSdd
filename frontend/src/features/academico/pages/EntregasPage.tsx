@@ -2,17 +2,17 @@ import { useEntregasSinCorregir } from '../hooks/useEntregas'
 import type { EntregaSinCorregir } from '../types'
 
 interface EntregasPageProps {
-  comisionId: string
+  asignacionId: string
+  materiaId: string
 }
 
 function exportarCSV(entregas: EntregaSinCorregir[]) {
-  const headers = ['Alumno', 'Legajo', 'Actividad', 'Fecha de entrega', 'Estado']
+  const headers = ['Nombre', 'Apellidos', 'Actividad', 'Importado el']
   const rows = entregas.map((e) => [
-    e.alumno_nombre,
-    e.alumno_legajo,
+    e.nombre,
+    e.apellidos,
     e.actividad,
-    e.fecha_entrega,
-    e.estado,
+    new Date(e.importado_at).toLocaleDateString('es-AR'),
   ])
   const csv = [headers, ...rows].map((r) => r.join(',')).join('\n')
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -24,10 +24,12 @@ function exportarCSV(entregas: EntregaSinCorregir[]) {
   URL.revokeObjectURL(url)
 }
 
-export function EntregasPage({ comisionId }: EntregasPageProps) {
-  const { data: entregas, isLoading, isError } = useEntregasSinCorregir(comisionId)
+export function EntregasPage({ asignacionId, materiaId }: EntregasPageProps) {
+  const { data: resp, isLoading, isError } = useEntregasSinCorregir(asignacionId, materiaId)
 
-  const sinEntregas = !entregas || entregas.length === 0
+  const sinContexto = !asignacionId || !materiaId
+  const entregas = resp?.items ?? []
+  const sinEntregas = entregas.length === 0
 
   return (
     <div className="space-y-6">
@@ -36,41 +38,41 @@ export function EntregasPage({ comisionId }: EntregasPageProps) {
         <button
           type="button"
           disabled={sinEntregas}
-          onClick={() => entregas && exportarCSV(entregas)}
+          onClick={() => exportarCSV(entregas)}
           className="rounded-lg border border-surface-subtle px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle disabled:cursor-not-allowed disabled:opacity-40"
         >
           Exportar CSV
         </button>
       </div>
 
-      {isLoading && <p className="text-text-muted">Cargando entregas...</p>}
+      {sinContexto && <p className="text-text-muted">No hay asignación seleccionada.</p>}
+      {!sinContexto && isLoading && <p className="text-text-muted">Cargando entregas...</p>}
+      {!sinContexto && isError && <p className="text-red-600">Error al cargar las entregas.</p>}
 
-      {isError && <p className="text-red-600">Error al cargar las entregas.</p>}
-
-      {entregas && entregas.length === 0 && (
+      {!sinContexto && !isLoading && !isError && sinEntregas && (
         <p className="text-text-muted">No hay entregas pendientes de corrección</p>
       )}
 
-      {entregas && entregas.length > 0 && (
+      {entregas.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-surface-subtle">
           <table className="w-full text-sm">
             <thead className="bg-surface-muted">
               <tr>
-                <th className="px-4 py-2 text-left font-medium text-text-muted">Alumno</th>
-                <th className="px-4 py-2 text-left font-medium text-text-muted">Legajo</th>
+                <th className="px-4 py-2 text-left font-medium text-text-muted">Nombre</th>
+                <th className="px-4 py-2 text-left font-medium text-text-muted">Apellidos</th>
                 <th className="px-4 py-2 text-left font-medium text-text-muted">Actividad</th>
-                <th className="px-4 py-2 text-left font-medium text-text-muted">Fecha de entrega</th>
-                <th className="px-4 py-2 text-left font-medium text-text-muted">Estado</th>
+                <th className="px-4 py-2 text-left font-medium text-text-muted">Importado el</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-subtle">
-              {entregas.map((e) => (
-                <tr key={e.id} className="hover:bg-surface-subtle">
-                  <td className="px-4 py-2 text-text">{e.alumno_nombre}</td>
-                  <td className="px-4 py-2 text-text">{e.alumno_legajo}</td>
+              {entregas.map((e, i) => (
+                <tr key={`${e.entrada_padron_id}-${e.actividad}-${i}`} className="hover:bg-surface-subtle">
+                  <td className="px-4 py-2 text-text">{e.nombre}</td>
+                  <td className="px-4 py-2 text-text">{e.apellidos}</td>
                   <td className="px-4 py-2 text-text">{e.actividad}</td>
-                  <td className="px-4 py-2 text-text">{e.fecha_entrega}</td>
-                  <td className="px-4 py-2 text-text">{e.estado}</td>
+                  <td className="px-4 py-2 text-text">
+                    {new Date(e.importado_at).toLocaleDateString('es-AR')}
+                  </td>
                 </tr>
               ))}
             </tbody>

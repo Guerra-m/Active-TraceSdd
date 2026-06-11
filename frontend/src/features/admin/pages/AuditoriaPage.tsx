@@ -10,10 +10,10 @@ import type { AuditLogFiltros } from '../types'
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const filtrosSchema = z.object({
-  desde: z.string().optional(),
-  hasta: z.string().optional(),
+  fecha_desde: z.string().optional(),
+  fecha_hasta: z.string().optional(),
   materia_id: z.string().optional(),
-  usuario_id: z.string().optional(),
+  actor_id: z.string().optional(),
   accion: z.string().optional(),
 })
 
@@ -21,8 +21,8 @@ type FiltrosForm = z.infer<typeof filtrosSchema>
 
 // ─── Panel KPIs ───────────────────────────────────────────────────────────────
 
-function PanelKPIs({ desde, hasta }: { desde?: string; hasta?: string }) {
-  const { data: panel, isLoading } = useAuditPanel({ desde, hasta })
+function PanelKPIs({ fecha_desde, fecha_hasta }: { fecha_desde?: string; fecha_hasta?: string }) {
+  const { data: panel, isLoading } = useAuditPanel({ fecha_desde, fecha_hasta })
 
   if (isLoading) return <Spinner />
   if (!panel) return null
@@ -35,7 +35,7 @@ function PanelKPIs({ desde, hasta }: { desde?: string; hasta?: string }) {
           <div className="flex gap-2 overflow-x-auto">
             {panel.acciones_por_dia.map((d) => (
               <div key={d.fecha} className="flex-shrink-0 rounded bg-blue-50 p-2 text-center text-xs">
-                <div className="font-bold text-blue-800">{d.count}</div>
+                <div className="font-bold text-blue-800">{d.total}</div>
                 <div className="text-gray-600">{d.fecha.slice(5)}</div>
               </div>
             ))}
@@ -43,23 +43,25 @@ function PanelKPIs({ desde, hasta }: { desde?: string; hasta?: string }) {
         </div>
       )}
 
-      {panel.comunicaciones_por_docente.length > 0 && (
+      {panel.por_actor.length > 0 && (
         <div className="rounded-lg border border-border p-4">
-          <h3 className="mb-2 font-semibold text-sm">Comunicaciones por docente</h3>
+          <h3 className="mb-2 font-semibold text-sm">Acciones por actor</h3>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                <th className="py-1 text-left">Docente</th>
-                <th className="py-1 text-right text-green-700">Enviadas</th>
-                <th className="py-1 text-right text-red-700">Fallidas</th>
+                <th className="py-1 text-left">Actor (ID)</th>
+                <th className="py-1 text-left">Materia (ID)</th>
+                <th className="py-1 text-right">Total</th>
               </tr>
             </thead>
             <tbody>
-              {panel.comunicaciones_por_docente.map((c) => (
-                <tr key={c.docente_nombre} className="border-b border-border">
-                  <td className="py-1">{c.docente_nombre}</td>
-                  <td className="py-1 text-right font-medium text-green-700">{c.enviadas}</td>
-                  <td className="py-1 text-right font-medium text-red-700">{c.fallidas}</td>
+              {panel.por_actor.map((c, i) => (
+                <tr key={i} className="border-b border-border">
+                  <td className="py-1 font-mono text-xs">{c.actor_id.slice(0, 8)}</td>
+                  <td className="py-1 font-mono text-xs text-gray-500">
+                    {c.materia_id ? c.materia_id.slice(0, 8) : '—'}
+                  </td>
+                  <td className="py-1 text-right font-medium">{c.total}</td>
                 </tr>
               ))}
             </tbody>
@@ -76,18 +78,19 @@ function AuditoriaContent() {
   const [filtros, setFiltros] = useState<AuditLogFiltros>({})
 
   const { data, isLoading, isError } = useAuditLogs(filtros)
+  const items = data ?? []
 
   const { register, handleSubmit } = useForm<FiltrosForm>({
     resolver: zodResolver(filtrosSchema),
   })
 
-  const onFiltrar = (data: FiltrosForm) => {
+  const onFiltrar = (formData: FiltrosForm) => {
     const newFiltros: AuditLogFiltros = {}
-    if (data.desde) newFiltros.desde = data.desde
-    if (data.hasta) newFiltros.hasta = data.hasta
-    if (data.materia_id) newFiltros.materia_id = data.materia_id
-    if (data.usuario_id) newFiltros.usuario_id = data.usuario_id
-    if (data.accion) newFiltros.accion = data.accion
+    if (formData.fecha_desde) newFiltros.fecha_desde = formData.fecha_desde
+    if (formData.fecha_hasta) newFiltros.fecha_hasta = formData.fecha_hasta
+    if (formData.materia_id) newFiltros.materia_id = formData.materia_id
+    if (formData.actor_id) newFiltros.actor_id = formData.actor_id
+    if (formData.accion) newFiltros.accion = formData.accion
     setFiltros(newFiltros)
   }
 
@@ -111,10 +114,8 @@ function AuditoriaContent() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Panel de auditoría</h1>
 
-      {/* Panel KPIs */}
-      <PanelKPIs desde={filtros.desde} hasta={filtros.hasta} />
+      <PanelKPIs fecha_desde={filtros.fecha_desde} fecha_hasta={filtros.fecha_hasta} />
 
-      {/* Filtros */}
       <form
         onSubmit={handleSubmit(onFiltrar)}
         className="flex flex-wrap gap-4 rounded-lg border border-border p-4"
@@ -124,7 +125,7 @@ function AuditoriaContent() {
           <input
             id="a-desde"
             type="date"
-            {...register('desde')}
+            {...register('fecha_desde')}
             className="rounded border border-border p-2 text-sm"
           />
         </div>
@@ -133,7 +134,7 @@ function AuditoriaContent() {
           <input
             id="a-hasta"
             type="date"
-            {...register('hasta')}
+            {...register('fecha_hasta')}
             className="rounded border border-border p-2 text-sm"
           />
         </div>
@@ -147,10 +148,10 @@ function AuditoriaContent() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="a-usuario">Usuario (ID)</label>
+          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="a-actor">Actor (ID)</label>
           <input
-            id="a-usuario"
-            {...register('usuario_id')}
+            id="a-actor"
+            {...register('actor_id')}
             className="rounded border border-border p-2 text-sm"
             placeholder="UUID"
           />
@@ -174,8 +175,7 @@ function AuditoriaContent() {
         </div>
       </form>
 
-      {/* Tabla de logs */}
-      {data?.items.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-gray-500">No hay registros para los filtros seleccionados.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
@@ -183,29 +183,26 @@ function AuditoriaContent() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="p-3 text-left">Fecha</th>
-                <th className="p-3 text-left">Usuario</th>
+                <th className="p-3 text-left">Actor (ID)</th>
                 <th className="p-3 text-left">Acción</th>
-                <th className="p-3 text-left">Recurso</th>
+                <th className="p-3 text-left">Detalle</th>
                 <th className="p-3 text-left">IP</th>
               </tr>
             </thead>
             <tbody>
-              {data?.items.map((log) => (
+              {items.map((log) => (
                 <tr key={log.id} className="border-b border-border">
                   <td className="p-3 text-gray-600">
-                    {new Date(log.creado_en).toLocaleString('es-AR')}
+                    {new Date(log.fecha_hora).toLocaleString('es-AR')}
                   </td>
-                  <td className="p-3 font-medium">{log.usuario_nombre}</td>
+                  <td className="p-3 font-mono text-xs">{log.actor_id.slice(0, 8)}</td>
                   <td className="p-3">
                     <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium">
                       {log.accion}
                     </span>
                   </td>
-                  <td className="p-3">
-                    {log.recurso}
-                    {log.recurso_id && (
-                      <span className="ml-1 text-gray-500 text-xs">({log.recurso_id.slice(0, 8)})</span>
-                    )}
+                  <td className="p-3 text-gray-500 text-xs">
+                    {log.detalle ? JSON.stringify(log.detalle).slice(0, 60) : '—'}
                   </td>
                   <td className="p-3 text-gray-600">{log.ip ?? '—'}</td>
                 </tr>
@@ -215,10 +212,8 @@ function AuditoriaContent() {
         </div>
       )}
 
-      {/* Paginación simple */}
-      <div className="flex items-center justify-between text-sm text-gray-600">
-        <span>Total: {data?.total ?? 0} registros</span>
-        <span>Página {data?.page ?? 1} de {Math.ceil((data?.total ?? 0) / (data?.page_size ?? 20))}</span>
+      <div className="text-sm text-gray-500">
+        Total: {items.length} registros
       </div>
     </div>
   )

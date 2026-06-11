@@ -4,10 +4,10 @@ import type { UpdateUsuarioAdminPayload } from '../types'
 
 export const USUARIOS_ADMIN_KEY = 'admin-usuarios'
 
-export function useUsuariosAdmin(params?: { page?: number; page_size?: number }) {
+export function useUsuariosAdmin() {
   return useQuery({
-    queryKey: [USUARIOS_ADMIN_KEY, params],
-    queryFn: () => fetchUsuariosAdmin(params),
+    queryKey: [USUARIOS_ADMIN_KEY],
+    queryFn: () => fetchUsuariosAdmin(),
   })
 }
 

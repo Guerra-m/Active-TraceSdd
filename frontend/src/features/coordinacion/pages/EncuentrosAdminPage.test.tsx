@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { EncuentrosAdminPage } from './EncuentrosAdminPage'
 import * as AuthContextModule from '@/features/auth/context/AuthContext'
 import * as encuentrosService from '../services/encuentrosAdminService'
-import type { PagedResponse, EncuentroAdmin } from '../types'
+import type { EncuentroAdmin } from '../types'
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -27,23 +27,19 @@ function mockAuth(permissions: string[]) {
 
 const mockEncuentro: EncuentroAdmin = {
   id: 'enc-1',
-  alumno_id: 'al-1',
-  alumno_nombre: 'María López',
-  tutor_id: 'tut-1',
-  tutor_nombre: 'Prof. García',
+  tenant_id: 't1',
+  slot_id: null,
+  materia_id: 'mat-1',
   fecha: '2024-08-10',
   hora: '14:00',
-  tipo: 'individual',
-  estado: 'programado',
-  tenant_id: 't1',
+  titulo: 'Encuentro de seguimiento',
+  estado: 'Programado',
+  meet_url: null,
+  video_url: null,
+  comentario: null,
 }
 
-const mockList: PagedResponse<EncuentroAdmin> = {
-  items: [mockEncuentro],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
+const mockList: EncuentroAdmin[] = [mockEncuentro]
 
 describe('EncuentrosAdminPage', () => {
   beforeEach(() => {
@@ -57,9 +53,9 @@ describe('EncuentrosAdminPage', () => {
     renderWithProviders(<EncuentrosAdminPage />)
 
     await waitFor(() => {
-      expect(screen.getByText('María López')).toBeInTheDocument()
+      expect(screen.getByText('Encuentro de seguimiento')).toBeInTheDocument()
     })
-    expect(screen.getByText('Prof. García')).toBeInTheDocument()
+    expect(screen.getByText('2024-08-10')).toBeInTheDocument()
     expect(screen.getByText('Programado')).toBeInTheDocument()
   })
 
@@ -71,31 +67,31 @@ describe('EncuentrosAdminPage', () => {
     expect(screen.getByText(/no tenés permiso/i)).toBeInTheDocument()
   })
 
-  it('abre modal de slots recurrentes al hacer clic', async () => {
+  it('abre modal de slots al hacer clic', async () => {
     const user = userEvent.setup()
     mockAuth(['encuentros:gestionar'])
     vi.spyOn(encuentrosService, 'fetchEncuentrosAdmin').mockResolvedValue(mockList)
 
     renderWithProviders(<EncuentrosAdminPage />)
 
-    await waitFor(() => screen.getByText('María López'))
-    await user.click(screen.getByRole('button', { name: /crear slots recurrentes/i }))
+    await waitFor(() => screen.getByText('Encuentro de seguimiento'))
+    await user.click(screen.getByRole('button', { name: /crear slot/i }))
 
-    expect(screen.getByRole('heading', { name: /crear slots recurrentes/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /crear slot/i })).toBeInTheDocument()
   })
 
-  it('valida formulario de slots sin día seleccionado', async () => {
+  it('valida formulario de slots sin campos requeridos', async () => {
     const user = userEvent.setup()
     mockAuth(['encuentros:gestionar'])
     vi.spyOn(encuentrosService, 'fetchEncuentrosAdmin').mockResolvedValue(mockList)
 
     renderWithProviders(<EncuentrosAdminPage />)
 
-    await waitFor(() => screen.getByText('María López'))
-    await user.click(screen.getByRole('button', { name: /crear slots recurrentes/i }))
+    await waitFor(() => screen.getByText('Encuentro de seguimiento'))
+    await user.click(screen.getByRole('button', { name: /crear slot/i }))
 
-    // Submit without filling fields
-    await user.click(screen.getByRole('button', { name: /^crear slots$/i }))
+    const submitButtons = screen.getAllByRole('button', { name: /^crear slot$/i })
+    await user.click(submitButtons[submitButtons.length - 1])
 
     await waitFor(() => {
       expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)

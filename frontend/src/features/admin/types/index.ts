@@ -73,50 +73,53 @@ export interface UpdateMateriaPayload {
 
 // ─── Usuarios Admin ───────────────────────────────────────────────────────────
 
-export type RolUsuario = 'ALUMNO' | 'TUTOR' | 'PROFESOR' | 'COORDINADOR' | 'NEXO' | 'ADMIN' | 'FINANZAS'
-
 export interface UsuarioAdmin {
   id: string
-  email: string
-  nombre: string
-  rol: RolUsuario
-  activo: boolean
   tenant_id: string
+  nombre: string | null
+  apellidos: string | null
+  legajo: string | null
+  estado: string
+  is_active: boolean
+  facturador: boolean
+  created_at: string
+  updated_at: string
 }
 
 export interface UpdateUsuarioAdminPayload {
-  activo?: boolean
-  rol?: RolUsuario
+  estado?: string
+  nombre?: string
+  apellidos?: string
 }
 
 // ─── Auditoría ────────────────────────────────────────────────────────────────
 
 export interface AuditLog {
   id: string
-  usuario_id: string
-  usuario_nombre: string
-  accion: string
-  recurso: string
-  recurso_id: string | null
-  detalle: Record<string, unknown>
-  ip: string | null
-  creado_en: string
   tenant_id: string
+  fecha_hora: string
+  actor_id: string
+  impersonado_id: string | null
+  materia_id: string | null
+  accion: string
+  detalle: Record<string, unknown> | null
+  filas_afectadas: number | null
+  ip: string | null
+  user_agent: string | null
 }
 
 export interface AuditLogFiltros {
-  desde?: string
-  hasta?: string
+  actor_id?: string
   materia_id?: string
-  usuario_id?: string
   accion?: string
-  page?: number
-  page_size?: number
+  fecha_desde?: string
+  fecha_hasta?: string
+  limit?: number
 }
 
-export interface AuditPanel {
-  acciones_por_dia: { fecha: string; count: number }[]
-  comunicaciones_por_docente: { docente_nombre: string; enviadas: number; fallidas: number }[]
+export interface MetricasAuditoria {
+  acciones_por_dia: { fecha: string; total: number }[]
+  por_actor: { actor_id: string; materia_id: string | null; total: number }[]
 }
 
 // ─── Pagination ───────────────────────────────────────────────────────────────

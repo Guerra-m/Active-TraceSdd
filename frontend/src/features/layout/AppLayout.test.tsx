@@ -19,7 +19,7 @@ describe('AppLayout', () => {
   it('6.4 - sidebar muestra solo ítems con permisos presentes', () => {
     mockUseAuth(
       { id: '1', email: 'u@t.com', nombre: 'Test User', rol: 'ALUMNO', tenant_id: 't1' },
-      ['alumnos:read', 'materias:read'],
+      ['padron:importar', 'estructura:gestionar'],
     )
 
     render(
@@ -28,7 +28,7 @@ describe('AppLayout', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('Alumnos')).toBeInTheDocument()
+    expect(screen.getByText('Alumnos (Padrón)')).toBeInTheDocument()
     expect(screen.getByText('Materias')).toBeInTheDocument()
     expect(screen.queryByText('Auditoría')).not.toBeInTheDocument()
     expect(screen.queryByText('Usuarios')).not.toBeInTheDocument()

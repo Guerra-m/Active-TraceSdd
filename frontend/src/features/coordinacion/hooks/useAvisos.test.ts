@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createElement } from 'react'
-import { useAvisos, useCreateAviso, usePublicarAviso } from './useAvisos'
+import { useAvisos, useCreateAviso } from './useAvisos'
 import * as avisosService from '../services/avisosService'
-import type { PagedResponse, Aviso } from '../types'
+import type { Aviso } from '../types'
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -16,23 +16,22 @@ function createWrapper() {
 
 const mockAviso: Aviso = {
   id: 'av-1',
+  tenant_id: 'tenant-1',
+  alcance: 'Global',
+  materia_id: null,
+  cohorte_id: null,
+  rol_destino: null,
+  severidad: 'Info',
   titulo: 'Aviso importante',
   cuerpo: 'Contenido del aviso',
-  scope: 'Global',
-  estado: 'publicado',
-  fecha_publicacion: '2024-06-01',
-  fecha_expiracion: null,
+  inicio_en: '2024-06-01T00:00:00Z',
+  fin_en: null,
+  orden: 0,
+  activo: true,
   requiere_ack: false,
-  leido_por_mi: false,
-  tenant_id: 'tenant-1',
 }
 
-const mockAvisoList: PagedResponse<Aviso> = {
-  items: [mockAviso],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
+const mockAvisos: Aviso[] = [mockAviso]
 
 describe('useAvisos', () => {
   beforeEach(() => {
@@ -40,14 +39,14 @@ describe('useAvisos', () => {
   })
 
   it('retorna lista de avisos exitosamente', async () => {
-    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisoList)
+    vi.spyOn(avisosService, 'fetchAvisos').mockResolvedValue(mockAvisos)
 
     const { result } = renderHook(() => useAvisos(), { wrapper: createWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(result.current.data?.items).toHaveLength(1)
-    expect(result.current.data?.items[0].titulo).toBe('Aviso importante')
+    expect(result.current.data).toHaveLength(1)
+    expect(result.current.data?.[0].titulo).toBe('Aviso importante')
   })
 
   it('expone error si el servicio falla', async () => {
@@ -72,7 +71,10 @@ describe('useCreateAviso', () => {
     result.current.mutate({
       titulo: 'Aviso importante',
       cuerpo: 'Contenido',
-      scope: 'Global',
+      alcance: 'Global',
+      severidad: 'Info',
+      inicio_en: '2024-06-01T00:00:00Z',
+      activo: true,
       requiere_ack: false,
     })
 
@@ -87,27 +89,16 @@ describe('useCreateAviso', () => {
 
     const { result } = renderHook(() => useCreateAviso(), { wrapper: createWrapper() })
 
-    result.current.mutate({ titulo: '', cuerpo: '', scope: 'Global', requiere_ack: false })
+    result.current.mutate({
+      titulo: '',
+      cuerpo: '',
+      alcance: 'Global',
+      severidad: 'Info',
+      inicio_en: '2024-06-01T00:00:00Z',
+      activo: true,
+      requiere_ack: false,
+    })
 
     await waitFor(() => expect(result.current.isError).toBe(true))
-  })
-})
-
-describe('usePublicarAviso', () => {
-  beforeEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('publica un aviso exitosamente', async () => {
-    const publicado = { ...mockAviso, estado: 'publicado' as const }
-    const spy = vi.spyOn(avisosService, 'publicarAviso').mockResolvedValue(publicado)
-
-    const { result } = renderHook(() => usePublicarAviso(), { wrapper: createWrapper() })
-
-    result.current.mutate('av-1')
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-
-    expect(spy).toHaveBeenCalledWith('av-1')
   })
 })

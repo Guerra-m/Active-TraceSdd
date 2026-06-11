@@ -1,53 +1,85 @@
 // ─── Equipos ──────────────────────────────────────────────────────────────────
 
-export interface Equipo {
+export interface AsignacionItem {
   id: string
-  nombre: string
-  periodo: string
-  fecha_inicio: string
-  fecha_fin: string
-  tutores_count: number
   tenant_id: string
+  usuario_id: string
+  rol: string
+  materia_id: string | null
+  carrera_id: string | null
+  cohorte_id: string | null
+  comisiones: string[]
+  responsable_id: string | null
+  desde: string
+  hasta: string | null
+  estado_vigencia: string
+  created_at: string
+  updated_at: string
 }
 
 export interface AsignacionMasivaPayload {
-  tutor_id: string
-  alumno_ids: string[]
+  usuario_ids: string[]
+  rol: string
+  materia_id?: string
+  carrera_id?: string
+  cohorte_id?: string
+  comisiones?: string[]
+  responsable_id?: string
+  desde: string
+  hasta?: string
 }
 
 export interface ClonarEquipoPayload {
-  periodo_destino: string
+  materia_id: string
+  carrera_id: string
+  cohorte_origen_id: string
+  cohorte_destino_id: string
+  desde: string
+  hasta?: string
 }
 
 export interface VigenciaBulkPayload {
-  equipo_ids: string[]
-  fecha_inicio: string
-  fecha_fin: string
+  materia_id: string
+  carrera_id: string
+  cohorte_id: string
+  desde?: string
+  hasta?: string
 }
 
 // ─── Avisos ───────────────────────────────────────────────────────────────────
 
-export type AvisoScope = 'Global' | 'PorMateria' | 'PorCohorte' | 'PorRol'
-export type AvisoEstado = 'borrador' | 'publicado' | 'expirado'
+export type AvisoAlcance = 'Global' | 'PorMateria' | 'PorCohorte' | 'PorRol'
+export type AvisoSeveridad = 'Info' | 'Advertencia' | 'Crítico'
 
 export interface Aviso {
   id: string
+  tenant_id: string
+  alcance: AvisoAlcance
+  materia_id: string | null
+  cohorte_id: string | null
+  rol_destino: string | null
+  severidad: AvisoSeveridad
   titulo: string
   cuerpo: string
-  scope: AvisoScope
-  estado: AvisoEstado
-  fecha_publicacion: string | null
-  fecha_expiracion: string | null
+  inicio_en: string
+  fin_en: string | null
+  orden: number
+  activo: boolean
   requiere_ack: boolean
-  leido_por_mi: boolean
-  tenant_id: string
 }
 
 export interface CreateAvisoPayload {
+  alcance: AvisoAlcance
+  materia_id?: string
+  cohorte_id?: string
+  rol_destino?: string
+  severidad: AvisoSeveridad
   titulo: string
   cuerpo: string
-  scope: AvisoScope
-  fecha_expiracion?: string
+  inicio_en: string
+  fin_en?: string
+  orden?: number
+  activo?: boolean
   requiere_ack: boolean
 }
 
@@ -55,38 +87,33 @@ export type UpdateAvisoPayload = Partial<CreateAvisoPayload>
 
 // ─── Tareas ───────────────────────────────────────────────────────────────────
 
-export type TareaEstado = 'pendiente' | 'en_progreso' | 'completada' | 'cancelada'
+export type TareaEstado = 'Pendiente' | 'En progreso' | 'Resuelta' | 'Cancelada'
 
 export interface Tarea {
   id: string
-  titulo: string
-  descripcion: string
-  estado: TareaEstado
-  asignado_a: string
-  asignado_a_nombre: string
-  creado_por: string
-  fecha_limite: string | null
   tenant_id: string
+  materia_id: string | null
+  asignado_a: string
+  asignado_por: string
+  estado: TareaEstado
+  descripcion: string
+  contexto_id: string | null
+  created_at: string
 }
 
 export interface Comentario {
   id: string
   tarea_id: string
   autor_id: string
-  autor_nombre: string
-  contenido: string
-  creado_en: string
+  texto: string
+  created_at: string
 }
 
 export interface CreateTareaPayload {
-  titulo: string
-  descripcion: string
   asignado_a: string
-  fecha_limite?: string
-}
-
-export interface DelegarTareaPayload {
-  nuevo_asignado: string
+  descripcion: string
+  materia_id?: string
+  contexto_id?: string
 }
 
 export interface CambiarEstadoPayload {
@@ -94,24 +121,18 @@ export interface CambiarEstadoPayload {
 }
 
 export interface CreateComentarioPayload {
-  contenido: string
+  texto: string
 }
 
 // ─── Monitor ──────────────────────────────────────────────────────────────────
 
 export interface MonitorMetrics {
-  alumnos_atrasados: number
-  entregas_pendientes: number
-  comunicaciones_enviadas: number
-  tasa_contacto: number
-  resumen_por_materia: MateriaSummary[]
-}
-
-export interface MateriaSummary {
-  materia_id: string
-  materia_nombre: string
+  total_alumnos: number
   atrasados: number
   al_dia: number
+  promedio_general: number | null
+  comunicaciones_enviadas: number
+  comunicaciones_pendientes: number
 }
 
 export interface MonitorFiltros {
@@ -121,66 +142,69 @@ export interface MonitorFiltros {
 
 // ─── Encuentros Admin ─────────────────────────────────────────────────────────
 
-export type EncuentroTipo = 'individual' | 'grupal'
-export type EncuentroEstado = 'programado' | 'realizado' | 'cancelado' | 'ausente'
-export type Recurrencia = 'semanal' | 'quincenal'
+export type EncuentroEstado = 'Programado' | 'Realizado' | 'Cancelado'
 
 export interface EncuentroAdmin {
   id: string
-  alumno_id: string
-  alumno_nombre: string
-  tutor_id: string
-  tutor_nombre: string
+  tenant_id: string
+  slot_id: string | null
+  materia_id: string
   fecha: string
   hora: string
-  tipo: EncuentroTipo
+  titulo: string
   estado: EncuentroEstado
-  tenant_id: string
+  meet_url: string | null
+  video_url: string | null
+  comentario: string | null
 }
 
-export interface SlotRecurrente {
-  dia_semana: number // 0=lunes, 6=domingo
+export interface SlotEncuentroCreate {
+  materia_id: string
+  titulo: string
   hora: string
-  recurrencia: Recurrencia
-  periodo: string
-  tutor_id: string
+  dia_semana?: string
+  fecha_inicio?: string
+  cant_semanas?: number
+  fecha_unica?: string
+  meet_url?: string
+  vig_desde?: string
+  vig_hasta?: string
 }
 
 export interface UpdateEncuentroPayload {
-  fecha?: string
-  hora?: string
   estado?: EncuentroEstado
+  meet_url?: string
+  video_url?: string
+  comentario?: string
 }
 
 // ─── Coloquios ────────────────────────────────────────────────────────────────
 
-export type ConvocatoriaEstado = 'abierta' | 'cerrada' | 'finalizada'
-
-export interface Convocatoria {
+export interface EvaluacionItem {
   id: string
-  materia_id: string
-  materia_nombre: string
-  fecha: string
-  cupo: number
-  inscriptos: number
-  descripcion: string
-  estado: ConvocatoriaEstado
   tenant_id: string
-}
-
-export interface ConvocatoriaMetrics {
-  convocatoria_id: string
-  aprobados: number
-  desaprobados: number
-  ausentes: number
-  nota_promedio: number
-}
-
-export interface CreateConvocatoriaPayload {
   materia_id: string
-  fecha: string
-  cupo: number
-  descripcion: string
+  cohorte_id: string
+  tipo: string
+  instancia: string
+  dias_disponibles: number
+  cupos_por_dia: number
+}
+
+export interface MetricasColoquio {
+  total_convocados: number
+  instancias_activas: number
+  reservas_activas: number
+  notas_registradas: number
+}
+
+export interface CreateEvaluacionPayload {
+  materia_id: string
+  cohorte_id: string
+  tipo: string
+  instancia: string
+  dias_disponibles: number
+  cupos_por_dia: number
 }
 
 export interface ImportarAlumnosPayload {

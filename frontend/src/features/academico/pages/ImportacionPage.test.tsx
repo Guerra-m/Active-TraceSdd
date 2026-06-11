@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { ImportacionPage } from './ImportacionPage'
 import * as academicoService from '../services/academicoService'
-import type { ActividadPreview, ImportacionResult } from '../types'
+import type { ImportarCalificacionesResponse } from '../types'
 
 function wrapper(ui: React.ReactElement) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -15,52 +15,49 @@ function wrapper(ui: React.ReactElement) {
   )
 }
 
-const ACTIVIDADES: ActividadPreview[] = [
-  { id: 'a1', nombre: 'Parcial 1', tipo: 'examen', fecha: '2024-05-01' },
-  { id: 'a2', nombre: 'TP Final', tipo: 'trabajo', fecha: '2024-06-15' },
-]
-
-const RESULTADO: ImportacionResult = { importadas: 2, mensaje: 'Importación exitosa' }
+const RESULTADO: ImportarCalificacionesResponse = {
+  asignacion_id: 'a1',
+  materia_id: 'm1',
+  filas_importadas: 15,
+  actividades_detectadas: ['TP 1', 'Parcial 1'],
+}
 
 beforeEach(() => {
-  vi.spyOn(academicoService, 'fetchPreviewCalificaciones').mockResolvedValue(ACTIVIDADES)
   vi.spyOn(academicoService, 'postImportarCalificaciones').mockResolvedValue(RESULTADO)
 })
 
 describe('ImportacionPage', () => {
   it('muestra el título de la página', () => {
-    wrapper(<ImportacionPage comisionId="c1" />)
+    wrapper(<ImportacionPage asignacionId="a1" materiaId="m1" />)
     expect(screen.getByText('Importar calificaciones')).toBeInTheDocument()
   })
 
-  it('muestra lista de actividades del preview', async () => {
-    wrapper(<ImportacionPage comisionId="c1" />)
-    expect(await screen.findByText('Parcial 1')).toBeInTheDocument()
-    expect(screen.getByText('TP Final')).toBeInTheDocument()
+  it('muestra mensaje cuando no hay asignación seleccionada', () => {
+    wrapper(<ImportacionPage asignacionId="" materiaId="" />)
+    expect(screen.getByText('No hay asignación seleccionada.')).toBeInTheDocument()
   })
 
-  it('muestra mensaje cuando no hay actividades disponibles', async () => {
-    vi.spyOn(academicoService, 'fetchPreviewCalificaciones').mockResolvedValue([])
-    wrapper(<ImportacionPage comisionId="c1" />)
-    expect(await screen.findByText('No hay actividades disponibles para importar')).toBeInTheDocument()
+  it('muestra el input de archivo', () => {
+    wrapper(<ImportacionPage asignacionId="a1" materiaId="m1" />)
+    expect(screen.getByLabelText('Archivo de calificaciones')).toBeInTheDocument()
   })
 
-  it('bloquea el submit sin selección mostrando error', async () => {
-    wrapper(<ImportacionPage comisionId="c1" />)
-    await screen.findByText('Parcial 1')
+  it('bloquea el submit sin archivo y muestra error', async () => {
+    wrapper(<ImportacionPage asignacionId="a1" materiaId="m1" />)
     const btn = screen.getByRole('button', { name: /importar/i })
     fireEvent.click(btn)
-    expect(await screen.findByText('Seleccioná al menos una actividad')).toBeInTheDocument()
+    expect(await screen.findByText('Seleccioná un archivo xlsx o csv')).toBeInTheDocument()
   })
 
-  it('importa actividades seleccionadas y muestra éxito', async () => {
-    wrapper(<ImportacionPage comisionId="c1" />)
-    const checkbox = await screen.findByLabelText('Parcial 1')
-    fireEvent.click(checkbox)
+  it('importa el archivo y muestra resultado exitoso', async () => {
+    wrapper(<ImportacionPage asignacionId="a1" materiaId="m1" />)
+    const input = screen.getByLabelText('Archivo de calificaciones')
+    const file = new File(['data'], 'notas.xlsx', { type: 'application/vnd.ms-excel' })
+    fireEvent.change(input, { target: { files: [file] } })
     const btn = screen.getByRole('button', { name: /importar/i })
     fireEvent.click(btn)
     await waitFor(() => {
-      expect(screen.getByText('Importación exitosa')).toBeInTheDocument()
+      expect(screen.getByText(/15 filas procesadas/i)).toBeInTheDocument()
     })
   })
 })

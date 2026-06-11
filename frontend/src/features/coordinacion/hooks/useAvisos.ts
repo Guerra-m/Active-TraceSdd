@@ -1,20 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  fetchAvisos,
-  createAviso,
-  updateAviso,
-  deleteAviso,
-  publicarAviso,
-  ackAviso,
-} from '../services/avisosService'
-import type { AvisoEstado, CreateAvisoPayload, UpdateAvisoPayload, PageParams } from '../types'
+import { fetchAvisos, createAviso, updateAviso, deleteAviso, ackAviso } from '../services/avisosService'
+import type { CreateAvisoPayload, UpdateAvisoPayload } from '../types'
 
 export const AVISOS_KEY = 'coordinacion-avisos'
 
-export function useAvisos(params?: PageParams & { estado?: AvisoEstado }) {
+export function useAvisos() {
   return useQuery({
-    queryKey: [AVISOS_KEY, params],
-    queryFn: () => fetchAvisos(params),
+    queryKey: [AVISOS_KEY],
+    queryFn: () => fetchAvisos(),
   })
 }
 
@@ -43,16 +36,6 @@ export function useDeleteAviso() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => deleteAviso(id),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [AVISOS_KEY] })
-    },
-  })
-}
-
-export function usePublicarAviso() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (id: string) => publicarAviso(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [AVISOS_KEY] })
     },

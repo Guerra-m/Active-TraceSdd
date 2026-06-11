@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { EquiposPage } from './EquiposPage'
 import * as AuthContextModule from '@/features/auth/context/AuthContext'
 import * as equiposService from '../services/equiposService'
-import type { PagedResponse, Equipo } from '../types'
+import type { AsignacionItem } from '../types'
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -27,22 +27,24 @@ function mockAuth(permissions: string[]) {
   })
 }
 
-const mockEquipoList: PagedResponse<Equipo> = {
-  items: [
-    {
-      id: 'eq-1',
-      nombre: 'Equipo Alpha',
-      periodo: '2024-1',
-      fecha_inicio: '2024-03-01',
-      fecha_fin: '2024-07-31',
-      tutores_count: 5,
-      tenant_id: 't1',
-    },
-  ],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
+const mockAsignaciones: AsignacionItem[] = [
+  {
+    id: 'asi-1',
+    tenant_id: 't1',
+    usuario_id: 'user-abc',
+    rol: 'PROFESOR',
+    materia_id: 'mat-1',
+    carrera_id: 'car-1',
+    cohorte_id: 'coh-1',
+    comisiones: ['A'],
+    responsable_id: null,
+    desde: '2024-03-01',
+    hasta: '2024-07-31',
+    estado_vigencia: 'vigente',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  },
+]
 
 describe('EquiposPage', () => {
   beforeEach(() => {
@@ -51,25 +53,25 @@ describe('EquiposPage', () => {
 
   it('muestra listado de equipos con permiso equipos:asignar', async () => {
     mockAuth(['equipos:asignar'])
-    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockEquipoList)
+    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockAsignaciones)
 
     renderWithProviders(<EquiposPage />)
 
     await waitFor(() => {
-      expect(screen.getByText('Equipo Alpha')).toBeInTheDocument()
+      expect(screen.getByText('user-abc')).toBeInTheDocument()
     })
-    expect(screen.getByText('2024-1')).toBeInTheDocument()
-    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText('PROFESOR')).toBeInTheDocument()
+    expect(screen.getByText('vigente')).toBeInTheDocument()
   })
 
   it('muestra fallback sin permiso equipos:asignar', () => {
     mockAuth(['alumnos:read'])
-    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockEquipoList)
+    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockAsignaciones)
 
     renderWithProviders(<EquiposPage />)
 
     expect(screen.getByText(/no tenés permiso/i)).toBeInTheDocument()
-    expect(screen.queryByText('Equipo Alpha')).not.toBeInTheDocument()
+    expect(screen.queryByText('user-abc')).not.toBeInTheDocument()
   })
 
   it('muestra error cuando la carga falla', async () => {
@@ -86,33 +88,30 @@ describe('EquiposPage', () => {
   it('abre modal de clonar al hacer clic en Clonar', async () => {
     const user = userEvent.setup()
     mockAuth(['equipos:asignar'])
-    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockEquipoList)
+    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockAsignaciones)
 
     renderWithProviders(<EquiposPage />)
 
-    await waitFor(() => screen.getByText('Equipo Alpha'))
+    await waitFor(() => screen.getByText('user-abc'))
 
     await user.click(screen.getByRole('button', { name: /clonar/i }))
 
-    expect(screen.getByText(/clonar equipo: Equipo Alpha/i)).toBeInTheDocument()
+    expect(screen.getByText(/clonar equipo: PROFESOR/i)).toBeInTheDocument()
   })
 
-  it('valida período destino vacío en modal de clonar', async () => {
+  it('valida cohorte destino vacío en modal de clonar', async () => {
     const user = userEvent.setup()
     mockAuth(['equipos:asignar'])
-    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockEquipoList)
+    vi.spyOn(equiposService, 'fetchEquipos').mockResolvedValue(mockAsignaciones)
 
     renderWithProviders(<EquiposPage />)
 
-    await waitFor(() => screen.getByText('Equipo Alpha'))
-    // Open the clone modal
+    await waitFor(() => screen.getByText('user-abc'))
     await user.click(screen.getByRole('button', { name: /^clonar$/i }))
 
-    // Modal should be visible
     const modalHeading = screen.getByRole('heading', { name: /clonar equipo/i })
     expect(modalHeading).toBeInTheDocument()
 
-    // Find the submit button inside the modal (type=submit)
     const submitButtons = screen.getAllByRole('button', { name: /^clonar$/i })
     const submitBtn = submitButtons.find((b) => b.getAttribute('type') === 'submit')
     expect(submitBtn).toBeDefined()

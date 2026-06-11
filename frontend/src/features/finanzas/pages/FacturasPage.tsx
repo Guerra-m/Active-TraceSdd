@@ -5,26 +5,31 @@ import { z } from 'zod'
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
 import { useFacturas, useCreateFactura, useAbonarFactura } from '../hooks/useFacturas'
-import type { Factura, FacturaFiltros } from '../types'
+import type { Factura, FacturaEstado, FacturaFiltros } from '../types'
 
 // ─── Schemas Zod ──────────────────────────────────────────────────────────────
 
 const filtrosSchema = z.object({
-  docente_id: z.string().optional(),
+  usuario_id: z.string().optional(),
   periodo: z.string().optional(),
-  estado: z.enum(['pendiente', 'abonada', 'anulada']).optional(),
+  estado: z.enum(['Pendiente', 'Abonada']).optional(),
 })
 
 const facturaSchema = z.object({
-  docente_id: z.string().min(1, 'El docente es requerido'),
+  usuario_id: z.string().min(1, 'El usuario es requerido'),
   monto: z.coerce.number().positive('El monto debe ser positivo'),
   periodo: z.string().min(7, 'Período requerido (YYYY-MM)'),
-  numero_factura: z.string().min(1, 'El número de factura es requerido'),
-  fecha_emision: z.string().min(1, 'La fecha de emisión es requerida'),
+  detalle: z.string().optional(),
+  archivo_ref: z.string().optional(),
+})
+
+const abonarSchema = z.object({
+  fecha_pago: z.string().min(1, 'La fecha de pago es requerida'),
 })
 
 type FiltrosForm = z.infer<typeof filtrosSchema>
 type FacturaForm = z.infer<typeof facturaSchema>
+type AbonarForm = z.infer<typeof abonarSchema>
 
 // ─── Modal Nueva Factura ──────────────────────────────────────────────────────
 
@@ -47,18 +52,18 @@ function NuevaFacturaModal({ onClose }: { onClose: () => void }) {
         <h2 className="mb-4 text-lg font-semibold">Registrar nueva factura</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="f-docente">
-              ID Docente
+            <label className="mb-1 block text-sm font-medium" htmlFor="f-usuario">
+              ID Usuario
             </label>
             <input
-              id="f-docente"
-              {...register('docente_id')}
+              id="f-usuario"
+              {...register('usuario_id')}
               className="w-full rounded border border-border p-2"
-              placeholder="UUID del docente"
+              placeholder="UUID del usuario"
             />
-            {errors.docente_id && (
+            {errors.usuario_id && (
               <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.docente_id.message}
+                {errors.usuario_id.message}
               </p>
             )}
           </div>
@@ -95,36 +100,14 @@ function NuevaFacturaModal({ onClose }: { onClose: () => void }) {
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="f-numero">
-              Número de factura
+            <label className="mb-1 block text-sm font-medium" htmlFor="f-detalle">
+              Detalle (opcional)
             </label>
             <input
-              id="f-numero"
-              {...register('numero_factura')}
-              className="w-full rounded border border-border p-2"
-              placeholder="A-00001"
-            />
-            {errors.numero_factura && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.numero_factura.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="f-fecha">
-              Fecha de emisión
-            </label>
-            <input
-              id="f-fecha"
-              type="date"
-              {...register('fecha_emision')}
+              id="f-detalle"
+              {...register('detalle')}
               className="w-full rounded border border-border p-2"
             />
-            {errors.fecha_emision && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
-                {errors.fecha_emision.message}
-              </p>
-            )}
           </div>
           {createMutation.isError && (
             <p role="alert" className="text-sm text-red-600">
@@ -153,6 +136,69 @@ function NuevaFacturaModal({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ─── Modal Abonar ─────────────────────────────────────────────────────────────
+
+function AbonarModal({
+  facturaId,
+  onClose,
+}: {
+  facturaId: string
+  onClose: () => void
+}) {
+  const abonarMutation = useAbonarFactura()
+  const { register, handleSubmit, formState: { errors } } = useForm<AbonarForm>({
+    resolver: zodResolver(abonarSchema),
+    defaultValues: { fecha_pago: new Date().toISOString().slice(0, 10) },
+  })
+
+  const onSubmit = (data: AbonarForm) => {
+    abonarMutation.mutate({ id: facturaId, fecha_pago: data.fecha_pago }, { onSuccess: onClose })
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+        <h2 className="mb-4 text-lg font-semibold">Marcar como abonada</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium" htmlFor="ab-fecha">
+              Fecha de pago
+            </label>
+            <input
+              id="ab-fecha"
+              type="date"
+              {...register('fecha_pago')}
+              className="w-full rounded border border-border p-2"
+            />
+            {errors.fecha_pago && (
+              <p role="alert" className="mt-1 text-sm text-red-600">
+                {errors.fecha_pago.message}
+              </p>
+            )}
+          </div>
+          {abonarMutation.isError && (
+            <p role="alert" className="text-sm text-red-600">
+              Error al abonar la factura. Intentá de nuevo.
+            </p>
+          )}
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose} className="rounded border border-border px-4 py-2 text-sm">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={abonarMutation.isPending}
+              className="rounded bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              {abonarMutation.isPending ? 'Guardando...' : 'Confirmar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // ─── Fila Factura ─────────────────────────────────────────────────────────────
 
 function FacturaRow({
@@ -165,19 +211,18 @@ function FacturaRow({
   const fmt = (n: number) =>
     n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
 
-  const estadoBadge: Record<Factura['estado'], string> = {
-    pendiente: 'bg-yellow-100 text-yellow-800',
-    abonada: 'bg-green-100 text-green-800',
-    anulada: 'bg-red-100 text-red-800',
+  const estadoBadge: Record<FacturaEstado, string> = {
+    Pendiente: 'bg-yellow-100 text-yellow-800',
+    Abonada: 'bg-green-100 text-green-800',
   }
 
   return (
     <tr className="border-b border-border">
-      <td className="p-3">{factura.numero_factura}</td>
-      <td className="p-3 font-medium">{factura.docente_nombre}</td>
+      <td className="p-3 font-mono text-xs text-gray-500">{factura.usuario_id.slice(0, 8)}</td>
       <td className="p-3">{factura.periodo}</td>
       <td className="p-3">{fmt(factura.monto)}</td>
-      <td className="p-3">{factura.fecha_emision}</td>
+      <td className="p-3 text-gray-500 text-xs">{factura.detalle ?? '—'}</td>
+      <td className="p-3">{factura.fecha_carga.slice(0, 10)}</td>
       <td className="p-3">
         <span
           className={`rounded px-2 py-0.5 text-xs font-medium ${estadoBadge[factura.estado]}`}
@@ -186,7 +231,7 @@ function FacturaRow({
         </span>
       </td>
       <td className="p-3">
-        {factura.estado === 'pendiente' && (
+        {factura.estado === 'Pendiente' && (
           <button
             onClick={() => onAbonar(factura.id)}
             className="rounded bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700"
@@ -204,19 +249,20 @@ function FacturaRow({
 function FacturasContent() {
   const [filtros, setFiltros] = useState<FacturaFiltros>({})
   const [showNueva, setShowNueva] = useState(false)
+  const [abonarId, setAbonarId] = useState<string | null>(null)
 
   const { data, isLoading, isError } = useFacturas(filtros)
-  const abonarMutation = useAbonarFactura()
+  const items = data ?? []
 
   const { register, handleSubmit } = useForm<FiltrosForm>({
     resolver: zodResolver(filtrosSchema),
   })
 
-  const onFiltrar = (data: FiltrosForm) => {
+  const onFiltrar = (formData: FiltrosForm) => {
     setFiltros({
-      ...(data.docente_id ? { docente_id: data.docente_id } : {}),
-      ...(data.periodo ? { periodo: data.periodo } : {}),
-      ...(data.estado ? { estado: data.estado } : {}),
+      ...(formData.usuario_id ? { usuario_id: formData.usuario_id } : {}),
+      ...(formData.periodo ? { periodo: formData.periodo } : {}),
+      ...(formData.estado ? { estado: formData.estado } : {}),
     })
   }
 
@@ -248,18 +294,17 @@ function FacturasContent() {
         </button>
       </div>
 
-      {/* Filtros */}
       <form
         onSubmit={handleSubmit(onFiltrar)}
         className="flex flex-wrap gap-4 rounded-lg border border-border p-4"
       >
         <div>
-          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="fl-docente">
-            Docente (ID)
+          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="fl-usuario">
+            Usuario (ID)
           </label>
           <input
-            id="fl-docente"
-            {...register('docente_id')}
+            id="fl-usuario"
+            {...register('usuario_id')}
             className="rounded border border-border p-2 text-sm"
             placeholder="UUID"
           />
@@ -285,9 +330,8 @@ function FacturasContent() {
             className="rounded border border-border p-2 text-sm"
           >
             <option value="">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="abonada">Abonada</option>
-            <option value="anulada">Anulada</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Abonada">Abonada</option>
           </select>
         </div>
         <div className="flex items-end">
@@ -300,29 +344,28 @@ function FacturasContent() {
         </div>
       </form>
 
-      {/* Tabla */}
-      {data?.items.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-gray-500">No hay facturas para los filtros seleccionados.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="p-3 text-left">N° Factura</th>
-                <th className="p-3 text-left">Docente</th>
+                <th className="p-3 text-left">Usuario (ID)</th>
                 <th className="p-3 text-left">Período</th>
                 <th className="p-3 text-left">Monto</th>
-                <th className="p-3 text-left">Fecha emisión</th>
+                <th className="p-3 text-left">Detalle</th>
+                <th className="p-3 text-left">Fecha carga</th>
                 <th className="p-3 text-left">Estado</th>
                 <th className="p-3 text-left">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {data?.items.map((f) => (
+              {items.map((f) => (
                 <FacturaRow
                   key={f.id}
                   factura={f}
-                  onAbonar={(id) => abonarMutation.mutate(id)}
+                  onAbonar={(id) => setAbonarId(id)}
                 />
               ))}
             </tbody>
@@ -330,13 +373,8 @@ function FacturasContent() {
         </div>
       )}
 
-      {abonarMutation.isError && (
-        <p role="alert" className="text-sm text-red-600">
-          Error al marcar como abonada. Intentá de nuevo.
-        </p>
-      )}
-
       {showNueva && <NuevaFacturaModal onClose={() => setShowNueva(false)} />}
+      {abonarId && <AbonarModal facturaId={abonarId} onClose={() => setAbonarId(null)} />}
     </div>
   )
 }

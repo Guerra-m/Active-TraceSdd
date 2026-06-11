@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchEntregasSinCorregir } from '../services/academicoService'
 
-export function useEntregasSinCorregir(comision_id: string) {
+export function useEntregasSinCorregir(asignacionId: string, materiaId: string) {
   return useQuery({
-    queryKey: ['entregas-sin-corregir', comision_id],
-    queryFn: () => fetchEntregasSinCorregir(comision_id),
-    enabled: !!comision_id,
+    queryKey: ['entregas-sin-corregir', asignacionId, materiaId],
+    queryFn: () => fetchEntregasSinCorregir(asignacionId, materiaId),
+    enabled: !!asignacionId && !!materiaId,
   })
 }

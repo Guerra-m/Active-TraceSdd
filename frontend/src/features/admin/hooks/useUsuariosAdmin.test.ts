@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createElement } from 'react'
 import { useUsuariosAdmin, useUpdateUsuarioAdmin } from './useUsuariosAdmin'
 import * as usuariosAdminService from '../services/usuariosAdminService'
-import type { UsuarioAdmin, PagedResponse } from '../types'
+import type { UsuarioAdmin } from '../types'
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -16,19 +16,18 @@ function createWrapper() {
 
 const mockUsuario: UsuarioAdmin = {
   id: 'usr-1',
-  email: 'juan@example.com',
-  nombre: 'Juan Pérez',
-  rol: 'TUTOR',
-  activo: true,
   tenant_id: 'tenant-1',
+  nombre: 'Juan',
+  apellidos: 'Pérez',
+  legajo: 'L001',
+  estado: 'Activo',
+  is_active: true,
+  facturador: false,
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
 }
 
-const mockPagedUsuarios: PagedResponse<UsuarioAdmin> = {
-  items: [mockUsuario],
-  total: 1,
-  page: 1,
-  page_size: 20,
-}
+const mockUsuarios: UsuarioAdmin[] = [mockUsuario]
 
 describe('useUsuariosAdmin', () => {
   beforeEach(() => {
@@ -36,14 +35,14 @@ describe('useUsuariosAdmin', () => {
   })
 
   it('retorna la lista de usuarios exitosamente', async () => {
-    vi.spyOn(usuariosAdminService, 'fetchUsuariosAdmin').mockResolvedValue(mockPagedUsuarios)
+    vi.spyOn(usuariosAdminService, 'fetchUsuariosAdmin').mockResolvedValue(mockUsuarios)
 
     const { result } = renderHook(() => useUsuariosAdmin(), { wrapper: createWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(result.current.data?.items).toHaveLength(1)
-    expect(result.current.data?.items[0].nombre).toBe('Juan Pérez')
+    expect(result.current.data).toHaveLength(1)
+    expect(result.current.data?.[0].nombre).toBe('Juan')
   })
 
   it('expone error cuando el servicio falla', async () => {
@@ -62,19 +61,19 @@ describe('useUpdateUsuarioAdmin', () => {
     vi.restoreAllMocks()
   })
 
-  it('llama a updateUsuarioAdmin con los parámetros correctos para activar/desactivar', async () => {
-    const usuarioInactivo: UsuarioAdmin = { ...mockUsuario, activo: false }
+  it('llama a updateUsuarioAdmin con los parámetros correctos para desactivar', async () => {
+    const usuarioInactivo: UsuarioAdmin = { ...mockUsuario, is_active: false, estado: 'Inactivo' }
     const spy = vi
       .spyOn(usuariosAdminService, 'updateUsuarioAdmin')
       .mockResolvedValue(usuarioInactivo)
 
     const { result } = renderHook(() => useUpdateUsuarioAdmin(), { wrapper: createWrapper() })
 
-    result.current.mutate({ id: 'usr-1', payload: { activo: false } })
+    result.current.mutate({ id: 'usr-1', payload: { estado: 'Inactivo' } })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(spy).toHaveBeenCalledWith('usr-1', { activo: false })
+    expect(spy).toHaveBeenCalledWith('usr-1', { estado: 'Inactivo' })
   })
 
   it('expone error si la actualización falla', async () => {
@@ -84,7 +83,7 @@ describe('useUpdateUsuarioAdmin', () => {
 
     const { result } = renderHook(() => useUpdateUsuarioAdmin(), { wrapper: createWrapper() })
 
-    result.current.mutate({ id: 'usr-1', payload: { activo: false } })
+    result.current.mutate({ id: 'usr-1', payload: { estado: 'Inactivo' } })
 
     await waitFor(() => expect(result.current.isError).toBe(true))
   })

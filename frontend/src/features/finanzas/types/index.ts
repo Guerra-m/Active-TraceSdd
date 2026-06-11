@@ -1,29 +1,32 @@
 // ─── Liquidaciones ────────────────────────────────────────────────────────────
 
-export type LiquidacionEstado = 'borrador' | 'cerrada' | 'anulada'
-export type TipoDocente = 'general' | 'nexo' | 'facturante'
+export type LiquidacionEstado = 'Abierta' | 'Cerrada'
 
 export interface Liquidacion {
   id: string
-  docente_id: string
-  docente_nombre: string
-  tipo: TipoDocente
+  tenant_id: string
   cohorte_id: string
-  periodo: string // YYYY-MM
+  periodo: string
+  usuario_id: string
+  rol: string
+  comisiones: string[]
   monto_base: number
   monto_plus: number
-  monto_total: number
+  total: number
+  es_nexo: boolean
+  excluido_por_factura: boolean
   estado: LiquidacionEstado
-  tenant_id: string
+  created_at: string
+  updated_at: string
 }
 
 export interface LiquidacionKPIs {
+  periodo: string
+  cohorte_id: string
   total_general: number
   total_nexo: number
   total_facturantes: number
-  count_general: number
-  count_nexo: number
-  count_facturantes: number
+  cantidad_liquidaciones: number
 }
 
 export interface CalcularLiquidacionPayload {
@@ -31,17 +34,9 @@ export interface CalcularLiquidacionPayload {
   periodo: string // YYYY-MM
 }
 
-export interface LiquidacionPreview {
-  items: Liquidacion[]
-  kpis: LiquidacionKPIs
-}
-
 export interface LiquidacionFiltros {
   cohorte_id?: string
   periodo?: string
-  estado?: LiquidacionEstado
-  page?: number
-  page_size?: number
 }
 
 // ─── Salarios ────────────────────────────────────────────────────────────────
@@ -94,35 +89,35 @@ export interface UpdateSalarioPlusPayload {
 
 // ─── Facturas ────────────────────────────────────────────────────────────────
 
-export type FacturaEstado = 'pendiente' | 'abonada' | 'anulada'
+export type FacturaEstado = 'Pendiente' | 'Abonada'
 
 export interface Factura {
   id: string
-  docente_id: string
-  docente_nombre: string
-  monto: number
-  periodo: string
-  numero_factura: string
-  estado: FacturaEstado
-  fecha_emision: string
-  fecha_pago: string | null
   tenant_id: string
+  usuario_id: string
+  periodo: string
+  monto: number
+  detalle: string
+  archivo_ref: string | null
+  estado: FacturaEstado
+  fecha_carga: string
+  fecha_pago: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface CreateFacturaPayload {
-  docente_id: string
+  usuario_id: string
   monto: number
   periodo: string
-  numero_factura: string
-  fecha_emision: string
+  detalle?: string
+  archivo_ref?: string
 }
 
 export interface FacturaFiltros {
-  docente_id?: string
+  usuario_id?: string
   periodo?: string
   estado?: FacturaEstado
-  page?: number
-  page_size?: number
 }
 
 // ─── Pagination ───────────────────────────────────────────────────────────────
