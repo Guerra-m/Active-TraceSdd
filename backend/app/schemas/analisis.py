@@ -1,5 +1,6 @@
 """Schemas Pydantic para el módulo de análisis académico (C-11)."""
 
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -57,3 +58,31 @@ class NotasFinalesResponse(BaseModel):
 
     total_alumnos: int
     alumnos: list[AlumnoNotaFinalResponse]
+
+
+class EntregaSinCorregirItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    entrada_padron_id: UUID
+    nombre: str
+    apellidos: str
+    actividad: str
+    importado_at: datetime
+
+
+class EntregasSinCorregirResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    total: int
+    items: list[EntregaSinCorregirItem]
+
+
+class MonitorResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    total_alumnos: int
+    atrasados: int
+    al_dia: int
+    promedio_general: float | None
+    comunicaciones_enviadas: int
+    comunicaciones_pendientes: int

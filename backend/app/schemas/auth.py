@@ -32,11 +32,22 @@ class LoginRequest(_StrictModel):
     password: str = Field(min_length=1)
 
 
+class UserInfo(_StrictModel):
+    """Datos públicos del usuario autenticado (sin PII cifrada)."""
+    id: str
+    email: str
+    nombre: str
+    rol: str
+    tenant_id: str
+
+
 class LoginResponse(_StrictModel):
     """Respuesta de login exitoso (sin 2FA o con 2FA ya verificado)."""
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+    user: UserInfo
+    permissions: list[str]
 
 
 class PreAuthResponse(_StrictModel):

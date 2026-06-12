@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { RequireAuth } from '@/shared/components/RequireAuth'
 import { AppLayout } from '@/features/layout/AppLayout'
+import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { TwoFactorPage } from '@/features/auth/pages/TwoFactorPage'
 import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
@@ -51,15 +52,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
-      {
-        path: 'dashboard',
-        element: (
-          <div className="p-6 space-y-4">
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-gray-500">Bienvenido a activia-trace. Seleccioná un módulo desde el menú lateral.</p>
-          </div>
-        ),
-      },
+      { path: 'dashboard', element: <DashboardPage /> },
       // Páginas implementadas
       { path: 'alumnos', element: <AlumnosPage /> },
       { path: 'materias', element: <MateriasPage /> },

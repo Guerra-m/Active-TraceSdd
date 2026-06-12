@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Filter, X, ShieldCheck, Activity, Users } from 'lucide-react'
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
 import { useAuditLogs, useAuditPanel } from '../hooks/useAuditoria'
@@ -19,53 +20,88 @@ const filtrosSchema = z.object({
 
 type FiltrosForm = z.infer<typeof filtrosSchema>
 
+// ─── Action badge ─────────────────────────────────────────────────────────────
+
+const ACTION_COLORS: Record<string, string> = {
+  LOGIN:   'bg-emerald-100 text-emerald-700',
+  LOGOUT:  'bg-slate-100  text-slate-600',
+  CREATE:  'bg-blue-100   text-blue-700',
+  UPDATE:  'bg-amber-100  text-amber-700',
+  DELETE:  'bg-red-100    text-red-700',
+  IMPORT:  'bg-purple-100 text-purple-700',
+  EXPORT:  'bg-cyan-100   text-cyan-700',
+}
+
+function ActionBadge({ accion }: { accion: string }) {
+  const colorClass = ACTION_COLORS[accion.toUpperCase()] ?? 'bg-surface-subtle text-text-muted'
+  return (
+    <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${colorClass}`}>
+      {accion}
+    </span>
+  )
+}
+
 // ─── Panel KPIs ───────────────────────────────────────────────────────────────
 
 function PanelKPIs({ fecha_desde, fecha_hasta }: { fecha_desde?: string; fecha_hasta?: string }) {
   const { data: panel, isLoading } = useAuditPanel({ fecha_desde, fecha_hasta })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <div className="flex items-center gap-2 py-2"><Spinner /><span className="text-sm text-text-muted">Cargando métricas…</span></div>
   if (!panel) return null
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {panel.acciones_por_dia.length > 0 && (
-        <div className="rounded-lg border border-border p-4">
-          <h3 className="mb-2 font-semibold text-sm">Acciones por día</h3>
-          <div className="flex gap-2 overflow-x-auto">
-            {panel.acciones_por_dia.map((d) => (
-              <div key={d.fecha} className="flex-shrink-0 rounded bg-blue-50 p-2 text-center text-xs">
-                <div className="font-bold text-blue-800">{d.total}</div>
-                <div className="text-gray-600">{d.fecha.slice(5)}</div>
-              </div>
-            ))}
+        <div className="rounded-xl border border-surface-subtle bg-surface p-5 shadow-sm">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50">
+              <Activity className="h-4 w-4 text-indigo-600" />
+            </div>
+            <h3 className="text-sm font-semibold text-text">Actividad por día</h3>
+          </div>
+          <div className="flex items-end gap-1.5 overflow-x-auto pb-1">
+            {(() => {
+              const max = Math.max(...panel.acciones_por_dia.map((d) => d.total), 1)
+              return panel.acciones_por_dia.map((d) => (
+                <div key={d.fecha} className="flex flex-col items-center gap-1" title={`${d.fecha}: ${d.total}`}>
+                  <span className="text-[10px] font-semibold text-text-muted">{d.total}</span>
+                  <div
+                    className="w-6 min-h-[4px] rounded-t-sm bg-indigo-400 transition-all"
+                    style={{ height: `${Math.max(4, Math.round((d.total / max) * 56))}px` }}
+                  />
+                  <span className="text-[9px] text-text-subtle rotate-0">{d.fecha.slice(5)}</span>
+                </div>
+              ))
+            })()}
           </div>
         </div>
       )}
 
       {panel.por_actor.length > 0 && (
-        <div className="rounded-lg border border-border p-4">
-          <h3 className="mb-2 font-semibold text-sm">Acciones por actor</h3>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="py-1 text-left">Actor (ID)</th>
-                <th className="py-1 text-left">Materia (ID)</th>
-                <th className="py-1 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {panel.por_actor.map((c, i) => (
-                <tr key={i} className="border-b border-border">
-                  <td className="py-1 font-mono text-xs">{c.actor_id.slice(0, 8)}</td>
-                  <td className="py-1 font-mono text-xs text-gray-500">
-                    {c.materia_id ? c.materia_id.slice(0, 8) : '—'}
-                  </td>
-                  <td className="py-1 text-right font-medium">{c.total}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="rounded-xl border border-surface-subtle bg-surface p-5 shadow-sm">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50">
+              <Users className="h-4 w-4 text-purple-600" />
+            </div>
+            <h3 className="text-sm font-semibold text-text">Por actor</h3>
+          </div>
+          <div className="divide-y divide-surface-subtle">
+            {panel.por_actor.map((c, i) => (
+              <div key={i} className="flex items-center justify-between py-2 text-xs">
+                <div>
+                  <span className="font-mono text-text">{c.actor_id.slice(0, 8)}…</span>
+                  {c.materia_id && (
+                    <span className="ml-2 text-text-subtle">
+                      mat: {c.materia_id.slice(0, 6)}…
+                    </span>
+                  )}
+                </div>
+                <span className="rounded-full bg-surface-subtle px-2 py-0.5 font-semibold text-text">
+                  {c.total}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -80,7 +116,7 @@ function AuditoriaContent() {
   const { data, isLoading, isError } = useAuditLogs(filtros)
   const items = data ?? []
 
-  const { register, handleSubmit } = useForm<FiltrosForm>({
+  const { register, handleSubmit, reset } = useForm<FiltrosForm>({
     resolver: zodResolver(filtrosSchema),
   })
 
@@ -94,127 +130,136 @@ function AuditoriaContent() {
     setFiltros(newFiltros)
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center p-8">
-        <Spinner />
-      </div>
-    )
+  const onLimpiar = () => {
+    reset()
+    setFiltros({})
   }
 
-  if (isError) {
-    return (
-      <div role="alert" className="rounded bg-red-50 p-4 text-red-700">
-        Error al cargar el log de auditoría. Intentá de nuevo.
-      </div>
-    )
-  }
+  const hasActiveFiltros = Object.values(filtros).some(Boolean)
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Panel de auditoría</h1>
+    <div className="space-y-6 pb-8">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+          <ShieldCheck className="h-5 w-5 text-slate-600" />
+        </div>
+        <div>
+          <h1 className="text-xl font-semibold text-text">Auditoría</h1>
+          <p className="text-sm text-text-muted">Log completo de acciones del tenant</p>
+        </div>
+      </div>
 
+      {/* Panel de métricas */}
       <PanelKPIs fecha_desde={filtros.fecha_desde} fecha_hasta={filtros.fecha_hasta} />
 
-      <form
-        onSubmit={handleSubmit(onFiltrar)}
-        className="flex flex-wrap gap-4 rounded-lg border border-border p-4"
-      >
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="a-desde">Desde</label>
-          <input
-            id="a-desde"
-            type="date"
-            {...register('fecha_desde')}
-            className="rounded border border-border p-2 text-sm"
-          />
+      {/* Filtros */}
+      <div className="rounded-xl border border-surface-subtle bg-surface p-5 shadow-sm">
+        <div className="mb-3 flex items-center gap-2">
+          <Filter className="h-4 w-4 text-text-muted" />
+          <span className="text-sm font-medium text-text">Filtros</span>
+          {hasActiveFiltros && (
+            <span className="ml-auto rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">
+              Activos
+            </span>
+          )}
         </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="a-hasta">Hasta</label>
-          <input
-            id="a-hasta"
-            type="date"
-            {...register('fecha_hasta')}
-            className="rounded border border-border p-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="a-materia">Materia (ID)</label>
-          <input
-            id="a-materia"
-            {...register('materia_id')}
-            className="rounded border border-border p-2 text-sm"
-            placeholder="UUID"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="a-actor">Actor (ID)</label>
-          <input
-            id="a-actor"
-            {...register('actor_id')}
-            className="rounded border border-border p-2 text-sm"
-            placeholder="UUID"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-500" htmlFor="a-accion">Acción</label>
-          <input
-            id="a-accion"
-            {...register('accion')}
-            className="rounded border border-border p-2 text-sm"
-            placeholder="LOGIN, CREATE..."
-          />
-        </div>
-        <div className="flex items-end">
-          <button
-            type="submit"
-            className="rounded border border-blue-600 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
-          >
-            Filtrar
-          </button>
-        </div>
-      </form>
-
-      {items.length === 0 ? (
-        <p className="text-gray-500">No hay registros para los filtros seleccionados.</p>
-      ) : (
-        <div className="overflow-x-auto rounded-lg border border-border">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-3 text-left">Fecha</th>
-                <th className="p-3 text-left">Actor (ID)</th>
-                <th className="p-3 text-left">Acción</th>
-                <th className="p-3 text-left">Detalle</th>
-                <th className="p-3 text-left">IP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((log) => (
-                <tr key={log.id} className="border-b border-border">
-                  <td className="p-3 text-gray-600">
-                    {new Date(log.fecha_hora).toLocaleString('es-AR')}
-                  </td>
-                  <td className="p-3 font-mono text-xs">{log.actor_id.slice(0, 8)}</td>
-                  <td className="p-3">
-                    <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                      {log.accion}
-                    </span>
-                  </td>
-                  <td className="p-3 text-gray-500 text-xs">
-                    {log.detalle ? JSON.stringify(log.detalle).slice(0, 60) : '—'}
-                  </td>
-                  <td className="p-3 text-gray-600">{log.ip ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <div className="text-sm text-gray-500">
-        Total: {items.length} registros
+        <form onSubmit={handleSubmit(onFiltrar)} className="flex flex-wrap gap-3">
+          {[
+            { id: 'a-desde',   field: 'fecha_desde' as const, label: 'Desde',      type: 'date',   placeholder: '' },
+            { id: 'a-hasta',   field: 'fecha_hasta' as const, label: 'Hasta',      type: 'date',   placeholder: '' },
+            { id: 'a-materia', field: 'materia_id'  as const, label: 'Materia ID', type: 'text',   placeholder: 'UUID' },
+            { id: 'a-actor',   field: 'actor_id'    as const, label: 'Actor ID',   type: 'text',   placeholder: 'UUID' },
+            { id: 'a-accion',  field: 'accion'      as const, label: 'Acción',     type: 'text',   placeholder: 'LOGIN, CREATE…' },
+          ].map(({ id, field, label, type, placeholder }) => (
+            <div key={id}>
+              <label className="mb-1 block text-xs font-medium text-text-muted" htmlFor={id}>
+                {label}
+              </label>
+              <input
+                id={id}
+                type={type}
+                placeholder={placeholder}
+                {...register(field)}
+                className="rounded-lg border border-surface-subtle bg-surface-muted px-3 py-2 text-sm text-text placeholder-text-subtle focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              />
+            </div>
+          ))}
+          <div className="flex items-end gap-2">
+            <button
+              type="submit"
+              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            >
+              Filtrar
+            </button>
+            {hasActiveFiltros && (
+              <button
+                type="button"
+                onClick={onLimpiar}
+                className="flex items-center gap-1.5 rounded-lg border border-surface-subtle px-3 py-2 text-sm text-text-muted hover:bg-surface-subtle hover:text-text"
+              >
+                <X className="h-3.5 w-3.5" />
+                Limpiar
+              </button>
+            )}
+          </div>
+        </form>
       </div>
+
+      {/* Tabla */}
+      {isLoading ? (
+        <div className="flex items-center gap-3 py-6">
+          <Spinner />
+          <span className="text-sm text-text-muted">Cargando registros…</span>
+        </div>
+      ) : isError ? (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Error al cargar el log de auditoría. Intentá de nuevo.
+        </div>
+      ) : items.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-surface-subtle bg-surface p-8 text-center">
+          <ShieldCheck className="mx-auto mb-2 h-6 w-6 text-text-subtle" />
+          <p className="text-sm text-text-muted">No hay registros para los filtros seleccionados.</p>
+        </div>
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-xl border border-surface-subtle shadow-sm">
+            <table className="w-full text-sm">
+              <thead className="bg-surface-muted">
+                <tr>
+                  {['Fecha', 'Actor', 'Acción', 'Detalle', 'IP'].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-muted">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-surface-subtle bg-surface">
+                {items.map((log) => (
+                  <tr key={log.id} className="hover:bg-surface-muted transition-colors">
+                    <td className="px-4 py-3 text-xs text-text-muted whitespace-nowrap">
+                      {new Date(log.fecha_hora).toLocaleString('es-AR')}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-text">
+                      {log.actor_id.slice(0, 8)}…
+                    </td>
+                    <td className="px-4 py-3">
+                      <ActionBadge accion={log.accion} />
+                    </td>
+                    <td className="px-4 py-3 text-xs text-text-muted max-w-xs truncate">
+                      {log.detalle ? JSON.stringify(log.detalle).slice(0, 60) : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-text-muted">{log.ip ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-text-subtle">
+            Mostrando {items.length} registro{items.length !== 1 ? 's' : ''}
+          </p>
+        </>
+      )}
     </div>
   )
 }

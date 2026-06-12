@@ -22,6 +22,7 @@ from app.core.dependencies import get_current_user, get_db, require_permission
 from app.repositories.comunicacion_repository import ComunicacionRepository
 from app.schemas.comunicaciones import (
     CrearLoteRequest,
+    CrearLotePorCriterioRequest,
     LoteComunicacionResponse,
     PreviewRequest,
     PreviewResponse,
@@ -57,6 +58,121 @@ async def preview_comunicacion(
         payload.variables_ejemplo,
     )
     return PreviewResponse(asunto_renderizado=asunto, cuerpo_renderizado=cuerpo)
+
+
+@router.post(
+    "/comunicaciones/lotes/por-criterio",
+    response_model=LoteComunicacionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def crear_lote_por_criterio(
+    payload: CrearLotePorCriterioRequest,
+    request: Request,
+    _: None = _PERM_ENVIAR,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> LoteComunicacionResponse:
+    """Crea un lote de mensajes usando los destinatarios del padrón activo, filtrados por criterio.
+
+    criterio='atrasados' → solo alumnos con actividades faltantes o reprobadas.
+    criterio='todos' → todos los alumnos del padrón activo de la materia.
+    Requiere permiso: `comunicacion:enviar`
+    """
+    from sqlalchemy import select
+    from app.models.entrada_padron import EntradaPadron
+    from app.models.version_padron import VersionPadron
+    from app.services.analisis_service import get_atrasados
+
+    settings = get_settings()
+
+    # Resolver destinatarios según criterio
+    if payload.criterio == "atrasados":
+        atrasados = await get_atrasados(
+            asignacion_id=payload.asignacion_id,
+            materia_id=payload.materia_id,
+            tenant_id=current_user.tenant_id,
+            db=db,
+        )
+        ep_ids = [a["entrada_padron_id"] for a in atrasados]
+        if not ep_ids:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="No hay alumnos atrasados para esta asignación",
+            )
+        stmt_eps = (
+            select(EntradaPadron)
+            .where(EntradaPadron.id.in_(ep_ids))
+            .where(EntradaPadron.tenant_id == current_user.tenant_id)
+            .where(EntradaPadron.deleted_at.is_(None))
+        )
+    else:
+        # todos: buscar versión padron activa para la materia
+        stmt_vp = (
+            select(VersionPadron)
+            .where(VersionPadron.tenant_id == current_user.tenant_id)
+            .where(VersionPadron.materia_id == payload.materia_id)
+            .where(VersionPadron.activa.is_(True))
+            .where(VersionPadron.deleted_at.is_(None))
+            .limit(1)
+        )
+        vp_result = await db.execute(stmt_vp)
+        vp = vp_result.scalar_one_or_none()
+        if vp is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="No hay padrón activo para esta materia",
+            )
+        stmt_eps = (
+            select(EntradaPadron)
+            .where(EntradaPadron.version_id == vp.id)
+            .where(EntradaPadron.tenant_id == current_user.tenant_id)
+            .where(EntradaPadron.deleted_at.is_(None))
+        )
+
+    eps_result = await db.execute(stmt_eps)
+    entradas = eps_result.scalars().all()
+    if not entradas:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="No se encontraron destinatarios",
+        )
+
+    destinatarios = [
+        {
+            "entrada_padron_id": str(ep.id),
+            "nombre": ep.nombre,
+            "apellidos": ep.apellidos,
+            "email_encrypted": ep.email_encrypted,
+        }
+        for ep in entradas
+    ]
+
+    lote = await crear_lote(
+        asunto_tpl=payload.asunto_template,
+        cuerpo_tpl=payload.cuerpo_template,
+        destinatarios=destinatarios,
+        materia_id=payload.materia_id,
+        enviado_por=current_user.id,
+        tenant_id=current_user.tenant_id,
+        umbral_aprobacion=settings.comunicacion_umbral_aprobacion,
+        db=db,
+    )
+
+    await audit(
+        db,
+        actor_id=request.state.actor_id,
+        tenant_id=current_user.tenant_id,
+        accion=COMUNICACION_ENVIAR,
+        materia_id=payload.materia_id,
+        filas_afectadas=len(destinatarios),
+        ip=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+        detalle={"lote_id": str(lote.id), "criterio": payload.criterio},
+    )
+
+    await db.commit()
+    await db.refresh(lote)
+    return LoteComunicacionResponse.model_validate(lote)
 
 
 @router.post(

@@ -1,9 +1,11 @@
 """Servicio de análisis académico — C-11 analisis-atrasados-reportes.
 
-Tres funciones de análisis sobre datos ya persistidos (C-09/C-10):
-  get_atrasados    — alumnos con actividades faltantes o reprobadas (RN-06)
-  get_ranking      — ranking por actividades aprobadas ≥1 (RN-09)
-  get_notas_finales— promedio numérico y resumen por alumno (F2.5)
+Funciones de análisis sobre datos ya persistidos (C-09/C-10):
+  get_atrasados             — alumnos con actividades faltantes o reprobadas (RN-06)
+  get_ranking               — ranking por actividades aprobadas ≥1 (RN-09)
+  get_notas_finales         — promedio numérico y resumen por alumno (F2.5)
+  get_entregas_sin_corregir — calificaciones importadas sin nota
+  get_monitor               — métricas agregadas de seguimiento
 
 Todas las funciones retornan dicts planos listos para serializar a schema.
 Identidad del alumno: solo alumnos con entrada_padron_id IS NOT NULL (D1).
@@ -12,7 +14,7 @@ Identidad del alumno: solo alumnos con entrada_padron_id IS NOT NULL (D1).
 from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import text
+from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -192,3 +194,90 @@ async def get_notas_finales(
         }
         for row in rows
     ]
+
+
+async def get_entregas_sin_corregir(
+    asignacion_id: UUID,
+    materia_id: UUID,
+    tenant_id: UUID,
+    db: AsyncSession,
+) -> list[dict]:
+    """Calificaciones importadas sin nota (nota_numerica IS NULL AND nota_textual IS NULL)."""
+    stmt = text(
+        """
+        SELECT c.entrada_padron_id,
+               ep.nombre,
+               ep.apellidos,
+               c.actividad,
+               c.importado_at
+        FROM calificaciones c
+        JOIN entrada_padron ep ON ep.id = c.entrada_padron_id
+        WHERE c.tenant_id     = :tid
+          AND c.asignacion_id = :asig_id
+          AND c.materia_id    = :mat_id
+          AND c.deleted_at IS NULL
+          AND c.entrada_padron_id IS NOT NULL
+          AND c.nota_numerica IS NULL
+          AND c.nota_textual IS NULL
+        ORDER BY ep.apellidos ASC, ep.nombre ASC, c.actividad ASC
+        """
+    )
+    result = await db.execute(
+        stmt,
+        {"tid": tenant_id, "asig_id": asignacion_id, "mat_id": materia_id},
+    )
+    rows = result.fetchall()
+    return [
+        {
+            "entrada_padron_id": row.entrada_padron_id,
+            "nombre": row.nombre,
+            "apellidos": row.apellidos,
+            "actividad": row.actividad,
+            "importado_at": row.importado_at,
+        }
+        for row in rows
+    ]
+
+
+async def get_monitor(
+    asignacion_id: UUID,
+    materia_id: UUID,
+    tenant_id: UUID,
+    db: AsyncSession,
+) -> dict:
+    """Métricas de seguimiento: totales, atrasados, promedio, comunicaciones."""
+    from app.models.lote_comunicacion import LoteComunicacion, LOTE_COMPLETADO, LOTE_CANCELADO
+
+    notas = await get_notas_finales(asignacion_id, materia_id, tenant_id, db)
+    total_alumnos = len(notas)
+
+    promedios = [float(n["promedio_numerico"]) for n in notas if n["promedio_numerico"] is not None]
+    promedio_general = round(sum(promedios) / len(promedios), 2) if promedios else None
+
+    atrasados_list = await get_atrasados(asignacion_id, materia_id, tenant_id, db)
+    atrasados = len(atrasados_list)
+
+    stmt_enviados = select(func.count()).where(
+        LoteComunicacion.tenant_id == tenant_id,
+        LoteComunicacion.materia_id == materia_id,
+        LoteComunicacion.deleted_at.is_(None),
+        LoteComunicacion.estado == LOTE_COMPLETADO,
+    )
+    stmt_pendientes = select(func.count()).where(
+        LoteComunicacion.tenant_id == tenant_id,
+        LoteComunicacion.materia_id == materia_id,
+        LoteComunicacion.deleted_at.is_(None),
+        LoteComunicacion.estado.not_in([LOTE_COMPLETADO, LOTE_CANCELADO]),
+    )
+
+    enviados_r = await db.execute(stmt_enviados)
+    pendientes_r = await db.execute(stmt_pendientes)
+
+    return {
+        "total_alumnos": total_alumnos,
+        "atrasados": atrasados,
+        "al_dia": total_alumnos - atrasados,
+        "promedio_general": promedio_general,
+        "comunicaciones_enviadas": enviados_r.scalar_one() or 0,
+        "comunicaciones_pendientes": pendientes_r.scalar_one() or 0,
+    }

@@ -16,8 +16,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import get_current_user, get_db, require_permission
 from app.repositories.asignacion_repository import AsignacionRepository
-from app.schemas.analisis import AtrasadosResponse, NotasFinalesResponse, RankingResponse
-from app.services.analisis_service import get_atrasados, get_notas_finales, get_ranking
+from app.schemas.analisis import (
+    AtrasadosResponse,
+    EntregasSinCorregirResponse,
+    MonitorResponse,
+    NotasFinalesResponse,
+    RankingResponse,
+)
+from app.services.analisis_service import (
+    get_atrasados,
+    get_entregas_sin_corregir,
+    get_monitor,
+    get_notas_finales,
+    get_ranking,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["analisis"])
 
@@ -125,3 +137,57 @@ async def get_notas_finales_endpoint(
         db=db,
     )
     return NotasFinalesResponse(total_alumnos=len(alumnos), alumnos=alumnos)
+
+
+@router.get(
+    "/analisis/entregas-sin-corregir/{asignacion_id}/{materia_id}",
+    response_model=EntregasSinCorregirResponse,
+)
+async def get_entregas_sin_corregir_endpoint(
+    asignacion_id: UUID,
+    materia_id: UUID,
+    request: Request,
+    _: None = _PERM,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> EntregasSinCorregirResponse:
+    """Calificaciones importadas sin nota (pendientes de corrección).
+
+    Requiere permiso: `atrasados:ver`
+    """
+    await _check_asignacion_scope(asignacion_id, current_user, request, db)
+
+    items = await get_entregas_sin_corregir(
+        asignacion_id=asignacion_id,
+        materia_id=materia_id,
+        tenant_id=current_user.tenant_id,
+        db=db,
+    )
+    return EntregasSinCorregirResponse(total=len(items), items=items)
+
+
+@router.get(
+    "/analisis/monitor/{asignacion_id}/{materia_id}",
+    response_model=MonitorResponse,
+)
+async def get_monitor_endpoint(
+    asignacion_id: UUID,
+    materia_id: UUID,
+    request: Request,
+    _: None = _PERM,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> MonitorResponse:
+    """Métricas de seguimiento: totales, atrasados, promedio, comunicaciones.
+
+    Requiere permiso: `atrasados:ver`
+    """
+    await _check_asignacion_scope(asignacion_id, current_user, request, db)
+
+    data = await get_monitor(
+        asignacion_id=asignacion_id,
+        materia_id=materia_id,
+        tenant_id=current_user.tenant_id,
+        db=db,
+    )
+    return MonitorResponse(**data)

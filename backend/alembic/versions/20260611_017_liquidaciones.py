@@ -79,7 +79,7 @@ def upgrade() -> None:
         sa.Column("usuario_id", sa.UUID(), nullable=False),
         sa.Column("rol", sa.String(20), nullable=False),
         sa.Column("comisiones", postgresql.JSONB(), nullable=False,
-                  server_default="'[]'::jsonb"),
+                  server_default=sa.text("'[]'::jsonb")),
         sa.Column("monto_base", sa.Numeric(12, 2), nullable=False, server_default="0"),
         sa.Column("monto_plus", sa.Numeric(12, 2), nullable=False, server_default="0"),
         sa.Column("total", sa.Numeric(12, 2), nullable=False, server_default="0"),

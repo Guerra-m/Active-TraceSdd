@@ -7,6 +7,15 @@ import { api, setRefreshToken } from '@/shared/services/api'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import type { AuthUser } from '@/features/auth/context/AuthContext'
 
+const DEV_USERS = [
+  { rol: 'Admin',       email: 'admin@trace.dev',    password: 'admin123'   },
+  { rol: 'Profesor',    email: 'profesor@trace.dev', password: 'profesor123' },
+  { rol: 'Tutor',       email: 'tutor@trace.dev',    password: 'tutor123'   },
+  { rol: 'Coordinador', email: 'coord@trace.dev',    password: 'coord123'   },
+  { rol: 'Nexo',        email: 'nexo@trace.dev',     password: 'nexo123'    },
+  { rol: 'Finanzas',    email: 'finanzas@trace.dev', password: 'fin123'     },
+]
+
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(1, 'La contraseña es requerida'),
@@ -32,10 +41,16 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
+
+  const fillCredentials = (email: string, password: string) => {
+    setValue('email', email)
+    setValue('password', password)
+  }
 
   const onSubmit = async (data: LoginFormData) => {
     setApiError(null)
@@ -140,6 +155,34 @@ export function LoginPage() {
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
+
+        {import.meta.env.DEV && (
+          <div className="mt-6 rounded-lg border border-dashed border-surface-subtle bg-surface-muted p-4">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
+              Usuarios de prueba
+            </p>
+            <div className="space-y-1.5">
+              {DEV_USERS.map((u) => (
+                <button
+                  key={u.email}
+                  type="button"
+                  onClick={() => fillCredentials(u.email, u.password)}
+                  className="w-full rounded-md bg-surface px-3 py-2 text-left transition-colors hover:bg-surface-subtle"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-text">{u.rol}</span>
+                    <span className="text-[10px] text-text-subtle">click para rellenar</span>
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-3">
+                    <span className="font-mono text-xs text-text-muted">{u.email}</span>
+                    <span className="text-text-subtle">·</span>
+                    <span className="font-mono text-xs text-text-muted">{u.password}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

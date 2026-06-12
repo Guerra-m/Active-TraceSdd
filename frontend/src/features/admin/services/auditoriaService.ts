@@ -2,7 +2,7 @@ import { api } from '@/shared/services/api'
 import type { AuditLog, AuditLogFiltros, MetricasAuditoria } from '../types'
 
 export async function fetchAuditLogs(filtros?: AuditLogFiltros): Promise<AuditLog[]> {
-  const { data } = await api.get<AuditLog[]>('/auditoria/', { params: filtros })
+  const { data } = await api.get<AuditLog[]>('/auditoria', { params: filtros })
   return data
 }
 

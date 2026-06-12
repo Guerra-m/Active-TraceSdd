@@ -41,6 +41,16 @@ class CrearLoteRequest(BaseModel):
     destinatarios: list[DestinatarioInput] = Field(..., min_length=1)
 
 
+class CrearLotePorCriterioRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    asignacion_id: UUID
+    materia_id: UUID
+    criterio: str = Field(..., pattern="^(atrasados|todos)$")
+    asunto_template: str = Field(..., min_length=1, max_length=500)
+    cuerpo_template: str = Field(..., min_length=1)
+
+
 class LoteComunicacionResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", from_attributes=True)
 

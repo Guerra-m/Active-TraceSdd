@@ -184,14 +184,17 @@ class AuthService:
     async def _issue_session(self, user: User, refresh_token_expire_days: int = 30) -> dict:
         """Emite un par access + refresh token para el usuario.
 
-        Args:
-            user: Usuario autenticado.
-            refresh_token_expire_days: Días de vida del refresh token.
-
         Returns:
-            dict con 'access_token', 'refresh_token', 'token_type'.
+            dict con 'access_token', 'refresh_token', 'token_type', 'user', 'permissions'.
         """
-        from datetime import datetime, timezone
+        from datetime import date, datetime, timezone
+
+        from sqlalchemy import and_, select
+
+        from app.models.permiso import Permiso
+        from app.models.rol import Rol
+        from app.models.rol_permiso import RolPermiso
+        from app.models.usuario_rol import UsuarioRol
 
         # Access token
         access_token = create_access_token(_build_access_token_claims(user))
@@ -205,10 +208,57 @@ class AuthService:
             expires_at=expires_at,
         )
 
+        # Roles activos del usuario
+        today = date.today()
+        roles_stmt = (
+            select(Rol.code)
+            .join(UsuarioRol, UsuarioRol.rol_id == Rol.id)
+            .where(
+                UsuarioRol.user_id == user.id,
+                UsuarioRol.deleted_at.is_(None),
+                UsuarioRol.valid_from <= today,
+                (UsuarioRol.valid_until.is_(None)) | (UsuarioRol.valid_until >= today),
+                Rol.deleted_at.is_(None),
+                Rol.is_active.is_(True),
+            )
+        )
+        roles_result = await self._db.execute(roles_stmt)
+        role_codes = [r for (r,) in roles_result.all()]
+
+        # Permisos activos del usuario (vía sus roles)
+        perms_stmt = (
+            select(Permiso.code)
+            .join(RolPermiso, RolPermiso.permiso_id == Permiso.id)
+            .join(Rol, Rol.id == RolPermiso.rol_id)
+            .join(UsuarioRol, UsuarioRol.rol_id == Rol.id)
+            .where(
+                UsuarioRol.user_id == user.id,
+                UsuarioRol.deleted_at.is_(None),
+                UsuarioRol.valid_from <= today,
+                (UsuarioRol.valid_until.is_(None)) | (UsuarioRol.valid_until >= today),
+                Rol.deleted_at.is_(None),
+                Rol.is_active.is_(True),
+                Permiso.is_active.is_(True),
+            )
+            .distinct()
+        )
+        perms_result = await self._db.execute(perms_stmt)
+        permissions = [p for (p,) in perms_result.all()]
+
+        email = decrypt(user.email_encrypted)
+
         return {
             "access_token": access_token,
             "refresh_token": token_raw,
             "token_type": "bearer",
+            "user": {
+                "id": str(user.id),
+                "email": email,
+                "nombre": user.nombre or "",
+                "rol": role_codes[0] if role_codes else "",
+                "tenant_id": str(user.tenant_id),
+            },
+            "permissions": permissions,
         }
 
     async def refresh(self, refresh_token_raw: str, refresh_token_expire_days: int = 30) -> dict:

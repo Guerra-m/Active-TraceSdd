@@ -29,11 +29,13 @@ COPY pyproject.toml ./
 RUN uv venv /opt/venv && \
     uv pip install --python /opt/venv/bin/python \
         --no-cache \
-        -e ".[]; include_extras=false" \
+        -e "." \
         fastapi uvicorn[standard] sqlalchemy[asyncio] alembic asyncpg \
         pydantic pydantic-settings argon2-cffi "python-jose[cryptography]" \
+        cryptography pyotp \
         "opentelemetry-sdk" opentelemetry-instrumentation-fastapi \
-        "opentelemetry-exporter-otlp" python-json-logger
+        "opentelemetry-exporter-otlp" python-json-logger \
+        python-multipart openpyxl httpx "pydantic[email]"
 
 # ---------------------------------------------------------------------------
 # Stage 2: runtime — imagen minima sin toolchain de build

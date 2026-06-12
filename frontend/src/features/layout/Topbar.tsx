@@ -1,11 +1,23 @@
+import { Menu, PanelLeftClose } from 'lucide-react'
 import { useAuth } from '@/features/auth/context/AuthContext'
 
-export function Topbar() {
+interface TopbarProps {
+  onMenuClick: () => void
+  sidebarOpen: boolean
+}
+
+export function Topbar({ onMenuClick, sidebarOpen }: TopbarProps) {
   const { user, logout } = useAuth()
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-surface-subtle bg-surface px-6">
-      <div />
+    <header className="flex h-16 items-center justify-between border-b border-surface-subtle bg-surface px-4">
+      <button
+        onClick={onMenuClick}
+        aria-label={sidebarOpen ? 'Cerrar sidebar' : 'Abrir sidebar'}
+        className="rounded-lg p-2 text-text-muted hover:bg-surface-subtle hover:text-text focus:outline-none focus:ring-2 focus:ring-brand-500"
+      >
+        {sidebarOpen ? <PanelLeftClose className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </button>
 
       <div className="flex items-center gap-4">
         {user && (
