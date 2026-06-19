@@ -5,6 +5,7 @@ import {
   BarChart3,
   BookOpen,
   Calendar,
+  CheckCircle2,
   DollarSign,
   Download,
   Inbox,
