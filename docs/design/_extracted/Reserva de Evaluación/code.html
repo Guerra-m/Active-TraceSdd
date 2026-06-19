@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activia-Trace | Evaluation Reservation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#e3c19b",
+                    "primary": "#162839",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#051d30",
+                    "surface-container": "#efedef",
+                    "inverse-surface": "#303032",
+                    "secondary": "#4b6076",
+                    "on-tertiary-fixed-variant": "#5a4225",
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#96a9be",
+                    "background": "#fbf9fa",
+                    "surface-container-high": "#e9e8e9",
+                    "primary-fixed-dim": "#b5c8df",
+                    "on-primary-fixed-variant": "#36485b",
+                    "secondary-container": "#cce2fc",
+                    "tertiary-container": "#4e381c",
+                    "on-tertiary-fixed": "#291802",
+                    "on-secondary-container": "#50657b",
+                    "surface-dim": "#dbd9db",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#2c3e50",
+                    "surface-variant": "#e4e2e3",
+                    "surface": "#fbf9fa",
+                    "surface-container-highest": "#e4e2e3",
+                    "surface-container-low": "#f5f3f4",
+                    "on-secondary-fixed-variant": "#34495e",
+                    "inverse-on-surface": "#f2f0f2",
+                    "surface-bright": "#fbf9fa",
+                    "secondary-fixed": "#cfe5ff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#d1e4fb",
+                    "on-background": "#1b1c1d",
+                    "tertiary": "#362308",
+                    "inverse-primary": "#b5c8df",
+                    "outline-variant": "#c4c6cd",
+                    "tertiary-fixed": "#ffddb7",
+                    "secondary-fixed-dim": "#b3c9e2",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#4e6073",
+                    "on-surface-variant": "#43474c",
+                    "on-primary-fixed": "#091d2e",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#c1a17d",
+                    "on-surface": "#1b1c1d",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#74777d",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "base": "4px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "table-cell-x": "12px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "table-cell-y": "8px"
+            },
+            "fontFamily": {
+                    "data-mono": ["JetBrains Mono"],
+                    "label-caps": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "title-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Shell Layout -->
+<div class="flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="flex flex-col h-full py-md px-base w-[240px] bg-surface-container-lowest dark:bg-primary-container border-r border-outline-variant dark:border-outline z-50">
+<div class="flex items-center gap-sm px-md mb-xl">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[20px]">school</span>
+</div>
+<div>
+<h1 class="font-title-sm text-title-sm font-bold text-on-surface dark:text-white">Student Portal</h1>
+<p class="text-[10px] text-on-surface-variant dark:text-primary-fixed-dim leading-none">Academic Management</p>
+</div>
+</div>
+<nav class="flex-1 space-y-base">
+<div class="px-md py-sm flex items-center gap-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary cursor-pointer duration-200 ease-in-out transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-sm text-body-sm">Home</span>
+</div>
+<div class="px-md py-sm flex items-center gap-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary cursor-pointer duration-200 ease-in-out transition-all">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-body-sm text-body-sm">My Subjects</span>
+</div>
+<div class="px-md py-sm flex items-center gap-md bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary font-medium rounded-lg cursor-pointer duration-200 ease-in-out transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+<span class="font-body-sm text-body-sm">Evaluations</span>
+</div>
+<div class="px-md py-sm flex items-center gap-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary cursor-pointer duration-200 ease-in-out transition-all">
+<span class="material-symbols-outlined">notifications_active</span>
+<span class="font-body-sm text-body-sm">Notices</span>
+</div>
+</nav>
+<div class="mt-auto space-y-base">
+<div class="px-md py-sm flex items-center gap-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary cursor-pointer duration-200 ease-in-out transition-all">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</div>
+<div class="px-md py-sm flex items-center gap-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary cursor-pointer duration-200 ease-in-out transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full relative overflow-hidden bg-background">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-lg w-full h-16 sticky top-0 z-50 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Activia-Trace</span>
+<div class="h-6 w-px bg-outline-variant mx-sm"></div>
+<nav class="flex gap-md">
+<span class="font-body-md text-body-md text-primary font-bold cursor-pointer">Reservations</span>
+<span class="font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer px-sm rounded">History</span>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-base rounded-full hover:bg-surface-container-low transition-colors">notifications</span>
+<div class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full border border-surface"></div>
+</div>
+<img class="w-8 h-8 rounded-full border border-outline-variant cursor-pointer object-cover" data-alt="A professional headshot of a young adult student in a brightly lit academic setting. The lighting is soft and natural, emphasizing a focused and serious demeanor. The image follows a high-key light mode aesthetic with soft shadows, consistent with a modern corporate student portal profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAg-uv2ZjLgni91VZQEvgbEKx1E0hVYrhpZ8oSCVUgjqXPF_xHaskLt36CL5u2zSDVXZz4oyLepvCqMB7r-4wfcx0PVCmVfm02qf3eg4875z5LpyKs8jzvHTN_xufWTqXyAM4LxdW2ZgDW8JEdmSYLjLgSZaYbtp-0BjHRa-Qa28INaOSLfUiGqql85mQ9XLDijhaoF0z3zR405Jmqk5OYFU2rfJQutGY8vigvSlXaQyG-qcQ-9o_On6VVX2EdmExIBm-e_b1O12C0"/>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-lg custom-scrollbar">
+<!-- Page Title -->
+<div class="mb-xl">
+<div class="flex items-center gap-xs text-on-surface-variant mb-base">
+<span class="font-body-sm text-body-sm">Dashboard</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-body-sm text-body-sm">Evaluations</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-body-sm text-body-sm text-primary font-medium">Reservations</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-primary">Agendamento de Avaliações</h2>
+<p class="text-on-surface-variant max-w-2xl mt-base">Reserve seu horário para exames regulares ou recuperações. Verifique a disponibilidade em tempo real abaixo.</p>
+</div>
+<div class="grid grid-cols-12 gap-lg">
+<!-- Left: Available Slots (Bento Grid Style) -->
+<div class="col-span-12 lg:col-span-8 space-y-lg">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-primary">Horários Disponíveis</h3>
+<div class="flex gap-sm">
+<button class="px-md py-base border border-outline-variant rounded-lg font-body-sm text-body-sm bg-surface hover:bg-surface-container transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                                    Filtros
+                                </button>
+<button class="px-md py-base border border-outline-variant rounded-lg font-body-sm text-body-sm bg-surface hover:bg-surface-container transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                                    Este Mês
+                                </button>
+</div>
+</div>
+<!-- Slots Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Slot Card 1 -->
+<div class="bg-surface border border-outline-variant p-md flex flex-col justify-between hover:border-primary transition-colors group">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="px-sm py-[2px] bg-tertiary-fixed-dim text-on-tertiary-fixed-variant font-label-caps text-label-caps rounded">RECOVERY</span>
+<div class="flex items-center gap-xs text-primary font-medium">
+<span class="material-symbols-outlined text-[18px]">person_apron</span>
+<span class="font-body-sm text-body-sm">3 de 10 cupos disponíveis</span>
+</div>
+</div>
+<h4 class="font-title-sm text-title-sm text-primary group-hover:text-primary transition-colors">Cálculo Diferencial e Integral II</h4>
+<p class="text-on-surface-variant font-body-sm text-body-sm mt-xs">Professor: Dr. Roberto Mendes</p>
+<div class="mt-md space-y-xs">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">event</span>
+<span class="font-body-sm text-body-sm">24 de Outubro, 2023</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-body-sm text-body-sm">14:00 - 16:30</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-body-sm text-body-sm">Laboratório de Informática 04</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg py-sm bg-primary text-on-primary rounded font-medium hover:bg-primary-container transition-all" onclick="openModal('Cálculo Diferencial e Integral II', '24 de Outubro, 14:00')">Reservar</button>
+</div>
+<!-- Slot Card 2 -->
+<div class="bg-surface border border-outline-variant p-md flex flex-col justify-between hover:border-primary transition-colors group">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="px-sm py-[2px] bg-secondary-container text-on-secondary-container font-label-caps text-label-caps rounded">EXAM</span>
+<div class="flex items-center gap-xs text-primary font-medium">
+<span class="material-symbols-outlined text-[18px]">person_apron</span>
+<span class="font-body-sm text-body-sm">8 de 12 cupos disponíveis</span>
+</div>
+</div>
+<h4 class="font-title-sm text-title-sm text-primary">Sistemas Operacionais Modernos</h4>
+<p class="text-on-surface-variant font-body-sm text-body-sm mt-xs">Professor: Ana Paula Silva</p>
+<div class="mt-md space-y-xs">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">event</span>
+<span class="font-body-sm text-body-sm">26 de Outubro, 2023</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-body-sm text-body-sm">08:30 - 11:00</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-body-sm text-body-sm">Auditório Principal (Bloco C)</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg py-sm bg-primary text-on-primary rounded font-medium hover:bg-primary-container transition-all" onclick="openModal('Sistemas Operacionais Modernos', '26 de Outubro, 08:30')">Reservar</button>
+</div>
+<!-- Slot Card 3 (Urgent/Almost Full) -->
+<div class="bg-surface border border-error-container p-md flex flex-col justify-between hover:border-error transition-colors group bg-red-50/20">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="px-sm py-[2px] bg-error-container text-on-error-container font-label-caps text-label-caps rounded">FINAL EXAM</span>
+<div class="flex items-center gap-xs text-error font-bold animate-pulse">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+<span class="font-body-sm text-body-sm">1 de 5 cupos disponíveis</span>
+</div>
+</div>
+<h4 class="font-title-sm text-title-sm text-primary">Estrutura de Dados e Algoritmos</h4>
+<p class="text-on-surface-variant font-body-sm text-body-sm mt-xs">Professor: Luiz Gonzaga</p>
+<div class="mt-md space-y-xs">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">event</span>
+<span class="font-body-sm text-body-sm">25 de Outubro, 2023</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-body-sm text-body-sm">19:00 - 22:00</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-body-sm text-body-sm">Sala de Projetos III</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg py-sm bg-primary text-on-primary rounded font-medium hover:bg-primary-container transition-all" onclick="openModal('Estrutura de Dados e Algoritmos', '25 de Outubro, 19:00')">Reservar</button>
+</div>
+<!-- Slot Card 4 -->
+<div class="bg-surface border border-outline-variant p-md flex flex-col justify-between hover:border-primary transition-colors group">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="px-sm py-[2px] bg-surface-variant text-on-surface-variant font-label-caps text-label-caps rounded">PRE-REGISTRATION</span>
+<div class="flex items-center gap-xs text-primary font-medium">
+<span class="material-symbols-outlined text-[18px]">person_apron</span>
+<span class="font-body-sm text-body-sm">10 de 15 cupos disponíveis</span>
+</div>
+</div>
+<h4 class="font-title-sm text-title-sm text-primary">Redes de Computadores I</h4>
+<p class="text-on-surface-variant font-body-sm text-body-sm mt-xs">Professor: Carlos André</p>
+<div class="mt-md space-y-xs">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">event</span>
+<span class="font-body-sm text-body-sm">30 de Outubro, 2023</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-body-sm text-body-sm">10:00 - 12:30</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-body-sm text-body-sm">Laboratório 01</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg py-sm bg-primary text-on-primary rounded font-medium hover:bg-primary-container transition-all" onclick="openModal('Redes de Computadores I', '30 de Outubro, 10:00')">Reservar</button>
+</div>
+</div>
+</div>
+<!-- Right: Active Reservations & Info -->
+<div class="col-span-12 lg:col-span-4 space-y-lg">
+<!-- My Active Reservations -->
+<div class="bg-surface border border-outline-variant rounded shadow-sm overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant bg-surface-container-low flex items-center justify-between">
+<h3 class="font-title-sm text-title-sm text-primary font-bold">Mis reservas activas</h3>
+<span class="bg-primary text-on-primary text-[10px] font-bold px-sm py-[2px] rounded-full">2</span>
+</div>
+<div class="p-lg space-y-md">
+<!-- Active Reservation Item 1 -->
+<div class="p-md bg-background border-l-4 border-primary rounded relative">
+<div class="flex justify-between mb-xs">
+<span class="font-label-caps text-label-caps text-primary">EXAM</span>
+<button class="text-error font-body-sm text-body-sm font-medium hover:underline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">close</span>
+                                            Cancelar
+                                        </button>
+</div>
+<h5 class="font-body-md text-body-md font-bold text-on-surface">Banco de Dados Relacional</h5>
+<p class="text-on-surface-variant text-[12px] mt-xs">Amanhã, 14:00 - Sala 102</p>
+</div>
+<!-- Active Reservation Item 2 -->
+<div class="p-md bg-background border-l-4 border-secondary rounded relative">
+<div class="flex justify-between mb-xs">
+<span class="font-label-caps text-label-caps text-secondary">PROJECT DEFENSE</span>
+<button class="text-error font-body-sm text-body-sm font-medium hover:underline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">close</span>
+                                            Cancelar
+                                        </button>
+</div>
+<h5 class="font-body-md text-body-md font-bold text-on-surface">Engenharia de Software</h5>
+<p class="text-on-surface-variant text-[12px] mt-xs">28 Out, 09:00 - Virtual</p>
+</div>
+<button class="w-full py-sm border border-outline text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container transition-all">Ver Histórico Completo</button>
+</div>
+</div>
+<!-- Calendar Summary Card -->
+<div class="bg-primary-container text-on-primary-container p-lg rounded relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="font-title-sm text-title-sm font-bold mb-xs">Resumo Acadêmico</h4>
+<p class="text-on-primary-container opacity-80 text-body-sm mb-md">Mantenha seu cronograma atualizado para evitar conflitos de horários.</p>
+<div class="space-y-sm">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]">done_all</span>
+</div>
+<div>
+<p class="text-white font-bold leading-none">85%</p>
+<p class="text-[10px] opacity-70">Avaliações Concluídas</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded bg-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]">hourglass_empty</span>
+</div>
+<div>
+<p class="text-white font-bold leading-none">3</p>
+<p class="text-[10px] opacity-70">Pendências de Agenda</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Background texture replacement via CSS pattern -->
+<div class="absolute top-0 right-0 w-32 h-32 opacity-10" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 8px 8px;"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Modal Confirmation Reservation -->
+<div class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300" id="reservationModal">
+<div class="bg-surface w-full max-w-md rounded-lg shadow-xl transform scale-95 transition-transform duration-300 border border-outline-variant overflow-hidden">
+<div class="p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">event_available</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Confirmar Reserva</h3>
+<p class="text-on-surface-variant font-body-sm text-body-sm">Por favor, revise os detalhes abaixo.</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-lg space-y-sm mb-lg border border-outline-variant">
+<div class="flex justify-between border-b border-outline-variant pb-xs">
+<span class="text-on-surface-variant text-body-sm">Disciplina</span>
+<span class="text-primary font-bold text-body-sm" id="modalSubject">Cálculo Diferencial e Integral II</span>
+</div>
+<div class="flex justify-between border-b border-outline-variant pb-xs">
+<span class="text-on-surface-variant text-body-sm">Data & Horário</span>
+<span class="text-primary font-bold text-body-sm" id="modalDateTime">24 de Outubro, 14:00</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant text-body-sm">Tipo de Prova</span>
+<span class="px-sm py-1 bg-tertiary-fixed-dim text-on-tertiary-fixed-variant rounded text-[10px] font-bold">RECUPERAÇÃO</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<p class="text-[12px] text-on-surface-variant italic text-center">Ao confirmar, você declara estar ciente das normas de aplicação de exames.</p>
+<div class="flex gap-md mt-sm">
+<button class="flex-1 py-sm border border-outline text-on-surface font-medium rounded hover:bg-surface-container transition-all" onclick="closeModal()">Cancelar</button>
+<button class="flex-1 py-sm bg-primary text-on-primary font-medium rounded hover:bg-primary-container transition-all shadow-md" onclick="confirmReservation()">Confirmar Reserva</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Success Toast (Hidden) -->
+<div class="fixed bottom-lg right-lg z-[200] transform translate-y-20 opacity-0 transition-all duration-500 bg-primary text-on-primary px-lg py-md rounded-lg shadow-2xl flex items-center gap-md" id="successToast">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+<div>
+<p class="font-bold">Reserva Confirmada!</p>
+<p class="text-sm opacity-80">Seu horário foi agendado com sucesso.</p>
+</div>
+</div>
+<script>
+        const modal = document.getElementById('reservationModal');
+        const modalContent = modal.querySelector('div');
+        const toast = document.getElementById('successToast');
+        
+        function openModal(subject, datetime) {
+            document.getElementById('modalSubject').textContent = subject;
+            document.getElementById('modalDateTime').textContent = datetime;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function confirmReservation() {
+            closeModal();
+            // Show toast
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 4000);
+        }
+
+        // Close modal on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    </script>
+</body></html>

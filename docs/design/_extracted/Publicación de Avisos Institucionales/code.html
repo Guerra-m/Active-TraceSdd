@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Notice Publishing - Academia ERP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb7",
+                    "on-secondary-fixed": "#051d30",
+                    "surface-bright": "#fbf9fa",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#5a4225",
+                    "primary-fixed": "#d1e4fb",
+                    "on-background": "#1b1c1d",
+                    "surface-container-low": "#f5f3f4",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#1b1c1d",
+                    "surface-container": "#efedef",
+                    "tertiary-fixed-dim": "#e3c19b",
+                    "secondary": "#4b6076",
+                    "outline": "#74777d",
+                    "on-tertiary-container": "#c1a17d",
+                    "surface-dim": "#dbd9db",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#34495e",
+                    "on-secondary-container": "#50657b",
+                    "outline-variant": "#c4c6cd",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#cce2fc",
+                    "on-tertiary-fixed": "#291802",
+                    "inverse-on-surface": "#f2f0f2",
+                    "tertiary": "#362308",
+                    "surface-tint": "#4e6073",
+                    "surface-container-low": "#f5f3f4",
+                    "primary-container": "#2c3e50",
+                    "primary": "#162839",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#303032",
+                    "secondary-fixed": "#cfe5ff",
+                    "inverse-primary": "#b5c8df",
+                    "secondary-fixed-dim": "#b3c9e2",
+                    "primary-fixed-dim": "#b5c8df",
+                    "surface": "#fbf9fa",
+                    "on-surface-variant": "#43474c",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "lg": "24px",
+                    "table-cell-y": "8px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "table-cell-x": "12px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c4c6cd;
+            border-radius: 10px;
+        }
+        .zebra-stripe:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+        .bento-card {
+            background: #ffffff;
+            border: 1px solid #E2E8F0;
+            transition: all 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: #96a9be;
+        }
+        .severity-radio:checked + label {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- Side Navigation -->
+<nav class="fixed left-0 top-0 h-full w-60 bg-primary border-r border-outline-variant flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Academia ERP</h1>
+<p class="font-body-sm text-body-sm text-on-primary-fixed-variant opacity-70">Admin Portal</p>
+</div>
+<div class="flex-1 px-sm space-y-xs">
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-body-md text-body-md">Academic</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Users</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Finances</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Auditing</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto px-md pt-lg border-t border-primary-container">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-on-primary">A. Peterson</p>
+<p class="font-body-sm text-body-sm text-on-primary-fixed-variant">Coordinator</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="ml-60 min-h-screen">
+<!-- Top Nav -->
+<header class="h-16 flex justify-between items-center px-lg border-b border-outline-variant bg-surface sticky top-0 z-40">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+<h2 class="font-title-sm text-title-sm text-primary">Academic Management System</h2>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">help_outline</span>
+</div>
+</header>
+<!-- Page Header -->
+<div class="p-lg bg-surface-bright flex justify-between items-end">
+<div>
+<nav class="flex items-center gap-xs text-on-surface-variant mb-xs">
+<span class="font-body-sm text-body-sm">Auditing</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-body-sm text-body-sm font-bold text-primary">Notice Center</span>
+</nav>
+<h1 class="font-display-lg text-display-lg text-primary">Notice Publishing</h1>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-title-sm flex items-center gap-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">send</span>
+                Publish Notice
+            </button>
+</div>
+<div class="p-lg grid grid-cols-12 gap-lg">
+<!-- Left: Form Section (8 Columns) -->
+<section class="col-span-12 xl:col-span-7 space-y-lg">
+<div class="bento-card rounded-xl p-lg">
+<div class="flex items-center gap-sm mb-lg border-b border-outline-variant pb-md">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+<h3 class="font-headline-md text-headline-md text-primary">Compose New Notice</h3>
+</div>
+<form class="space-y-md">
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Notice Title</label>
+<input class="w-full border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary bg-surface transition-all font-body-md" id="notice-title" oninput="updatePreview()" placeholder="e.g., End of Semester Grade Submissions" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Severity Level</label>
+<div class="grid grid-cols-3 gap-md">
+<div class="relative">
+<input checked="" class="hidden severity-radio" id="sev-info" name="severity" onclick="updatePreview()" type="radio" value="info"/>
+<label class="flex flex-col items-center justify-center p-md border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition-colors text-primary" for="sev-info">
+<span class="material-symbols-outlined mb-xs">info</span>
+<span class="font-label-caps">Information</span>
+</label>
+</div>
+<div class="relative">
+<input class="hidden severity-radio" id="sev-warning" name="severity" onclick="updatePreview()" type="radio" value="warning"/>
+<label class="flex flex-col items-center justify-center p-md border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition-colors text-on-tertiary-fixed-variant" for="sev-warning">
+<span class="material-symbols-outlined mb-xs">warning</span>
+<span class="font-label-caps">Warning</span>
+</label>
+</div>
+<div class="relative">
+<input class="hidden severity-radio" id="sev-error" name="severity" onclick="updatePreview()" type="radio" value="error"/>
+<label class="flex flex-col items-center justify-center p-md border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition-colors text-error" for="sev-error">
+<span class="material-symbols-outlined mb-xs">error</span>
+<span class="font-label-caps">Critical</span>
+</label>
+</div>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Target Audience</label>
+<select class="w-full border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary bg-surface font-body-md">
+<option>Global (All Staff &amp; Students)</option>
+<option>Faculty Only</option>
+<option>Students Only</option>
+<option>Specific Department: Computer Science</option>
+<option>Specific Role: Academic Coordinators</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Message Content</label>
+<textarea class="w-full border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary bg-surface transition-all font-body-md" id="notice-body" oninput="updatePreview()" placeholder="Draft your detailed notice content here..." rows="6"></textarea>
+</div>
+<div class="flex items-center justify-between p-md bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">priority_high</span>
+<div>
+<p class="font-title-sm text-title-sm">Require Acknowledgment</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Force users to click "I understand" before dismissing.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="ack-toggle" onchange="updatePreview()" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</form>
+</div>
+</section>
+<!-- Right: Preview Section (4 Columns) -->
+<section class="col-span-12 xl:col-span-5">
+<div class="sticky top-24 space-y-lg">
+<div class="flex items-center justify-between">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Live Student Preview</h3>
+<div class="flex gap-xs">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+</div>
+</div>
+<div class="bento-card rounded-xl overflow-hidden shadow-xl border-2 border-primary">
+<div class="bg-primary-container p-md flex items-center justify-between text-on-primary">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">smartphone</span>
+<span class="font-label-caps text-[10px]">Student Dashboard View</span>
+</div>
+<span class="text-[10px] font-data-mono">10:45 AM</span>
+</div>
+<!-- Dynamic Preview Card -->
+<div class="p-lg bg-surface transition-all duration-300 min-h-[300px] flex flex-col" id="preview-container">
+<div class="w-full h-1 bg-primary mb-lg rounded-full" id="preview-severity-bar"></div>
+<div class="flex items-start gap-md mb-md">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container flex-shrink-0" id="preview-icon-bg">
+<span class="material-symbols-outlined" id="preview-icon">info</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-xs" id="preview-title">Title Placeholder</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Posted by Admin • Just now</p>
+</div>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed whitespace-pre-wrap" id="preview-body-text">Your message content will appear here as you type...</p>
+</div>
+<div class="mt-xl pt-lg border-t border-outline-variant flex justify-end gap-md hidden" id="preview-action">
+<button class="px-md py-sm border border-outline-variant rounded font-body-sm hover:bg-surface-container transition-colors">Dismiss</button>
+<button class="px-md py-sm bg-primary text-on-primary rounded font-title-sm">I Acknowledge</button>
+</div>
+<div class="mt-xl flex justify-end" id="preview-dismiss">
+<button class="text-primary font-title-sm hover:underline">Dismiss</button>
+</div>
+</div>
+</div>
+<div class="p-md bg-secondary-container rounded-lg text-on-secondary-container flex items-start gap-md">
+<span class="material-symbols-outlined">lightbulb</span>
+<p class="font-body-sm text-body-sm">
+<strong>Design Tip:</strong> Use 'Critical' severity sparingly. Excessive critical notices can lead to "notification fatigue" among students.
+                        </p>
+</div>
+</div>
+</section>
+<!-- Bottom: Previous Notices -->
+<section class="col-span-12">
+<div class="bento-card rounded-xl overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="font-headline-md text-headline-md text-primary">Recent Publications</h3>
+<div class="flex items-center gap-md">
+<div class="flex border border-outline-variant rounded-lg overflow-hidden">
+<button class="px-md py-xs bg-white font-label-caps text-primary border-r border-outline-variant">ALL</button>
+<button class="px-md py-xs hover:bg-white font-label-caps text-on-surface-variant border-r border-outline-variant">ACTIVE</button>
+<button class="px-md py-xs hover:bg-white font-label-caps text-on-surface-variant">ARCHIVED</button>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">filter_list</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container border-b border-outline-variant">
+<th class="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">NOTICE TITLE</th>
+<th class="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">AUDIENCE</th>
+<th class="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">DATE PUBLISHED</th>
+<th class="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">SEVERITY</th>
+<th class="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">METRICS</th>
+<th class="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="zebra-stripe hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant">warning</span>
+<div>
+<p class="font-title-sm text-title-sm text-primary">System Maintenance Window</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">ID: #PUB-8821</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg">
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase">GLOBAL</span>
+</td>
+<td class="px-lg py-lg font-data-mono text-body-sm">24 Oct, 2023</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-on-tertiary-fixed-variant"></span>
+<span class="font-body-sm">Warning</span>
+</div>
+</td>
+<td class="px-lg py-lg">
+<div class="space-y-xs">
+<div class="flex items-center justify-between text-[11px]">
+<span class="text-on-surface-variant">Views: 1.2k</span>
+<span class="font-bold">92%</span>
+</div>
+<div class="w-32 h-1.5 bg-outline-variant rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 92%"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant">Ack: 844 / 1,200</p>
+</div>
+</td>
+<td class="px-lg py-lg text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="zebra-stripe hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">info</span>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Library Holiday Hours</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">ID: #PUB-8755</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg">
+<span class="px-sm py-xs bg-surface-variant text-on-surface-variant rounded-full text-[10px] font-bold uppercase">STUDENTS</span>
+</td>
+<td class="px-lg py-lg font-data-mono text-body-sm">20 Oct, 2023</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-body-sm">Info</span>
+</div>
+</td>
+<td class="px-lg py-lg">
+<div class="space-y-xs">
+<div class="flex items-center justify-between text-[11px]">
+<span class="text-on-surface-variant">Views: 850</span>
+<span class="font-bold">100%</span>
+</div>
+<div class="w-32 h-1.5 bg-outline-variant rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 100%"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant">No Acknowledgment Required</p>
+</div>
+</td>
+<td class="px-lg py-lg text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="zebra-stripe hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-error">error</span>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Emergency Campus Evacuation Drill</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">ID: #PUB-8699</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg">
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase">GLOBAL</span>
+</td>
+<td class="px-lg py-lg font-data-mono text-body-sm">15 Oct, 2023</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-body-sm">Critical</span>
+</div>
+</td>
+<td class="px-lg py-lg">
+<div class="space-y-xs">
+<div class="flex items-center justify-between text-[11px]">
+<span class="text-on-surface-variant">Views: 4.5k</span>
+<span class="font-bold">68%</span>
+</div>
+<div class="w-32 h-1.5 bg-outline-variant rounded-full overflow-hidden">
+<div class="bg-error h-full" style="width: 68%"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant">Ack: 3,060 / 4,500</p>
+</div>
+</td>
+<td class="px-lg py-lg text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md flex justify-between items-center bg-white">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Showing 3 of 42 notices</p>
+<div class="flex gap-xs">
+<button class="p-xs hover:bg-surface-container rounded border border-outline-variant">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-xs hover:bg-surface-container rounded border border-outline-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<script>
+        function updatePreview() {
+            const title = document.getElementById('notice-title').value || "Title Placeholder";
+            const body = document.getElementById('notice-body').value || "Your message content will appear here as you type...";
+            const severity = document.querySelector('input[name="severity"]:checked').value;
+            const requiresAck = document.getElementById('ack-toggle').checked;
+
+            const previewTitle = document.getElementById('preview-title');
+            const previewBody = document.getElementById('preview-body-text');
+            const previewBar = document.getElementById('preview-severity-bar');
+            const previewIcon = document.getElementById('preview-icon');
+            const previewIconBg = document.getElementById('preview-icon-bg');
+            const previewAction = document.getElementById('preview-action');
+            const previewDismiss = document.getElementById('preview-dismiss');
+
+            previewTitle.innerText = title;
+            previewBody.innerText = body;
+
+            // Reset classes
+            previewBar.className = "w-full h-1 mb-lg rounded-full ";
+            previewIconBg.className = "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ";
+            
+            if (severity === 'info') {
+                previewBar.classList.add('bg-primary');
+                previewIconBg.classList.add('bg-secondary-container', 'text-on-secondary-container');
+                previewIcon.innerText = 'info';
+            } else if (severity === 'warning') {
+                previewBar.classList.add('bg-tertiary-fixed-dim');
+                previewIconBg.classList.add('bg-tertiary-fixed', 'text-on-tertiary-fixed-variant');
+                previewIcon.innerText = 'warning';
+            } else if (severity === 'error') {
+                previewBar.classList.add('bg-error');
+                previewIconBg.classList.add('bg-error-container', 'text-on-error-container');
+                previewIcon.innerText = 'error';
+            }
+
+            if (requiresAck) {
+                previewAction.classList.remove('hidden');
+                previewDismiss.classList.add('hidden');
+            } else {
+                previewAction.classList.add('hidden');
+                previewDismiss.classList.remove('hidden');
+            }
+        }
+
+        // Initialize preview
+        updatePreview();
+    </script>
+</body></html>

@@ -5,8 +5,8 @@ import {
   BarChart3,
   BookOpen,
   Calendar,
-  CheckCircle2,
   DollarSign,
+  Download,
   Inbox,
   MessageSquare,
   Users,
@@ -25,22 +25,51 @@ interface KpiCardProps {
   label: string
   value: number | string
   icon: React.ElementType
-  colorClass: string
-  bgClass: string
-  description?: string
+  iconBgClass: string
+  iconColorClass: string
+  badge?: string
+  badgeClass?: string
+  barColor?: string
+  barPercent?: number
 }
 
-function KpiCard({ label, value, icon: Icon, colorClass, bgClass, description }: KpiCardProps) {
+function KpiCard({
+  label,
+  value,
+  icon: Icon,
+  iconBgClass,
+  iconColorClass,
+  badge,
+  badgeClass,
+  barColor,
+  barPercent,
+}: KpiCardProps) {
   return (
-    <div className="flex items-start gap-4 rounded-xl border border-surface-subtle bg-surface p-4 shadow-sm">
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${bgClass}`}>
-        <Icon className={`h-5 w-5 ${colorClass}`} />
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-6 hover:border-primary transition-colors">
+      <div className="flex justify-between items-start mb-4">
+        <div className={`p-2 rounded ${iconBgClass} ${iconColorClass}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+        {badge && (
+          <span className={`font-mono text-xs font-bold ${badgeClass}`}>{badge}</span>
+        )}
       </div>
-      <div className="min-w-0">
-        <p className="text-xs font-medium text-text-muted">{label}</p>
-        <p className="mt-0.5 text-2xl font-bold text-text leading-none">{value}</p>
-        {description && <p className="mt-1 text-xs text-text-subtle">{description}</p>}
+      <h3 className="text-[11px] font-bold uppercase tracking-widest text-outline mb-1">
+        {label}
+      </h3>
+      <div className="flex items-baseline gap-2">
+        <span className="text-[30px] leading-[38px] tracking-tight font-semibold text-on-surface">
+          {value}
+        </span>
       </div>
+      {barPercent !== undefined && barColor && (
+        <div className="mt-4 h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full ${barColor}`}
+            style={{ width: `${barPercent}%` }}
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -53,27 +82,27 @@ function AlumnosBar({ metrics }: { metrics: MonitorMetrics }) {
   const pctAtrasados = 100 - pctAlDia
 
   return (
-    <div className="rounded-xl border border-surface-subtle bg-surface p-5 shadow-sm">
-      <h3 className="text-sm font-semibold text-text mb-3">Estado de alumnos</h3>
-
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-surface-subtle">
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-6">
+      <h3 className="text-[11px] font-bold uppercase tracking-widest text-outline mb-4">
+        Estado de alumnos
+      </h3>
+      <div className="flex h-2 w-full overflow-hidden rounded-full bg-surface-container">
         <div
-          className="h-full bg-emerald-500 transition-all duration-500"
+          className="h-full bg-green-500 transition-all duration-500 rounded-l-full"
           style={{ width: `${pctAlDia}%` }}
         />
         <div
-          className="h-full bg-red-400 transition-all duration-500"
+          className="h-full bg-error transition-all duration-500 rounded-r-full"
           style={{ width: `${pctAtrasados}%` }}
         />
       </div>
-
-      <div className="mt-3 flex items-center gap-6 text-xs text-text-muted">
+      <div className="mt-3 flex items-center gap-6 text-xs text-on-surface-variant">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+          <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
           Al día — {metrics.al_dia} ({pctAlDia}%)
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-red-400" />
+          <span className="inline-block h-2 w-2 rounded-full bg-error" />
           Atrasados — {metrics.atrasados} ({pctAtrasados}%)
         </span>
       </div>
@@ -108,8 +137,8 @@ const QUICK_LINKS: QuickLinkProps[] = [
     description: 'Enviar mensajes a alumnos',
     path: '/profesor/comunicaciones',
     icon: MessageSquare,
-    colorClass: 'text-blue-600',
-    bgClass: 'bg-blue-50',
+    colorClass: 'text-on-secondary-container',
+    bgClass: 'bg-secondary-container',
     permission: 'comunicacion:enviar',
   },
   {
@@ -117,8 +146,8 @@ const QUICK_LINKS: QuickLinkProps[] = [
     description: 'Métricas del cuatrimestre',
     path: '/monitor',
     icon: BarChart3,
-    colorClass: 'text-indigo-600',
-    bgClass: 'bg-indigo-50',
+    colorClass: 'text-on-primary-fixed',
+    bgClass: 'bg-primary-fixed',
     permission: 'atrasados:ver',
   },
   {
@@ -126,8 +155,8 @@ const QUICK_LINKS: QuickLinkProps[] = [
     description: 'Gestionar asignaciones de docentes',
     path: '/equipos',
     icon: Users,
-    colorClass: 'text-teal-600',
-    bgClass: 'bg-teal-50',
+    colorClass: 'text-on-secondary-fixed',
+    bgClass: 'bg-secondary-fixed-dim',
     permission: 'equipos:asignar',
   },
   {
@@ -135,8 +164,8 @@ const QUICK_LINKS: QuickLinkProps[] = [
     description: 'Administrar encuentros sincrónicos',
     path: '/encuentros/admin',
     icon: Calendar,
-    colorClass: 'text-purple-600',
-    bgClass: 'bg-purple-50',
+    colorClass: 'text-on-tertiary-fixed',
+    bgClass: 'bg-tertiary-fixed',
     permission: 'encuentros:gestionar',
   },
   {
@@ -144,8 +173,8 @@ const QUICK_LINKS: QuickLinkProps[] = [
     description: 'Ver y gestionar liquidaciones',
     path: '/finanzas/liquidaciones',
     icon: DollarSign,
-    colorClass: 'text-emerald-600',
-    bgClass: 'bg-emerald-50',
+    colorClass: 'text-green-700',
+    bgClass: 'bg-green-100',
     permission: 'liquidaciones:operar',
   },
   {
@@ -153,8 +182,8 @@ const QUICK_LINKS: QuickLinkProps[] = [
     description: 'Padrón de alumnos activos',
     path: '/alumnos',
     icon: UserCheck,
-    colorClass: 'text-cyan-600',
-    bgClass: 'bg-cyan-50',
+    colorClass: 'text-on-secondary-container',
+    bgClass: 'bg-secondary-container',
     permission: 'padron:importar',
   },
   {
@@ -162,8 +191,8 @@ const QUICK_LINKS: QuickLinkProps[] = [
     description: 'Gestionar instancias de coloquio',
     path: '/coloquios',
     icon: BookOpen,
-    colorClass: 'text-rose-600',
-    bgClass: 'bg-rose-50',
+    colorClass: 'text-on-error-container',
+    bgClass: 'bg-error-container',
     permission: 'coloquios:gestionar',
   },
 ]
@@ -175,29 +204,33 @@ function QuickAccess() {
   if (visible.length === 0) return null
 
   return (
-    <section>
-      <h2 className="mb-3 text-sm font-semibold text-text">Accesos rápidos</h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <section className="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+      <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+        <h3 className="text-[16px] leading-6 font-medium text-primary">Accesos rápidos</h3>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 divide-x divide-y divide-outline-variant">
         {visible.map((link) => {
           const Icon = link.icon
           return (
             <NavLink
               key={link.path}
               to={link.path}
-              className="group flex items-center gap-3 rounded-xl border border-surface-subtle bg-surface p-4 shadow-sm transition-shadow hover:shadow-md hover:border-brand-200"
+              className="group flex items-center gap-3 p-4 hover:bg-surface-container-low transition-colors"
             >
               <div
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${link.bgClass}`}
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded ${link.bgClass}`}
               >
                 <Icon className={`h-4 w-4 ${link.colorClass}`} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-text leading-tight">{link.label}</p>
-                <p className="mt-0.5 text-xs text-text-muted leading-tight truncate">
+                <p className="text-[14px] font-medium text-on-surface leading-tight">
+                  {link.label}
+                </p>
+                <p className="mt-0.5 text-[13px] text-on-surface-variant truncate">
                   {link.description}
                 </p>
               </div>
-              <ArrowRight className="h-3.5 w-3.5 shrink-0 text-text-subtle opacity-0 transition-opacity group-hover:opacity-100" />
+              <ArrowRight className="h-3.5 w-3.5 shrink-0 text-outline opacity-0 transition-opacity group-hover:opacity-100" />
             </NavLink>
           )
         })}
@@ -225,57 +258,61 @@ function KpiSection() {
     return (
       <div className="flex items-center gap-3 py-4">
         <Spinner />
-        <span className="text-sm text-text-muted">Cargando métricas…</span>
+        <span className="text-[14px] text-on-surface-variant">Cargando métricas…</span>
       </div>
     )
   }
 
   if (isError || !data) {
     return (
-      <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
+      <div className="rounded-lg bg-error-container border border-error/20 px-4 py-3 text-[14px] text-on-error-container">
         No se pudieron cargar las métricas del cuatrimestre.
       </div>
     )
   }
 
+  const total = data.total_alumnos
+  const pctAtRisk = total > 0 ? Math.round((data.atrasados / total) * 100) : 0
+  const comTotal = data.comunicaciones_enviadas + data.comunicaciones_pendientes
+  const pctPendingCom = comTotal > 0
+    ? Math.round((data.comunicaciones_pendientes / comTotal) * 100)
+    : 0
+
   return (
     <section className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <KpiCard
+          label="Alumnos en riesgo"
+          value={data.atrasados}
+          icon={AlertTriangle}
+          iconBgClass="bg-error-container"
+          iconColorClass="text-on-error-container"
+          badge={`+${pctAtRisk}% del total`}
+          badgeClass="text-error"
+          barColor="bg-error"
+          barPercent={pctAtRisk}
+        />
         <KpiCard
           label="Total alumnos"
           value={data.total_alumnos}
           icon={Users}
-          colorClass="text-brand-600"
-          bgClass="bg-brand-50"
+          iconBgClass="bg-tertiary-fixed"
+          iconColorClass="text-on-tertiary-fixed"
+          badge={`${data.al_dia} al día`}
+          badgeClass="text-tertiary-container"
+          barColor="bg-tertiary-container"
+          barPercent={total > 0 ? Math.round((data.al_dia / total) * 100) : 0}
         />
         <KpiCard
-          label="Atrasados"
-          value={data.atrasados}
-          icon={AlertTriangle}
-          colorClass="text-red-500"
-          bgClass="bg-red-50"
-        />
-        <KpiCard
-          label="Al día"
-          value={data.al_dia}
-          icon={CheckCircle2}
-          colorClass="text-emerald-600"
-          bgClass="bg-emerald-50"
-        />
-        <KpiCard
-          label="Comuns. enviadas"
-          value={data.comunicaciones_enviadas}
-          icon={MessageSquare}
-          colorClass="text-purple-600"
-          bgClass="bg-purple-50"
-        />
-        <KpiCard
-          label="Pendientes"
+          label="Comunicaciones pendientes"
           value={data.comunicaciones_pendientes}
-          icon={AlertTriangle}
-          colorClass="text-amber-500"
-          bgClass="bg-amber-50"
-          description={data.comunicaciones_pendientes > 0 ? 'Requieren acción' : undefined}
+          icon={MessageSquare}
+          iconBgClass="bg-secondary-container"
+          iconColorClass="text-on-secondary-container"
+          badge={`${data.comunicaciones_enviadas} enviadas`}
+          badgeClass="text-secondary"
+          barColor="bg-primary"
+          barPercent={pctPendingCom}
         />
       </div>
       <AlumnosBar metrics={data} />
@@ -419,25 +456,36 @@ export function DashboardPage() {
   const isAlumno = user?.rol === 'ALUMNO'
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-6 pb-8">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold text-text">
-          {user ? `Hola, ${user.nombre.split(' ')[0]}` : 'Dashboard'}
-        </h1>
-        <p className="mt-0.5 text-sm text-text-muted">
-          Resumen del cuatrimestre en curso
-        </p>
+      <div className="flex justify-between items-end">
+        <div>
+          <nav className="flex items-center gap-1 text-[13px] text-outline mb-1">
+            <span>Dashboard</span>
+            <ArrowRight className="h-3 w-3" />
+            <span className="text-on-surface-variant">Resumen académico</span>
+          </nav>
+          <h2 className="text-[30px] leading-[38px] tracking-tight font-semibold text-on-background">
+            {user ? `Hola, ${user.nombre.split(' ')[0]}` : 'Dashboard'}
+          </h2>
+        </div>
+        <div className="flex gap-2">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded text-[14px] hover:bg-surface-container transition-colors">
+            <Calendar className="h-4 w-4" />
+            Cuatrimestre actual
+          </button>
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-primary text-on-primary rounded text-[14px] hover:opacity-90 transition-colors">
+            <Download className="h-4 w-4" />
+            Exportar reporte
+          </button>
+        </div>
       </div>
 
       {isAlumno ? (
-        /* Vista exclusiva alumno: calificaciones + mensajes */
         <AlumnoDashboard />
       ) : (
         <>
-          {/* Métricas (roles con atrasados:ver) */}
           <KpiSection />
-          {/* Accesos rápidos */}
           <QuickAccess />
         </>
       )}

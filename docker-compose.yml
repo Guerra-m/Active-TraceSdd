@@ -11,9 +11,17 @@
 #   docker-compose logs -f api              # ver logs del API
 #   docker-compose down -v                  # bajar y borrar volumenes
 #
-# Variables de entorno: leer desde .env en backend/.env
+# Variables de entorno: leer desde backend/.env
+# Para interpolacion de puertos en este archivo, usar:
+#   docker-compose --env-file ./backend/.env up -d
+# O definir POSTGRES_PORT / API_PORT en el .env raiz.
 # Nunca hardcodear credenciales en este archivo.
 # =============================================================================
+
+# Fragmento compartido: env_file para todos los servicios con backend
+x-backend-env: &backend-env
+  env_file:
+    - ./backend/.env
 
 services:
 
@@ -30,7 +38,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5434}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-trace} -d ${POSTGRES_DB:-trace_dev}"]
       interval: 10s

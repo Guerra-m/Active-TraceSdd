@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#e3c19b",
+                        "primary": "#162839",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#051d30",
+                        "surface-container": "#efedef",
+                        "inverse-surface": "#303032",
+                        "secondary": "#4b6076",
+                        "on-tertiary-fixed-variant": "#5a4225",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#96a9be",
+                        "background": "#fbf9fa",
+                        "surface-container-high": "#e9e8e9",
+                        "primary-fixed-dim": "#b5c8df",
+                        "on-primary-fixed-variant": "#36485b",
+                        "secondary-container": "#cce2fc",
+                        "tertiary-container": "#4e381c",
+                        "on-tertiary-fixed": "#291802",
+                        "on-secondary-container": "#50657b",
+                        "surface-dim": "#dbd9db",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#2c3e50",
+                        "surface-variant": "#e4e2e3",
+                        "surface": "#fbf9fa",
+                        "surface-container-highest": "#e4e2e3",
+                        "surface-container-low": "#f5f3f4",
+                        "on-secondary-fixed-variant": "#34495e",
+                        "inverse-on-surface": "#f2f0f2",
+                        "surface-bright": "#fbf9fa",
+                        "secondary-fixed": "#cfe5ff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#d1e4fb",
+                        "on-background": "#1b1c1d",
+                        "tertiary": "#362308",
+                        "inverse-primary": "#b5c8df",
+                        "outline-variant": "#c4c6cd",
+                        "tertiary-fixed": "#ffddb7",
+                        "secondary-fixed-dim": "#b3c9e2",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#4e6073",
+                        "on-surface-variant": "#43474c",
+                        "on-primary-fixed": "#091d2e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#c1a17d",
+                        "on-surface": "#1b1c1d",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#74777d",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "table-cell-x": "12px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "table-cell-y": "8px"
+                    },
+                    "fontFamily": {
+                        "data-mono": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fbf9fa;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background">
+<!-- TopNavBar -->
+<header class="w-full h-16 sticky top-0 flex justify-between items-center px-lg z-50 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Activia-Trace</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center bg-surface-container rounded-lg px-md py-xs">
+<span class="material-symbols-outlined text-on-surface-variant mr-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md outline-none" placeholder="Search notices..." type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-sm rounded-full hover:bg-surface-container-low transition-colors text-primary cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a diverse university student for a profile avatar. The background is a clean, softly blurred modern campus setting with cool blue and grey tones. High-quality corporate photography style with natural lighting and professional composition, matching the Activia-Trace design system aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx9iDuSVszIU2_PxP9IdvxtKG6xXzeA6fmk2cPnUSpdOJQQi5x7_ZogVTPmKGbBCTU-deSG1Dm6Zd_XTpfUicR7fo-KxzaYIAqSURGPkt6RJyQpDyshTMu4OCQGaV8GHwKNzAclY2GAcLS2MJvq3eMOTLWgwpra6qqRb9iBovIdudgF4VqY7QqIqhGmSFD4KR-x6UNAuqbxdoVeWIahLKd03TESCwDGm_WUxICJSNOAI_b-I-TEgToj85-MfW73KLbIJQjt0ViuUg"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex">
+<!-- SideNavBar -->
+<aside class="w-[240px] h-[calc(100vh-64px)] fixed left-0 top-16 flex flex-col py-md px-base bg-surface-container-lowest dark:bg-primary-container border-r border-outline-variant dark:border-outline hidden md:flex">
+<div class="mb-lg px-md">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-title-sm text-title-sm font-bold text-on-surface">Student Portal</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Academic Management</p>
+</div>
+<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-sm text-body-sm">Home</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-body-sm text-body-sm">My Subjects</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+<span class="font-body-sm text-body-sm">Evaluations</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary font-medium rounded-lg duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+<span class="font-body-sm text-body-sm">Notices</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-[240px] p-lg">
+<div class="max-w-5xl mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-xl gap-md">
+<div>
+<nav class="flex items-center gap-xs mb-xs text-on-surface-variant">
+<span class="font-body-sm text-body-sm">Academic</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-body-sm text-body-sm text-primary font-medium">Notices</span>
+</nav>
+<h1 class="font-display-lg text-display-lg text-primary">Institutional Notices</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Stay informed with the latest updates from your faculty and the administration.</p>
+</div>
+<div class="flex items-center gap-sm">
+<button class="px-md py-sm border border-outline rounded-lg font-body-sm text-body-sm font-medium hover:bg-surface-container transition-all">
+                            Filter by Severity
+                        </button>
+<button class="px-md py-sm bg-primary text-on-primary rounded-lg font-body-sm text-body-sm font-medium hover:opacity-90 transition-all">
+                            Archives
+                        </button>
+</div>
+</div>
+<!-- Notices List (Bento-style items) -->
+<div class="grid grid-cols-1 gap-md">
+<!-- Notice Item: High Severity -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md flex flex-col md:flex-row gap-lg group hover:border-primary transition-all duration-300">
+<div class="flex-shrink-0 w-1 bg-error rounded-full"></div>
+<div class="flex-1">
+<div class="flex flex-wrap items-center gap-sm mb-sm">
+<span class="bg-error-container text-on-error-container px-sm py-[2px] rounded-full font-label-caps text-label-caps">URGENT</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant uppercase">Academic Records • Oct 24, 2023</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-primary mb-xs">Final Examination Enrollment Deadline Extension</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md leading-relaxed">The enrollment period for the Semester 2 final examinations has been extended until October 31st. All students must verify their course registrations and clear any pending administrative dues to ensure eligibility for the exam series.</p>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg font-body-sm text-body-sm font-medium hover:opacity-90 transition-all cursor-pointer" onclick="this.closest('.group').classList.add('opacity-50')">
+<span class="material-symbols-outlined text-[18px]">done_all</span>
+                                    Marcar como leído
+                                </button>
+<a class="text-primary font-body-sm text-body-sm font-medium underline underline-offset-4 decoration-outline hover:decoration-primary transition-all px-sm" href="#">View Details</a>
+</div>
+</div>
+</div>
+<!-- Notice Item: Medium Severity -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md flex flex-col md:flex-row gap-lg group hover:border-primary transition-all duration-300">
+<div class="flex-shrink-0 w-1 bg-tertiary rounded-full"></div>
+<div class="flex-1">
+<div class="flex flex-wrap items-center gap-sm mb-sm">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-sm py-[2px] rounded-full font-label-caps text-label-caps">IMPORTANT</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant uppercase">IT Infrastructure • Oct 22, 2023</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-primary mb-xs">Scheduled Maintenance: Learning Management System</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md leading-relaxed">The LMS will be offline for scheduled maintenance this Saturday from 02:00 AM to 06:00 AM GMT. Access to course materials and assignment submissions will be temporarily unavailable during this window.</p>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-sm border border-outline rounded-lg font-body-sm text-body-sm font-medium hover:bg-surface-container transition-all cursor-pointer" onclick="this.closest('.group').classList.add('opacity-50')">
+                                    Marcar como leído
+                                </button>
+</div>
+</div>
+</div>
+<!-- Notice Item: Low Severity / Informational -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md flex flex-col md:flex-row gap-lg group hover:border-primary transition-all duration-300">
+<div class="flex-shrink-0 w-1 bg-secondary rounded-full"></div>
+<div class="flex-1">
+<div class="flex flex-wrap items-center gap-sm mb-sm">
+<span class="bg-surface-container-high text-on-surface-variant px-sm py-[2px] rounded-full font-label-caps text-label-caps">INFO</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant uppercase">Career Services • Oct 20, 2023</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-primary mb-xs">Upcoming Virtual Career Fair - November 2023</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md leading-relaxed">Over 40 partner companies will be participating in our annual virtual career fair. Registered students will have the opportunity to schedule one-on-one networking sessions with HR representatives from leading tech and finance firms.</p>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-sm border border-outline rounded-lg font-body-sm text-body-sm font-medium hover:bg-surface-container transition-all cursor-pointer" onclick="this.closest('.group').classList.add('opacity-50')">
+                                    Marcar como leído
+                                </button>
+<a class="text-primary font-body-sm text-body-sm font-medium underline underline-offset-4 decoration-outline hover:decoration-primary transition-all px-sm" href="#">Register Now</a>
+</div>
+</div>
+</div>
+<!-- Notice Item: High Severity with Card-like image -->
+<div class="bg-surface-container-lowest border border-outline-variant flex flex-col lg:flex-row overflow-hidden group hover:border-primary transition-all duration-300">
+<div class="lg:w-1/4 h-48 lg:h-auto overflow-hidden relative">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="A sophisticated architectural photograph of a modern university library interior. Wide-angle shot showing sleek wooden reading tables, large glass windows with soft natural light, and clean white walls. The atmosphere is quiet, academic, and organized, maintaining a high-end corporate aesthetic with a muted blue and grey color palette." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACZcTSxN2yK8nzNwBy-1OE0f_BDDAAgt2-NteZy7kYc4rBvl_-UJ5jrEw5zJKsHuORW_mpmw7KBVf3xeV-QNtbnzN0_kRKlbBR4eHDVbRPMioyUqXsoSdNPw0tZpugfskC29mYYjSGCv0IjQiMTRVxhJWmKmw7chD9RYCSK8HUvxM-Xl_KrErk-ICU-1XLZmHv6JQo7uDK5puC9_iBCde72-RuaUuk8Gr6RVqeIjSJ4rCi3JHqHEqM8t-DnguByubrtB-SvJTU1Sc')"></div>
+<div class="absolute top-md left-md">
+<span class="bg-error text-on-error px-sm py-[2px] rounded-full font-label-caps text-label-caps">ALERT</span>
+</div>
+</div>
+<div class="flex-1 p-md flex flex-col justify-center">
+<div class="mb-sm">
+<span class="font-data-mono text-data-mono text-on-surface-variant uppercase">Campus Safety • Oct 18, 2023</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-primary mb-xs">Building A - Library Access Restrictions</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Due to structural inspections in the north wing of the central library, certain study areas will be closed until further notice. Please utilize the digital resources portal for any restricted physical collections.</p>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg font-body-sm text-body-sm font-medium hover:opacity-90 transition-all cursor-pointer" onclick="this.closest('.group').classList.add('opacity-50')">
+                                    Marcar como leído
+                                </button>
+</div>
+</div>
+</div>
+<!-- Notice Item: Info -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md flex flex-col md:flex-row gap-lg group hover:border-primary transition-all duration-300">
+<div class="flex-shrink-0 w-1 bg-secondary rounded-full"></div>
+<div class="flex-1">
+<div class="flex flex-wrap items-center gap-sm mb-sm">
+<span class="bg-surface-container-high text-on-surface-variant px-sm py-[2px] rounded-full font-label-caps text-label-caps">INFO</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant uppercase">Student Union • Oct 15, 2023</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-primary mb-xs">New Student Wellness Program Launch</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md leading-relaxed">The Student Union is proud to introduce a new wellness initiative featuring free meditation sessions, mindfulness workshops, and expanded counseling hours starting this month.</p>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-sm border border-outline rounded-lg font-body-sm text-body-sm font-medium hover:bg-surface-container transition-all cursor-pointer" onclick="this.closest('.group').classList.add('opacity-50')">
+                                    Marcar como leído
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More / Pagination -->
+<div class="mt-xl flex justify-center">
+<button class="group flex items-center gap-sm px-xl py-md text-primary font-body-md text-body-md font-medium hover:bg-surface-container-high transition-all rounded-full">
+<span>Load Previous Notices</span>
+<span class="material-symbols-outlined transition-transform group-hover:translate-y-1">keyboard_double_arrow_down</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Bottom Navigation (Responsive Pivot) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant flex justify-around items-center py-sm z-50">
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-[10px] font-medium">Subjects</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+<span class="text-[10px] font-bold">Notices</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</nav>
+<script>
+        // Simple Micro-interaction for feedback
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if(this.textContent.trim() === 'Marcar como leído') {
+                    const icon = this.querySelector('.material-symbols-outlined');
+                    if(icon) {
+                        icon.style.fontVariationSettings = "'FILL' 1";
+                    }
+                    this.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span> Leído';
+                    this.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+                    this.classList.add('bg-surface-container', 'text-on-surface-variant', 'opacity-60');
+                    this.disabled = true;
+                }
+            });
+        });
+    </script>
+</body></html>

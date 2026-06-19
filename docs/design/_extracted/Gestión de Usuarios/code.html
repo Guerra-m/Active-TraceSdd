@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management | Academia ERP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom scrollbar for high-density tables */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "tertiary-fixed": "#ffddb7",
+                "on-secondary-fixed": "#051d30",
+                "surface-bright": "#fbf9fa",
+                "on-error-container": "#93000a",
+                "on-tertiary": "#ffffff",
+                "on-tertiary-fixed-variant": "#5a4225",
+                "primary-fixed": "#d1e4fb",
+                "on-background": "#1b1c1d",
+                "surface-container-low": "#f5f3f4",
+                "on-secondary": "#ffffff",
+                "on-surface": "#1b1c1d",
+                "surface-container": "#efedef",
+                "tertiary-fixed-dim": "#e3c19b",
+                "secondary": "#4b6076",
+                "outline": "#74777d",
+                "on-tertiary-container": "#c1a17d",
+                "surface-dim": "#dbd9db",
+                "on-primary": "#ffffff",
+                "on-secondary-fixed-variant": "#34495e",
+                "on-secondary-container": "#50657b",
+                "outline-variant": "#c4c6cd",
+                "error": "#ba1a1a",
+                "secondary-container": "#cce2fc",
+                "on-tertiary-fixed": "#291802",
+                "inverse-on-surface": "#f2f0f2",
+                "tertiary": "#362308",
+                "surface-tint": "#4e6073",
+                "surface-container-high": "#e9e8e9",
+                "on-primary-container": "#96a9be",
+                "tertiary-container": "#4e381c",
+                "on-primary-fixed-variant": "#36485b",
+                "surface-container-lowest": "#ffffff",
+                "surface-variant": "#e4e2e3",
+                "surface-container-highest": "#e4e2e3",
+                "on-primary-fixed": "#091d2e",
+                "primary-container": "#2c3e50",
+                "primary": "#162839",
+                "on-error": "#ffffff",
+                "inverse-surface": "#303032",
+                "secondary-fixed": "#cfe5ff",
+                "inverse-primary": "#b5c8df",
+                "secondary-fixed-dim": "#b3c9e2",
+                "primary-fixed-dim": "#b5c8df",
+                "surface": "#fbf9fa",
+                "on-surface-variant": "#43474c",
+                "error-container": "#ffdad6",
+                "background": "#fbf9fa"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+              },
+              "spacing": {
+                "xl": "32px",
+                "lg": "24px",
+                "table-cell-y": "8px",
+                "base": "4px",
+                "sm": "8px",
+                "xs": "4px",
+                "table-cell-x": "12px",
+                "md": "16px"
+              },
+              "fontFamily": {
+                "title-sm": ["Inter"],
+                "body-sm": ["Inter"],
+                "headline-md": ["Inter"],
+                "display-lg": ["Inter"],
+                "data-mono": ["JetBrains Mono"],
+                "label-caps": ["Inter"],
+                "body-md": ["Inter"]
+              },
+              "fontSize": {
+                "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen overflow-hidden">
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-full w-60 bg-primary border-r border-outline-variant flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Academia ERP</h1>
+<p class="text-on-primary-container font-body-sm opacity-80">Admin Portal</p>
+</div>
+<nav class="flex-1 space-y-xs px-sm">
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-body-md">Academic</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md">Users</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md">Finances</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md">Auditing</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container transition-colors duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</nav>
+<div class="px-md pt-lg border-t border-outline-variant/20 flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="Close up professional headshot of a female administrator with a friendly expression, wearing a navy blazer and white blouse, set against a blurred office background with soft natural lighting and corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJnrXIvYMCxKrWkUotoYCTTgJbOwH1jfoiDKe6AZCwGZsoelRzNyeV1UdpOilM61e6oeqpGepfPKpbNgPpPLJEodUPSqhQPXsZ0PLKslOcDcYU-4f9GtCU_-evdvQUnfHMoz_APNcZ7tsdYYnoXn8rF5uFZwJLdylgh9gHPrOfbVl83009i0OTOXhbUgNhSXEvrbdqKtFWwd8K2w9-I677XfCbmiCHN0IQC6eYBXWGq4kg4fYIZP_2MV6du4qlIFT0R5mAEmlcOcg"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-sm font-bold text-on-primary truncate">Admin User</p>
+<p class="text-[10px] text-on-primary-container truncate">admin@academia.edu</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-60 flex flex-col h-screen">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center h-16 px-lg bg-surface border-b border-outline-variant sticky top-0 z-40">
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded text-body-sm w-80 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Search students, faculty, or staff..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80">help_outline</button>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+<span class="text-title-sm font-title-sm text-primary">Academic Management System</span>
+</div>
+</div>
+</header>
+<!-- Screen Content Container -->
+<div class="flex-1 overflow-auto p-lg custom-scrollbar">
+<!-- Breadcrumbs & Header Actions -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<nav class="flex items-center gap-xs text-body-sm text-on-surface-variant mb-base">
+<span>Dashboard</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface font-medium">User Management</span>
+</nav>
+<h2 class="font-display-lg text-display-lg text-primary">User Management</h2>
+</div>
+<button class="flex items-center gap-sm px-lg py-sm bg-primary text-on-primary rounded-lg font-title-sm hover:opacity-90 transition-opacity shadow-sm">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                    Invite User
+                </button>
+</div>
+<!-- Dashboard Stats (Bento Grid Style) -->
+<div class="grid grid-cols-4 gap-md mb-xl">
+<div class="bg-surface-container-lowest p-md border border-outline-variant rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-sm rounded-lg">group</span>
+<span class="text-label-caps text-green-600">+12%</span>
+</div>
+<p class="text-on-surface-variant font-label-caps mb-xs">TOTAL USERS</p>
+<h3 class="text-display-lg font-display-lg text-primary">1,284</h3>
+</div>
+<div class="bg-surface-container-lowest p-md border border-outline-variant rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-secondary bg-secondary-container p-sm rounded-lg">school</span>
+<span class="text-label-caps text-on-surface-variant">Active Now</span>
+</div>
+<p class="text-on-surface-variant font-label-caps mb-xs">FACULTY</p>
+<h3 class="text-display-lg font-display-lg text-primary">342</h3>
+</div>
+<div class="bg-surface-container-lowest p-md border border-outline-variant rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-tertiary-container bg-tertiary-fixed p-sm rounded-lg">pending_actions</span>
+<span class="text-label-caps text-error">4 Actions</span>
+</div>
+<p class="text-on-surface-variant font-label-caps mb-xs">PENDING INVITES</p>
+<h3 class="text-display-lg font-display-lg text-primary">18</h3>
+</div>
+<div class="bg-surface-container-lowest p-md border border-outline-variant rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant bg-surface-container-high p-sm rounded-lg">history</span>
+<span class="text-label-caps text-on-surface-variant">Today</span>
+</div>
+<p class="text-on-surface-variant font-label-caps mb-xs">RECENT ACTIVITY</p>
+<h3 class="text-display-lg font-display-lg text-primary">89</h3>
+</div>
+</div>
+<!-- Table Filters and Search -->
+<div class="bg-surface border border-outline-variant rounded-t-xl p-md flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm px-sm py-1.5 bg-surface-container rounded border border-outline-variant cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+<span class="text-body-sm font-medium">Role: All Roles</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</div>
+<div class="flex items-center gap-sm px-sm py-1.5 bg-surface-container rounded border border-outline-variant cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="text-body-sm font-medium">Status: Active</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="text-body-sm text-on-surface-variant">Showing 1-10 of 1,284 users</span>
+<div class="flex border border-outline-variant rounded divide-x divide-outline-variant">
+<button class="p-1 hover:bg-surface-variant"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="p-1 hover:bg-surface-variant"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</div>
+<!-- User Data Table -->
+<div class="bg-surface-container-lowest border-x border-b border-outline-variant rounded-b-xl overflow-hidden shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low sticky top-0 z-10 border-b border-outline-variant">
+<tr>
+<th class="px-table-cell-x py-table-cell-y text-label-caps text-on-surface-variant">
+<input class="rounded border-outline-variant text-primary focus:ring-primary h-3 w-3" type="checkbox"/>
+</th>
+<th class="px-table-cell-x py-table-cell-y text-label-caps text-on-surface-variant">Name & Identity</th>
+<th class="px-table-cell-x py-table-cell-y text-label-caps text-on-surface-variant">Roles</th>
+<th class="px-table-cell-x py-table-cell-y text-label-caps text-on-surface-variant">Status</th>
+<th class="px-table-cell-x py-table-cell-y text-label-caps text-on-surface-variant">Last Activity</th>
+<th class="px-table-cell-x py-table-cell-y text-label-caps text-on-surface-variant text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50">
+<!-- User Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-table-cell-x py-md"><input class="rounded border-outline-variant text-primary h-3 w-3" type="checkbox"/></td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-fixed flex items-center justify-center text-primary font-bold">JD</div>
+<div>
+<p class="font-title-sm text-primary leading-tight">Julianna Davenport</p>
+<p class="font-data-mono text-on-surface-variant">j.davenport@academia.edu</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-0.5 bg-secondary-container text-on-secondary-container text-[11px] font-bold rounded uppercase tracking-wider">Coordinator</span>
+<span class="px-xs py-0.5 bg-surface-container-high text-on-surface-variant text-[11px] font-bold rounded uppercase tracking-wider">Professor</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<span class="inline-flex items-center gap-xs px-sm py-0.5 bg-green-100 text-green-800 text-[11px] font-bold rounded-full border border-green-200">
+<span class="w-1 h-1 rounded-full bg-green-600"></span> Active
+                                </span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-on-surface-variant text-body-sm">
+                                2023-11-24 09:42 AM
+                            </td>
+<td class="px-table-cell-x py-md text-right">
+<div class="flex items-center justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center text-error bg-error-container/20 hover:bg-error-container rounded transition-colors" onclick="alert('Entering impersonation mode...')" title="Impersonate User">
+<span class="material-symbols-outlined text-[20px]">switch_account</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-table-cell-x py-md"><input class="rounded border-outline-variant text-primary h-3 w-3" type="checkbox"/></td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-tertiary-fixed flex items-center justify-center text-tertiary font-bold">MC</div>
+<div>
+<p class="font-title-sm text-primary leading-tight">Marcus Chen</p>
+<p class="font-data-mono text-on-surface-variant">m.chen@academia.edu</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-0.5 bg-secondary-container text-on-secondary-container text-[11px] font-bold rounded uppercase tracking-wider">Administrator</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<span class="inline-flex items-center gap-xs px-sm py-0.5 bg-green-100 text-green-800 text-[11px] font-bold rounded-full border border-green-200">
+<span class="w-1 h-1 rounded-full bg-green-600"></span> Active
+                                </span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-on-surface-variant text-body-sm">
+                                2023-11-24 11:15 AM
+                            </td>
+<td class="px-table-cell-x py-md text-right">
+<div class="flex items-center justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center text-error bg-error-container/20 hover:bg-error-container rounded transition-colors" title="Impersonate User">
+<span class="material-symbols-outlined text-[20px]">switch_account</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User Row 3 (Pending) -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-table-cell-x py-md"><input class="rounded border-outline-variant text-primary h-3 w-3" type="checkbox"/></td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold">SL</div>
+<div>
+<p class="font-title-sm text-primary leading-tight">Sarah Lawson</p>
+<p class="font-data-mono text-on-surface-variant italic">s.lawson@academia.edu (Pending)</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-0.5 bg-surface-container-high text-on-surface-variant text-[11px] font-bold rounded uppercase tracking-wider">Instructor</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<span class="inline-flex items-center gap-xs px-sm py-0.5 bg-amber-100 text-amber-800 text-[11px] font-bold rounded-full border border-amber-200">
+<span class="w-1 h-1 rounded-full bg-amber-600"></span> Invited
+                                </span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-on-surface-variant text-body-sm italic">
+                                Never logged in
+                            </td>
+<td class="px-table-cell-x py-md text-right">
+<div class="flex items-center justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center text-secondary hover:bg-secondary-container rounded transition-colors" title="Resend Invite">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User Row 4 (Inactive) -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-table-cell-x py-md"><input class="rounded border-outline-variant text-primary h-3 w-3" type="checkbox"/></td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-error-container flex items-center justify-center text-on-error-container font-bold">RK</div>
+<div>
+<p class="font-title-sm text-primary leading-tight">Robert Kinsley</p>
+<p class="font-data-mono text-on-surface-variant">r.kinsley@academia.edu</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-0.5 bg-surface-container-high text-on-surface-variant text-[11px] font-bold rounded uppercase tracking-wider">Staff</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<span class="inline-flex items-center gap-xs px-sm py-0.5 bg-slate-100 text-slate-600 text-[11px] font-bold rounded-full border border-slate-200">
+<span class="w-1 h-1 rounded-full bg-slate-400"></span> Deactivated
+                                </span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-on-surface-variant text-body-sm">
+                                2023-08-12 04:30 PM
+                            </td>
+<td class="px-table-cell-x py-md text-right">
+<div class="flex items-center justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center text-green-700 hover:bg-green-100 rounded transition-colors" title="Activate User">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User Row 5 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-table-cell-x py-md"><input class="rounded border-outline-variant text-primary h-3 w-3" type="checkbox"/></td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-fixed flex items-center justify-center text-primary font-bold">EA</div>
+<div>
+<p class="font-title-sm text-primary leading-tight">Elena Aris</p>
+<p class="font-data-mono text-on-surface-variant">e.aris@academia.edu</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-0.5 bg-surface-container-high text-on-surface-variant text-[11px] font-bold rounded uppercase tracking-wider">Admissions</span>
+<span class="px-xs py-0.5 bg-surface-container-high text-on-surface-variant text-[11px] font-bold rounded uppercase tracking-wider">Staff</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md">
+<span class="inline-flex items-center gap-xs px-sm py-0.5 bg-green-100 text-green-800 text-[11px] font-bold rounded-full border border-green-200">
+<span class="w-1 h-1 rounded-full bg-green-600"></span> Active
+                                </span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-on-surface-variant text-body-sm">
+                                2023-11-23 05:55 PM
+                            </td>
+<td class="px-table-cell-x py-md text-right">
+<div class="flex items-center justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center text-error bg-error-container/20 hover:bg-error-container rounded transition-colors" title="Impersonate User">
+<span class="material-symbols-outlined text-[20px]">switch_account</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-lg py-md bg-surface-container-lowest border-t border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="text-body-sm text-on-surface-variant">Rows per page:</span>
+<select class="bg-transparent border-none text-body-sm focus:ring-0 cursor-pointer">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+</select>
+</div>
+<div class="flex items-center gap-md">
+<span class="text-body-sm text-on-surface-variant">1-10 of 1,284</span>
+<div class="flex gap-sm">
+<button class="p-1 hover:bg-surface-variant rounded disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">first_page</span>
+</button>
+<button class="p-1 hover:bg-surface-variant rounded disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-1 hover:bg-surface-variant rounded">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="p-1 hover:bg-surface-variant rounded">
+<span class="material-symbols-outlined">last_page</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Contextual Help / Tips -->
+<div class="mt-xl grid grid-cols-2 gap-lg">
+<div class="flex gap-md p-lg bg-secondary-container/30 border border-secondary-container rounded-xl">
+<span class="material-symbols-outlined text-on-secondary-container">security</span>
+<div>
+<h4 class="font-title-sm text-primary mb-xs">Sensitive Action Security</h4>
+<p class="text-body-sm text-on-surface-variant">Using the <strong>Impersonate</strong> function creates a high-level audit trail. All actions performed while impersonating a user are logged with both your admin ID and the target user ID for compliance purposes.</p>
+</div>
+</div>
+<div class="flex gap-md p-lg bg-surface-container-low border border-outline-variant rounded-xl">
+<span class="material-symbols-outlined text-primary">box_edit</span>
+<div>
+<h4 class="font-title-sm text-primary mb-xs">Bulk Management</h4>
+<p class="text-body-sm text-on-surface-variant">Select multiple users to perform bulk actions like Role assignment, Password reset invitations, or Account deactivation. Access bulk actions via the floating action bar that appears upon selection.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Selection Action Bar (Hidden by default) -->
+<div class="fixed bottom-lg left-1/2 -translate-x-1/2 bg-primary text-on-primary px-xl py-md rounded-full shadow-2xl flex items-center gap-xl z-50 transform translate-y-32 transition-transform duration-300" id="selection-bar">
+<span class="font-title-sm"><span id="selected-count">0</span> items selected</span>
+<div class="h-6 w-[1px] bg-on-primary/20"></div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-xs text-body-sm hover:text-secondary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+                Assign Role
+            </button>
+<button class="flex items-center gap-xs text-body-sm hover:text-secondary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">lock_reset</span>
+                Reset Passwords
+            </button>
+<button class="flex items-center gap-xs text-body-sm text-error-container hover:text-red-300 transition-colors">
+<span class="material-symbols-outlined text-[18px]">block</span>
+                Deactivate
+            </button>
+</div>
+<button class="material-symbols-outlined text-[20px] hover:rotate-90 transition-transform" onclick="clearSelection()">close</button>
+</div>
+<script>
+        // Simple logic for the selection bar visibility
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        const selectionBar = document.getElementById('selection-bar');
+        const selectedCountLabel = document.getElementById('selected-count');
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const checked = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+                if (checked.length > 0) {
+                    selectionBar.classList.remove('translate-y-32');
+                    selectedCountLabel.textContent = checked.length;
+                } else {
+                    selectionBar.classList.add('translate-y-32');
+                }
+            });
+        });
+
+        function clearSelection() {
+            checkboxes.forEach(cb => cb.checked = false);
+            selectionBar.classList.add('translate-y-32');
+        }
+
+        // Global search focus micro-interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.classList.add('w-96');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.classList.remove('w-96');
+        });
+    </script>
+</body></html>
