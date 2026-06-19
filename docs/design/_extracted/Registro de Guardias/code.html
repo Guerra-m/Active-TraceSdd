@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activia-Trace | Registro de Guardias</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e4e2e3",
+                        "surface-dim": "#dbd9db",
+                        "outline": "#74777d",
+                        "on-surface-variant": "#43474c",
+                        "background": "#fbf9fa",
+                        "primary": "#162839",
+                        "on-secondary-fixed": "#051d30",
+                        "on-secondary-container": "#50657b",
+                        "on-primary-fixed-variant": "#36485b",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f2f0f2",
+                        "surface-tint": "#4e6073",
+                        "surface-container-high": "#e9e8e9",
+                        "primary-container": "#2c3e50",
+                        "surface-container-highest": "#e4e2e3",
+                        "on-surface": "#1b1c1d",
+                        "surface-container": "#efedef",
+                        "secondary-fixed-dim": "#b3c9e2",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5a4225",
+                        "surface": "#fbf9fa",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#c1a17d",
+                        "secondary-fixed": "#cfe5ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#091d2e",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#303032",
+                        "tertiary-fixed-dim": "#e3c19b",
+                        "tertiary-container": "#4e381c",
+                        "on-background": "#1b1c1d",
+                        "secondary": "#4b6076",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#d1e4fb",
+                        "on-secondary-fixed-variant": "#34495e",
+                        "tertiary-fixed": "#ffddb7",
+                        "primary-fixed-dim": "#b5c8df",
+                        "on-primary-container": "#96a9be",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#b5c8df",
+                        "surface-bright": "#fbf9fa",
+                        "tertiary": "#362308",
+                        "on-tertiary-fixed": "#291802",
+                        "secondary-container": "#cce2fc",
+                        "surface-container-low": "#f5f3f4",
+                        "outline-variant": "#c4c6cd",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "table-cell-x": "12px",
+                        "base": "4px",
+                        "table-cell-y": "8px"
+                    },
+                    "fontFamily": {
+                        "title-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #f7f8fa; color: #1b1c1d; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active { background-color: #cce2fc; color: #50657b; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8e0; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-body-md text-body-md selection:bg-secondary-container">
+<!-- SideNavBar Shell -->
+<aside class="w-60 h-screen fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col py-md px-sm z-50">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Activia-Trace</h1>
+<p class="text-body-sm text-outline opacity-70">Academic Management</p>
+</div>
+<button class="mx-sm mb-lg flex items-center justify-center gap-2 bg-primary text-on-primary py-sm px-md rounded-lg font-medium hover:opacity-90 transition-opacity active:scale-95 duration-100">
+<span class="material-symbols-outlined">edit_note</span>
+<span>New Message</span>
+</button>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span>Communications</span>
+</a>
+<a class="flex items-center gap-3 px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Teams</span>
+</a>
+<a class="flex items-center gap-3 px-md py-sm bg-secondary-container text-on-secondary-container font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Settlements</span>
+</a>
+<a class="flex items-center gap-3 px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Notices &amp; Auditing</span>
+</a>
+</nav>
+<div class="pt-md border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-3 px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span>Support</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 border-b border-outline-variant bg-surface-container-lowest flex justify-between items-center px-lg z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container pl-10 pr-4 py-2 border-none rounded-full focus:ring-2 focus:ring-primary text-body-md transition-all" placeholder="Search teacher, room, or activity..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined hover:bg-surface-container rounded-full p-2 text-secondary active:scale-95 transition-transform duration-100">notifications</button>
+<button class="material-symbols-outlined hover:bg-surface-container rounded-full p-2 text-secondary active:scale-95 transition-transform duration-100">history</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 ml-2 hover:bg-surface-container p-1 pr-3 rounded-full cursor-pointer transition-colors">
+<img class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional studio portrait of a university administrator in their mid-40s, wearing business casual attire. The background is a softly blurred modern office environment with neutral tones and clean architectural lines. The lighting is bright and even, reinforcing a light-mode corporate aesthetic, emphasizing competence and approachability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMJ0WIGbMAEmu_bHlCBVe4PYWX0LQa0gtE0fwblqcr3TfllaNVsbhBrpzebaB68BpXobyPcfUaXraZ4Z2FcC61EO6lR_IUbfgtt_f1X4WNmhOxdBb4k9Sf3s92dnoyPeiRa8WmUh5VponQRwj8h1Z76A2vd1mmaY8q48kOb8viLFr1sEGE2V2Kfwln_30LZuWh0U1T8wu4ztTLZZl92FRhMC2aic5tdHHVksmFK-MG2StsUf50bZbdtnq09OPH-YEYLQI7eeiNhbU"/>
+<span class="font-title-sm text-title-sm text-primary">Dr. Henderson</span>
+<span class="material-symbols-outlined text-secondary">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="ml-60 pt-24 px-lg pb-xl">
+<!-- Header & Breadcrumbs -->
+<div class="mb-lg">
+<nav class="flex items-center gap-2 mb-sm">
+<a class="text-body-sm text-outline hover:text-primary transition-colors" href="#">Academic Management</a>
+<span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
+<span class="text-body-sm text-primary font-medium">Registro de Guardias</span>
+</nav>
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg text-primary">Registro de Guardias</h2>
+<p class="text-body-md text-secondary">Attendance records and time slot management for current academic term.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 border border-outline-variant px-md py-2 rounded-lg bg-white hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+<span class="font-title-sm text-title-sm">Filters</span>
+</button>
+<button class="flex items-center gap-2 border border-outline-variant px-md py-2 rounded-lg bg-white hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">download</span>
+<span class="font-title-sm text-title-sm">Export CSV</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-4 gap-lg mb-xl">
+<div class="bg-white border border-outline-variant rounded-xl p-md flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-secondary uppercase">Active Guards</span>
+<span class="text-display-lg font-display-lg text-primary">24</span>
+<div class="flex items-center gap-1 text-green-600 text-body-sm">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>12% vs last week</span>
+</div>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-md flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-secondary uppercase">Compliance Rate</span>
+<span class="text-display-lg font-display-lg text-primary">98.2%</span>
+<div class="w-full bg-surface-container rounded-full h-1.5 mt-2">
+<div class="bg-primary h-full rounded-full w-[98%]"></div>
+</div>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-md flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-secondary uppercase">Unrecorded Slots</span>
+<span class="text-display-lg font-display-lg text-error">3</span>
+<span class="text-body-sm text-outline">Action required for Monday</span>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-md flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-secondary uppercase">Current Shift</span>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">timer</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Block D4</p>
+<p class="text-body-sm text-outline">12:30 - 14:00</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Table Container -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="flex items-center justify-between px-lg py-md border-b border-outline-variant bg-surface-container-lowest">
+<div class="flex items-center gap-md">
+<h3 class="font-title-sm text-title-sm text-primary">Detailed Guard Logs</h3>
+<div class="flex rounded-lg border border-outline-variant overflow-hidden">
+<button class="px-md py-1 bg-surface-container text-primary font-medium text-body-sm">All</button>
+<button class="px-md py-1 bg-white text-secondary text-body-sm border-l border-outline-variant hover:bg-surface-container">Pending</button>
+<button class="px-md py-1 bg-white text-secondary text-body-sm border-l border-outline-variant hover:bg-surface-container">Completed</button>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="text-body-sm text-outline">Page 1 of 12</span>
+<div class="flex gap-1">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-lg py-md text-label-caps font-label-caps text-secondary uppercase tracking-wider">Professor / Tutor</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-secondary uppercase tracking-wider">Time Slot</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-secondary uppercase tracking-wider">Activity Type</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-secondary uppercase tracking-wider">Location</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-secondary uppercase tracking-wider">Attendance</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-secondary uppercase tracking-wider">Status</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-secondary uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold text-xs">SM</div>
+<div>
+<div class="font-title-sm text-title-sm text-primary">Sergio Martínez</div>
+<div class="text-body-sm text-outline">Mathematics Dept.</div>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-data-mono text-data-mono text-primary">08:00 - 09:30</span>
+<span class="text-body-sm text-outline">Oct 24, 2023</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded text-xs font-medium">Exam Proctoring</span>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-md text-primary">Aula Magna B</span>
+</td>
+<td class="px-lg py-md text-body-md">
+<div class="flex items-center gap-1 text-green-700">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Present
+                                </div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tight">Validated</span>
+</td>
+<td class="px-lg py-md">
+<button class="text-secondary hover:text-primary material-symbols-outlined">more_vert</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-xs">EL</div>
+<div>
+<div class="font-title-sm text-title-sm text-primary">Elena Lofgren</div>
+<div class="text-body-sm text-outline">Language Sciences</div>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-data-mono text-data-mono text-primary">09:30 - 11:00</span>
+<span class="text-body-sm text-outline">Oct 24, 2023</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-surface-container text-secondary px-2 py-1 rounded text-xs font-medium">Recess Guard</span>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-md text-primary">North Courtyard</span>
+</td>
+<td class="px-lg py-md text-body-md">
+<div class="flex items-center gap-1 text-error">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">cancel</span>
+                                    Absent
+                                </div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tight">Unjustified</span>
+</td>
+<td class="px-lg py-md">
+<button class="text-secondary hover:text-primary material-symbols-outlined">more_vert</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-xs">DR</div>
+<div>
+<div class="font-title-sm text-title-sm text-primary">David Rivers</div>
+<div class="text-body-sm text-outline">Information Tech</div>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-data-mono text-data-mono text-primary">11:00 - 12:30</span>
+<span class="text-body-sm text-outline">Oct 24, 2023</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded text-xs font-medium">Substitution</span>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-md text-primary">Lab 402</span>
+</td>
+<td class="px-lg py-md text-body-md">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                    Late (10m)
+                                </div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tight">Pending Review</span>
+</td>
+<td class="px-lg py-md">
+<button class="text-secondary hover:text-primary material-symbols-outlined">more_vert</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-xs">AB</div>
+<div>
+<div class="font-title-sm text-title-sm text-primary">Ana Beltrán</div>
+<div class="text-body-sm text-outline">Physics &amp; Chem</div>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-data-mono text-data-mono text-primary">12:30 - 14:00</span>
+<span class="text-body-sm text-outline">Oct 24, 2023</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-surface-container text-secondary px-2 py-1 rounded text-xs font-medium">Library Guard</span>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-md text-primary">Main Library</span>
+</td>
+<td class="px-lg py-md text-body-md">
+<div class="flex items-center gap-1 text-green-700">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Present
+                                </div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tight">Validated</span>
+</td>
+<td class="px-lg py-md">
+<button class="text-secondary hover:text-primary material-symbols-outlined">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer of Table -->
+<div class="bg-surface-container-low px-lg py-md flex items-center justify-between border-t border-outline-variant">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-2">
+<span class="text-body-sm text-outline">Rows per page:</span>
+<select class="bg-white border border-outline-variant rounded px-2 py-0.5 text-body-sm focus:ring-primary focus:border-primary">
+<option>10</option>
+<option selected="">20</option>
+<option>50</option>
+</select>
+</div>
+</div>
+<div class="flex gap-4 items-center">
+<span class="text-body-sm text-outline">1-10 of 240 items</span>
+<div class="flex items-center gap-2">
+<button class="p-1 hover:bg-surface-container rounded opacity-50 cursor-not-allowed">
+<span class="material-symbols-outlined">first_page</span>
+</button>
+<button class="p-1 hover:bg-surface-container rounded opacity-50 cursor-not-allowed">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-1 hover:bg-surface-container rounded">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="p-1 hover:bg-surface-container rounded">
+<span class="material-symbols-outlined">last_page</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Focus Area: Asymmetric Layout for Notes/Schedule -->
+<div class="grid grid-cols-12 gap-lg mt-xl">
+<!-- Conflict Resolver Card -->
+<div class="col-span-12 lg:col-span-8 bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<div>
+<h4 class="font-title-sm text-title-sm text-primary">Pending Guard Conflicts</h4>
+<p class="text-body-sm text-outline">Discrepancies flagged by the automatic auditing system.</p>
+</div>
+<button class="text-primary font-medium hover:underline text-body-sm">Resolve All</button>
+</div>
+<div class="p-lg space-y-md">
+<div class="flex items-start gap-md p-md rounded-lg border border-error-container bg-error-container bg-opacity-10">
+<span class="material-symbols-outlined text-error mt-1">warning</span>
+<div class="flex-1">
+<p class="font-title-sm text-title-sm text-on-error-container">Overlapping Schedule Detected</p>
+<p class="text-body-sm text-on-secondary-container">Prof. Sergio Martínez is assigned to "Exam Proctoring" and "Department Meeting" simultaneously for Oct 26th.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-md py-1 border border-outline text-body-sm rounded hover:bg-white transition-colors">Dismiss</button>
+<button class="px-md py-1 bg-primary text-on-primary text-body-sm rounded hover:opacity-90">Edit Shift</button>
+</div>
+</div>
+<div class="flex items-start gap-md p-md rounded-lg border border-outline-variant bg-surface-container-low">
+<span class="material-symbols-outlined text-secondary mt-1">info</span>
+<div class="flex-1">
+<p class="font-title-sm text-title-sm text-primary">Missing Sign-off</p>
+<p class="text-body-sm text-outline">3 sessions from yesterday have not been validated by the Head of Department.</p>
+</div>
+<button class="px-md py-1 bg-white border border-outline-variant text-body-sm rounded hover:bg-surface-container transition-colors">Remind Head</button>
+</div>
+</div>
+</div>
+<!-- Mini Calendar/Summary Widget -->
+<div class="col-span-12 lg:col-span-4 space-y-lg">
+<div class="bg-primary text-on-primary rounded-xl p-lg overflow-hidden relative">
+<!-- Subtle pattern -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+<h4 class="font-title-sm text-title-sm mb-md relative z-10">Upcoming Tomorrow</h4>
+<div class="space-y-md relative z-10">
+<div class="bg-white/10 backdrop-blur-sm p-md rounded-lg border border-white/20">
+<p class="font-data-mono text-data-mono text-white/70">08:00 - 10:00</p>
+<p class="font-title-sm text-title-sm mt-1">Morning Assembly Guard</p>
+<div class="flex -space-x-2 mt-2">
+<div class="w-6 h-6 rounded-full bg-blue-400 border border-primary text-[8px] flex items-center justify-center font-bold">AB</div>
+<div class="w-6 h-6 rounded-full bg-green-400 border border-primary text-[8px] flex items-center justify-center font-bold">SM</div>
+<div class="w-6 h-6 rounded-full bg-amber-400 border border-primary text-[8px] flex items-center justify-center font-bold">DR</div>
+</div>
+</div>
+<div class="bg-white/10 backdrop-blur-sm p-md rounded-lg border border-white/20">
+<p class="font-data-mono text-data-mono text-white/70">12:00 - 13:00</p>
+<p class="font-title-sm text-title-sm mt-1">Dining Hall Supervision</p>
+<p class="text-body-sm text-white/60">4 Tutors assigned</p>
+</div>
+</div>
+<button class="w-full mt-lg py-2 rounded-lg bg-white text-primary font-bold text-body-sm hover:bg-surface-container transition-colors">View Master Schedule</button>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-lg">
+<h4 class="font-title-sm text-title-sm text-primary mb-md">Quick Summary</h4>
+<ul class="space-y-sm">
+<li class="flex justify-between items-center text-body-sm">
+<span class="text-outline">Total Hours Recorded</span>
+<span class="font-medium text-primary">1,240h</span>
+</li>
+<li class="flex justify-between items-center text-body-sm">
+<span class="text-outline">Active Prof. Checked-in</span>
+<span class="font-medium text-primary">18/22</span>
+</li>
+<li class="flex justify-between items-center text-body-sm">
+<span class="text-outline">Incidents Today</span>
+<span class="font-medium text-error">1 Unsolved</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button - Mobile Only Hidden here as per design anchor for desktop but conceptually present -->
+<div class="fixed bottom-lg right-lg md:hidden">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<script>
+        // Simple micro-interaction for rows
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SPAN') {
+                    // Logic for row expansion or detailed view
+                    console.log('Opening guard details...');
+                }
+            });
+        });
+    </script>
+</body></html>

@@ -37,38 +37,42 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="flex h-full w-60 flex-col bg-surface border-r border-surface-subtle">
-      {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-5 border-b border-surface-subtle">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-600">
-          <span className="text-[11px] font-bold text-white tracking-tight">AT</span>
+    <aside className="flex h-full w-60 flex-col bg-surface border-r border-outline-variant">
+      {/* Logo / Brand */}
+      <div className="flex items-center gap-2 px-2 py-4 mb-8">
+        <div className="w-10 h-10 bg-primary rounded flex items-center justify-center text-on-primary shrink-0">
+          <LayoutDashboard className="w-5 h-5" />
         </div>
-        <span className="text-sm font-semibold text-text tracking-tight">activia-trace</span>
+        <div>
+          <h1 className="text-[20px] leading-7 font-semibold text-primary leading-tight tracking-tight">
+            Activia-Trace
+          </h1>
+          <p className="text-[13px] leading-[18px] text-on-surface-variant opacity-70">
+            Academic Management
+          </p>
+        </div>
       </div>
 
       <nav
-        className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5"
+        className="flex-1 overflow-y-auto px-2 space-y-1"
         aria-label="Navegación principal"
       >
-        {/* Dashboard — acceso directo */}
+        {/* Dashboard — direct link */}
         <NavLink
           to="/dashboard"
           className={({ isActive }) =>
-            `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            `flex items-center gap-4 p-2 rounded-lg text-[14px] leading-5 font-medium transition-colors ${
               isActive
-                ? 'bg-brand-50 text-brand-700'
-                : 'text-text-muted hover:bg-surface-subtle hover:text-text'
+                ? 'bg-secondary-container text-on-secondary-container'
+                : 'text-on-surface-variant hover:bg-surface-container-low'
             }`
           }
         >
-          <LayoutDashboard className="h-4 w-4 shrink-0" />
-          Dashboard
+          <LayoutDashboard className="h-[22px] w-[22px] shrink-0" />
+          <span>Dashboard</span>
         </NavLink>
 
-        {/* Separador */}
-        <div className="my-2 border-t border-surface-subtle" />
-
-        {/* Secciones colapsables */}
+        {/* Collapsible sections */}
         {MENU_SECTIONS.map((section) => {
           const visibleItems = section.items.filter((item) =>
             permissions.includes(item.permission),
@@ -82,31 +86,31 @@ export function Sidebar() {
             <div key={section.id}>
               <button
                 onClick={() => toggleSection(section.id)}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-text-muted hover:bg-surface-subtle hover:text-text transition-colors"
+                className="flex w-full items-center justify-between p-2 rounded-lg text-[14px] leading-5 text-on-surface-variant hover:bg-surface-container-low transition-colors"
                 aria-expanded={isOpen}
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon className="h-4 w-4 shrink-0" />
+                <div className="flex items-center gap-4">
+                  <Icon className="h-[22px] w-[22px] shrink-0" />
                   <span>{section.label}</span>
                 </div>
                 <ChevronRight
-                  className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${
+                  className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
                     isOpen ? 'rotate-90' : ''
                   }`}
                 />
               </button>
 
               {isOpen && (
-                <ul className="mt-0.5 mb-1 space-y-0.5 pl-9 pr-1">
+                <ul className="mt-0.5 mb-1 space-y-0.5 pl-10 pr-1">
                   {visibleItems.map((item) => (
                     <li key={item.path}>
                       <NavLink
                         to={item.path}
                         className={({ isActive }) =>
-                          `block rounded-md px-3 py-1.5 text-sm transition-colors ${
+                          `block rounded-lg px-3 py-2 text-[14px] leading-5 transition-colors ${
                             isActive
-                              ? 'bg-brand-50 text-brand-700 font-medium'
-                              : 'text-text-muted hover:bg-surface-subtle hover:text-text'
+                              ? 'bg-secondary-container text-on-secondary-container font-medium'
+                              : 'text-on-surface-variant hover:bg-surface-container-low'
                           }`
                         }
                       >

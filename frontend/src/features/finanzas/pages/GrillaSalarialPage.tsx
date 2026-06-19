@@ -2,6 +2,17 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import {
+  BarChart3,
+  Activity,
+  Gauge,
+  Download,
+  Pencil,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  Plus,
+} from 'lucide-react'
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
 import {
@@ -24,6 +35,11 @@ const salarioSchema = z.object({
 })
 
 type SalarioForm = z.infer<typeof salarioSchema>
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const fmt = (n: number) =>
+  n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
 
 // ─── Modal Salario ────────────────────────────────────────────────────────────
 
@@ -79,19 +95,13 @@ function SalarioModal({
   const onSubmit = (data: SalarioForm) => {
     if (tipo === 'base') {
       if (isEditing && salario) {
-        updateBase.mutate(
-          { id: salario.id, payload: data },
-          { onSuccess: onClose },
-        )
+        updateBase.mutate({ id: salario.id, payload: data }, { onSuccess: onClose })
       } else {
         createBase.mutate(data, { onSuccess: onClose })
       }
     } else {
       if (isEditing && salario) {
-        updatePlus.mutate(
-          { id: salario.id, payload: data },
-          { onSuccess: onClose },
-        )
+        updatePlus.mutate({ id: salario.id, payload: data }, { onSuccess: onClose })
       } else {
         createPlus.mutate(data, { onSuccess: onClose })
       }
@@ -102,71 +112,71 @@ function SalarioModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-lg font-semibold">{titulo}</h2>
+      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl border border-[#c4c6cd]">
+        <h2 className="mb-4 text-lg font-semibold text-primary">{titulo}</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="s-rol">
+            <label className="mb-1 block text-sm font-medium text-[#1b1c1d]" htmlFor="s-rol">
               Rol
             </label>
             <input
               id="s-rol"
               {...register('rol')}
-              className="w-full rounded border border-border p-2"
+              className="w-full rounded-lg border border-[#c4c6cd] p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Ej: TUTOR"
             />
             {errors.rol && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
+              <p role="alert" className="mt-1 text-xs text-[#ba1a1a]">
                 {errors.rol.message}
               </p>
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="s-monto">
+            <label className="mb-1 block text-sm font-medium text-[#1b1c1d]" htmlFor="s-monto">
               Monto
             </label>
             <input
               id="s-monto"
               type="number"
               {...register('monto')}
-              className="w-full rounded border border-border p-2"
+              className="w-full rounded-lg border border-[#c4c6cd] p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="80000"
             />
             {errors.monto && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
+              <p role="alert" className="mt-1 text-xs text-[#ba1a1a]">
                 {errors.monto.message}
               </p>
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="s-desde">
+            <label className="mb-1 block text-sm font-medium text-[#1b1c1d]" htmlFor="s-desde">
               Desde
             </label>
             <input
               id="s-desde"
               type="date"
               {...register('desde')}
-              className="w-full rounded border border-border p-2"
+              className="w-full rounded-lg border border-[#c4c6cd] p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {errors.desde && (
-              <p role="alert" className="mt-1 text-sm text-red-600">
+              <p role="alert" className="mt-1 text-xs text-[#ba1a1a]">
                 {errors.desde.message}
               </p>
             )}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="s-hasta">
+            <label className="mb-1 block text-sm font-medium text-[#1b1c1d]" htmlFor="s-hasta">
               Hasta (opcional)
             </label>
             <input
               id="s-hasta"
               type="date"
               {...register('hasta')}
-              className="w-full rounded border border-border p-2"
+              className="w-full rounded-lg border border-[#c4c6cd] p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           {isError && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-[#ba1a1a]">
               Error al guardar el salario. Intentá de nuevo.
             </p>
           )}
@@ -174,14 +184,14 @@ function SalarioModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded border border-border px-4 py-2 text-sm"
+              className="rounded-lg border border-[#c4c6cd] px-4 py-2 text-sm text-[#43474c] hover:bg-[#f5f3f4]"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-primary px-4 py-2 text-sm text-white hover:opacity-90 disabled:opacity-50"
             >
               {isPending ? 'Guardando...' : 'Guardar'}
             </button>
@@ -207,52 +217,113 @@ function SalariosTable({
   onNuevo: () => void
   onEditar: (s: SalarioBase | SalarioPlus) => void
 }) {
-  const fmt = (n: number) =>
-    n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
-
   return (
-    <div className="rounded-lg border border-border">
-      <div className="flex items-center justify-between border-b border-border bg-gray-50 px-4 py-3">
-        <h2 className="font-semibold">{titulo}</h2>
+    <div className="bg-white border border-[#c4c6cd] rounded-xl overflow-hidden shadow-sm">
+      <div className="px-6 py-4 border-b border-[#c4c6cd] flex justify-between items-center bg-white">
+        <h3 className="font-medium text-sm text-primary">{titulo}</h3>
         <button
           onClick={onNuevo}
-          className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
+          className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity"
         >
-          + Nuevo
+          <Plus className="w-3 h-3" />
+          Nuevo
         </button>
       </div>
+
       {items.length === 0 ? (
-        <p className="p-4 text-gray-500">No hay registros de salario {tipo}.</p>
+        <p className="p-6 text-sm text-[#43474c]">No hay registros de salario {tipo}.</p>
       ) : (
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="p-3 text-left">Rol</th>
-              <th className="p-3 text-left">Monto</th>
-              <th className="p-3 text-left">Desde</th>
-              <th className="p-3 text-left">Hasta</th>
-              <th className="p-3 text-left">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((s) => (
-              <tr key={s.id} className="border-b border-border">
-                <td className="p-3 font-medium">{s.rol}</td>
-                <td className="p-3">{fmt(s.monto)}</td>
-                <td className="p-3">{s.desde}</td>
-                <td className="p-3">{s.hasta ?? '—'}</td>
-                <td className="p-3">
-                  <button
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
+              <thead className="bg-white">
+                <tr className="text-[#43474c] border-b border-[#c4c6cd]">
+                  <th className="text-[11px] font-bold tracking-[0.05em] px-6 py-4 uppercase">
+                    Rol / ID
+                  </th>
+                  <th className="text-[11px] font-bold tracking-[0.05em] px-6 py-4 uppercase">
+                    Monto (base)
+                  </th>
+                  <th className="text-[11px] font-bold tracking-[0.05em] px-6 py-4 uppercase">
+                    Desde
+                  </th>
+                  <th className="text-[11px] font-bold tracking-[0.05em] px-6 py-4 uppercase">
+                    Hasta
+                  </th>
+                  <th className="text-[11px] font-bold tracking-[0.05em] px-6 py-4 uppercase">
+                    Estado
+                  </th>
+                  <th className="text-[11px] font-bold tracking-[0.05em] px-6 py-4 uppercase">
+                    {tipo === 'base' ? 'Variación' : 'Factor'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((s, idx) => (
+                  <tr
+                    key={s.id}
+                    className={`hover:bg-[#cce2fc]/10 transition-colors group cursor-pointer ${
+                      idx % 2 === 0 ? '' : 'bg-[#f1f5f9]'
+                    }`}
                     onClick={() => onEditar(s)}
-                    className="rounded border border-border px-3 py-1 text-sm hover:bg-gray-50"
                   >
-                    Editar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    <td className="px-6 py-4 font-mono text-xs text-primary font-medium">
+                      {s.rol}
+                    </td>
+                    <td className="px-6 py-4 font-mono text-sm">{fmt(s.monto)}</td>
+                    <td className="px-6 py-4 text-sm text-[#43474c]">{s.desde}</td>
+                    <td className="px-6 py-4 text-sm text-[#43474c]">{s.hasta ?? '—'}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            s.hasta ? 'bg-[#c4c6cd]' : 'bg-green-500'
+                          }`}
+                        />
+                        <span className="text-xs text-[#43474c]">
+                          {s.hasta ? 'Histórico' : 'Activo'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded font-mono text-[11px]">
+                          Vigente
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onEditar(s)
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity ml-2"
+                          title="Editar"
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-[#43474c] hover:text-primary" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="p-4 bg-[#f5f3f4] border-t border-[#c4c6cd] flex justify-between items-center">
+            <p className="text-xs text-[#43474c]">
+              Mostrando {items.length} de {items.length} registros
+            </p>
+            <div className="flex gap-2">
+              <button className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-white transition-colors">
+                <ChevronLeft className="w-4 h-4 text-[#43474c]" />
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center bg-primary text-white rounded text-xs font-medium">
+                1
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-white transition-colors">
+                <ChevronRight className="w-4 h-4 text-[#43474c]" />
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
@@ -271,6 +342,13 @@ function GrillaSalarialContent() {
   const { data: salariosBase, isLoading: loadingBase } = useSalariosBase()
   const { data: salariosPlus, isLoading: loadingPlus } = useSalariosPlus()
 
+  const baseItems = salariosBase ?? []
+  const plusItems = salariosPlus ?? []
+
+  const totalAnual = baseItems.reduce((s, b) => s + b.monto * 12, 0)
+  const promedioBase = baseItems.length > 0 ? baseItems.reduce((s, b) => s + b.monto, 0) / baseItems.length : 0
+  const bonusUso = plusItems.length > 0 ? Math.min(100, (plusItems.length / 10) * 100) : 0
+
   if (loadingBase || loadingPlus) {
     return (
       <div className="flex justify-center p-8">
@@ -281,20 +359,93 @@ function GrillaSalarialContent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Grilla salarial</h1>
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <nav className="flex items-center gap-1 text-xs text-[#43474c] mb-1">
+            <span>Configuración institucional</span>
+            <ChevronRight className="w-3 h-3" />
+            <span>Liquidaciones</span>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-primary font-medium">Grilla Salarial</span>
+          </nav>
+          <h1 className="text-[30px] font-semibold leading-tight tracking-tight text-primary">
+            Grilla Salarial
+          </h1>
+        </div>
+        <div className="flex gap-3">
+          <button className="px-4 py-2 bg-white border border-[#c4c6cd] text-primary font-medium rounded hover:bg-[#f5f3f4] transition-colors flex items-center gap-2 text-sm">
+            <Download className="w-4 h-4" />
+            Exportar PDF
+          </button>
+          <button
+            onClick={() => setModal({ tipo: 'base' })}
+            className="px-4 py-2 bg-primary text-white font-medium rounded hover:opacity-90 transition-opacity flex items-center gap-2 text-sm shadow-sm"
+          >
+            <Pencil className="w-4 h-4" />
+            Nuevo salario base
+          </button>
+        </div>
+      </div>
 
+      {/* KPI Cards */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="col-span-1 bg-white border border-[#c4c6cd] p-4 rounded-xl">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-[11px] font-bold tracking-[0.05em] text-[#43474c] uppercase">
+              Total Anual Planilla
+            </p>
+            <BarChart3 className="w-5 h-5 text-primary" />
+          </div>
+          <p className="font-mono text-2xl font-bold text-primary">{fmt(totalAnual)}</p>
+          <div className="flex items-center gap-1 mt-2 text-green-700">
+            <TrendingUp className="w-3 h-3" />
+            <span className="text-xs">Proyección anual</span>
+          </div>
+        </div>
+        <div className="col-span-1 bg-white border border-[#c4c6cd] p-4 rounded-xl">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-[11px] font-bold tracking-[0.05em] text-[#43474c] uppercase">
+              Promedio Salario Base
+            </p>
+            <Activity className="w-5 h-5 text-primary" />
+          </div>
+          <p className="font-mono text-2xl font-bold text-primary">{fmt(promedioBase)}</p>
+          <p className="text-xs text-[#43474c] mt-2">
+            Calculado sobre {baseItems.length} registros
+          </p>
+        </div>
+        <div className="col-span-1 bg-white border border-[#c4c6cd] p-4 rounded-xl">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-[11px] font-bold tracking-[0.05em] text-[#43474c] uppercase">
+              Registros Plus
+            </p>
+            <Gauge className="w-5 h-5 text-primary" />
+          </div>
+          <p className="font-mono text-2xl font-bold text-primary">{plusItems.length}</p>
+          <div className="w-full bg-[#efedef] h-1.5 rounded-full mt-2">
+            <div
+              className="bg-primary h-full rounded-full transition-all"
+              style={{ width: `${bonusUso}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Tabla Base */}
       <SalariosTable
-        titulo="Salario Base"
+        titulo="Matriz de Salario Base"
         tipo="base"
-        items={salariosBase ?? []}
+        items={baseItems}
         onNuevo={() => setModal({ tipo: 'base' })}
         onEditar={(s) => setModal({ tipo: 'base', salario: s as SalarioBase })}
       />
 
+      {/* Tabla Plus */}
       <SalariosTable
-        titulo="Salario Plus"
+        titulo="Estructura de Plus / Bonus"
         tipo="plus"
-        items={salariosPlus ?? []}
+        items={plusItems}
         onNuevo={() => setModal({ tipo: 'plus' })}
         onEditar={(s) => setModal({ tipo: 'plus', salario: s as SalarioPlus })}
       />

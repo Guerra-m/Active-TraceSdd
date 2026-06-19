@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activia-Trace | Calendario de Encuentros</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e4e2e3",
+                        "surface-dim": "#dbd9db",
+                        "outline": "#74777d",
+                        "on-surface-variant": "#43474c",
+                        "background": "#fbf9fa",
+                        "primary": "#162839",
+                        "on-secondary-fixed": "#051d30",
+                        "on-secondary-container": "#50657b",
+                        "on-primary-fixed-variant": "#36485b",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f2f0f2",
+                        "surface-tint": "#4e6073",
+                        "surface-container-high": "#e9e8e9",
+                        "primary-container": "#2c3e50",
+                        "surface-container-highest": "#e4e2e3",
+                        "on-surface": "#1b1c1d",
+                        "surface-container": "#efedef",
+                        "secondary-fixed-dim": "#b3c9e2",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5a4225",
+                        "surface": "#fbf9fa",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#c1a17d",
+                        "secondary-fixed": "#cfe5ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#091d2e",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#303032",
+                        "tertiary-fixed-dim": "#e3c19b",
+                        "tertiary-container": "#4e381c",
+                        "on-background": "#1b1c1d",
+                        "secondary": "#4b6076",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#d1e4fb",
+                        "on-secondary-fixed-variant": "#34495e",
+                        "tertiary-fixed": "#ffddb7",
+                        "primary-fixed-dim": "#b5c8df",
+                        "on-primary-container": "#96a9be",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#b5c8df",
+                        "surface-bright": "#fbf9fa",
+                        "tertiary": "#362308",
+                        "on-tertiary-fixed": "#291802",
+                        "secondary-container": "#cce2fc",
+                        "surface-container-low": "#f5f3f4",
+                        "outline-variant": "#c4c6cd",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "table-cell-x": "12px",
+                        "base": "4px",
+                        "table-cell-y": "8px"
+                    },
+                    "fontFamily": {
+                        "title-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .calendar-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); }
+        .time-row { height: 80px; border-bottom: 1px solid #f1f5f9; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary-container">
+<!-- Sidebar Navigation -->
+<aside class="w-60 h-screen fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col py-md px-sm">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Activia-Trace</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Academic Management</p>
+</div>
+<nav class="flex-grow space-y-xs">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-sm bg-secondary-container text-on-secondary-container font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Calendario</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span>Communications</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Teams</span>
+</a>
+</nav>
+<button class="mt-lg w-full bg-primary text-on-primary py-md px-lg rounded-lg font-medium flex items-center justify-center gap-sm hover:opacity-90 transition-opacity" onclick="openModal()">
+<span class="material-symbols-outlined">add_circle</span>
+            Nuevo Encuentro
+        </button>
+<div class="mt-auto pt-lg border-t border-outline-variant">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span>Support</span>
+</a>
+</div>
+</aside>
+<!-- Top AppBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 border-b border-outline-variant bg-surface-container-lowest flex justify-between items-center px-lg z-10">
+<div class="flex items-center gap-md">
+<h2 class="font-title-sm text-title-sm text-primary">Agenda Académica</h2>
+<div class="flex items-center gap-xs bg-surface-container rounded-lg p-xs">
+<button class="px-md py-1 bg-surface-container-lowest shadow-sm rounded text-body-sm font-medium">Semana</button>
+<button class="px-md py-1 text-on-surface-variant text-body-sm hover:bg-surface-container-high rounded transition-colors">Mes</button>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined hover:bg-surface-container rounded-full p-2 cursor-pointer transition-colors">notifications</span>
+<span class="material-symbols-outlined hover:bg-surface-container rounded-full p-2 cursor-pointer transition-colors">history</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up headshot of a professional university professor with silver hair wearing glasses and a navy blue blazer, set against a blurred academic library background with soft, natural morning light coming through large windows. The mood is authoritative and scholarly, fitting a high-end educational administrative interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIn65wk7g0lyQJoHt1AYUcEDGjQgG0FxXy1e_KTmR0k20Pldugck4VqX281MAmiEecP4l6z7yhtgbkEO5Fs3w0_EL5wOmSAHb0lb-dHfM6qbOFZCkh3hdIn7Q2j-EDxnilZvl240fc77F9Okh_dACNlt1ZZfBU3yxOOXJaQSYfAjt-bmAT-Dr1W4ERasuOqUpttLTEGKGwQmv3xGUn_gu7yq8xn-VlEhk38r4TM4EEBn48FroIUL1Kgj4ekU3WX3O6glf7p-6wEqg"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-60 pt-16 h-screen overflow-hidden flex flex-col">
+<!-- Calendar Controls -->
+<section class="p-lg flex justify-between items-center bg-surface">
+<div class="flex items-center gap-md">
+<h3 class="font-display-lg text-display-lg text-on-surface">Octubre 2023</h3>
+<div class="flex border border-outline-variant rounded-lg overflow-hidden">
+<button class="p-sm hover:bg-surface-container transition-colors border-r border-outline-variant">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-sm hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<button class="px-md py-sm border border-outline-variant rounded-lg font-medium hover:bg-surface-container transition-colors">Hoy</button>
+</div>
+<div class="flex items-center gap-md">
+<span class="text-body-sm text-on-surface-variant italic">Zona horaria: GMT-5 (Lima/Bogotá)</span>
+</div>
+</section>
+<!-- Calendar Body -->
+<section class="flex-grow overflow-auto custom-scrollbar bg-surface-container-lowest">
+<div class="min-w-[1000px]">
+<!-- Header Days -->
+<div class="calendar-grid sticky top-0 bg-surface-container-lowest border-b border-outline-variant z-10">
+<div class="h-12 border-r border-outline-variant"></div>
+<div class="h-12 flex flex-col items-center justify-center border-r border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant">LUN</span>
+<span class="font-title-sm text-title-sm">16</span>
+</div>
+<div class="h-12 flex flex-col items-center justify-center border-r border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant">MAR</span>
+<span class="font-title-sm text-title-sm">17</span>
+</div>
+<div class="h-12 flex flex-col items-center justify-center border-r border-outline-variant bg-primary-fixed/20">
+<span class="font-label-caps text-label-caps text-primary">MIE</span>
+<span class="font-title-sm text-title-sm text-primary">18</span>
+</div>
+<div class="h-12 flex flex-col items-center justify-center border-r border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant">JUE</span>
+<span class="font-title-sm text-title-sm">19</span>
+</div>
+<div class="h-12 flex flex-col items-center justify-center border-r border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant">VIE</span>
+<span class="font-title-sm text-title-sm">20</span>
+</div>
+<div class="h-12 flex flex-col items-center justify-center border-r border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SAB</span>
+<span class="font-title-sm text-title-sm">21</span>
+</div>
+<div class="h-12 flex flex-col items-center justify-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant">DOM</span>
+<span class="font-title-sm text-title-sm">22</span>
+</div>
+</div>
+<!-- Grid Rows -->
+<div class="relative">
+<!-- Current Time Indicator -->
+<div class="absolute w-full top-[320px] pointer-events-none flex items-center z-[5]">
+<div class="w-[60px] flex justify-center">
+<span class="bg-error text-on-error text-[10px] px-1 rounded-sm font-bold">12:00</span>
+</div>
+<div class="flex-grow h-[2px] bg-error/50"></div>
+</div>
+<!-- Hours -->
+<div class="calendar-grid">
+<div class="time-row flex justify-center items-start pt-2 border-r border-outline-variant">
+<span class="font-data-mono text-data-mono text-outline">08:00</span>
+</div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r relative">
+<!-- Instance: Scheduled -->
+<div class="absolute inset-x-2 top-4 bottom-4 bg-primary-container/10 border-l-4 border-primary p-sm rounded-r shadow-sm cursor-pointer hover:brightness-95 transition-all">
+<p class="text-[11px] font-bold text-primary leading-tight">Intro to Algorithms</p>
+<p class="text-[10px] text-primary/70">Aula A-202</p>
+</div>
+</div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row"></div>
+<div class="time-row flex justify-center items-start pt-2 border-r border-outline-variant">
+<span class="font-data-mono text-data-mono text-outline">10:00</span>
+</div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r relative">
+<!-- Instance: Completed -->
+<div class="absolute inset-x-2 top-2 bottom-2 bg-secondary-container/30 border-l-4 border-secondary p-sm rounded-r shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[11px] font-bold text-on-secondary-container">Tutoría Privada</p>
+<span class="material-symbols-outlined text-xs text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="text-[10px] text-on-secondary-container/80">Est. Juan Pérez</p>
+</div>
+</div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row"></div>
+<div class="time-row flex justify-center items-start pt-2 border-r border-outline-variant">
+<span class="font-data-mono text-data-mono text-outline">12:00</span>
+</div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r relative">
+<!-- Instance: Rescheduled -->
+<div class="absolute inset-x-2 top-8 bottom-[-40px] bg-tertiary-fixed/40 border-l-4 border-tertiary-container p-sm rounded-r shadow-sm z-[2]">
+<div class="flex justify-between items-start">
+<p class="text-[11px] font-bold text-tertiary-container">Sustentación Tesis</p>
+<span class="material-symbols-outlined text-xs text-tertiary-container">schedule</span>
+</div>
+<p class="text-[10px] text-tertiary-container/80">Reagendado: Ver notas</p>
+</div>
+</div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row"></div>
+<div class="time-row flex justify-center items-start pt-2 border-r border-outline-variant">
+<span class="font-data-mono text-data-mono text-outline">14:00</span>
+</div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row border-r"></div>
+<div class="time-row"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-[50] hidden flex items-center justify-center p-lg" id="modalBackdrop">
+<!-- Creation Modal -->
+<div class="bg-surface rounded-xl shadow-xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h4 class="font-headline-md text-headline-md text-primary">Agendar Encuentro</h4>
+<button class="p-xs hover:bg-surface-container rounded-full transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-lg">
+<form class="space-y-lg">
+<!-- Title & Mode Toggle -->
+<div class="grid grid-cols-2 gap-lg">
+<div class="col-span-2 space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">TÍTULO DEL ENCUENTRO</label>
+<input class="w-full border-outline-variant rounded-lg focus:ring-primary focus:border-primary" placeholder="Ej: Clase Magistral de Ética" type="text"/>
+</div>
+<div class="col-span-2 space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">MODO DE SESIÓN</label>
+<div class="flex gap-sm">
+<button class="flex-grow py-sm px-md border-2 border-primary bg-primary/5 text-primary rounded-lg font-medium transition-all" id="btnUnico" onclick="toggleMode('unico')" type="button">Único</button>
+<button class="flex-grow py-sm px-md border-2 border-outline-variant text-on-surface-variant rounded-lg font-medium transition-all" id="btnRecurrente" onclick="toggleMode('recurrente')" type="button">Recurrente</button>
+</div>
+</div>
+</div>
+<!-- Unique Fields -->
+<div class="grid grid-cols-2 gap-lg" id="fieldsUnico">
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">FECHA</label>
+<input class="w-full border-outline-variant rounded-lg" type="date"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">HORA</label>
+<input class="w-full border-outline-variant rounded-lg" type="time"/>
+</div>
+</div>
+<!-- Recurrent Fields -->
+<div class="hidden grid grid-cols-2 gap-lg" id="fieldsRecurrente">
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">DÍA DE LA SEMANA</label>
+<select class="w-full border-outline-variant rounded-lg">
+<option>Lunes</option>
+<option>Martes</option>
+<option>Miércoles</option>
+<option>Jueves</option>
+<option>Viernes</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">NÚMERO DE SEMANAS</label>
+<input class="w-full border-outline-variant rounded-lg" max="52" min="1" type="number" value="16"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">FECHA DE INICIO</label>
+<input class="w-full border-outline-variant rounded-lg" type="date"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">HORA</label>
+<input class="w-full border-outline-variant rounded-lg" type="time"/>
+</div>
+</div>
+<!-- Links -->
+<div class="space-y-lg border-t border-outline-variant pt-lg">
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm">videocam</span> LINK DE VIDEOCONFERENCIA
+                            </label>
+<input class="w-full border-outline-variant rounded-lg" placeholder="https://zoom.us/j/..." type="url"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm">cloud_upload</span> LINK DE GRABACIÓN (OPCIONAL)
+                            </label>
+<input class="w-full border-outline-variant rounded-lg" placeholder="https://drive.google.com/..." type="url"/>
+</div>
+</div>
+<div class="flex justify-end gap-md pt-md">
+<button class="px-xl py-sm text-on-surface-variant font-medium hover:bg-surface-container rounded-lg transition-colors" onclick="closeModal()" type="button">Cancelar</button>
+<button class="px-xl py-sm bg-primary text-on-primary font-medium rounded-lg hover:opacity-90 transition-opacity" type="submit">Crear Sesión</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<script>
+        const backdrop = document.getElementById('modalBackdrop');
+        const fieldsUnico = document.getElementById('fieldsUnico');
+        const fieldsRecurrente = document.getElementById('fieldsRecurrente');
+        const btnUnico = document.getElementById('btnUnico');
+        const btnRecurrente = document.getElementById('btnRecurrente');
+
+        function openModal() {
+            backdrop.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            backdrop.classList.add('hidden');
+        }
+
+        function toggleMode(mode) {
+            if (mode === 'unico') {
+                fieldsUnico.classList.remove('hidden');
+                fieldsRecurrente.classList.add('hidden');
+                btnUnico.classList.add('border-primary', 'bg-primary/5', 'text-primary');
+                btnUnico.classList.remove('border-outline-variant', 'text-on-surface-variant');
+                btnRecurrente.classList.remove('border-primary', 'bg-primary/5', 'text-primary');
+                btnRecurrente.classList.add('border-outline-variant', 'text-on-surface-variant');
+            } else {
+                fieldsUnico.classList.add('hidden');
+                fieldsRecurrente.classList.remove('hidden');
+                btnRecurrente.classList.add('border-primary', 'bg-primary/5', 'text-primary');
+                btnRecurrente.classList.remove('border-outline-variant', 'text-on-surface-variant');
+                btnUnico.classList.remove('border-primary', 'bg-primary/5', 'text-primary');
+                btnUnico.classList.add('border-outline-variant', 'text-on-surface-variant');
+            }
+        }
+
+        // Close on backdrop click
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) closeModal();
+        });
+    </script>
+</body></html>

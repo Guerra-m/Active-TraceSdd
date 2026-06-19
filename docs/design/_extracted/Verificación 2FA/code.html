@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activia-Trace | Verificación de dos pasos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#e3c19b",
+                    "primary": "#162839",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#051d30",
+                    "surface-container": "#efedef",
+                    "inverse-surface": "#303032",
+                    "secondary": "#4b6076",
+                    "on-tertiary-fixed-variant": "#5a4225",
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#96a9be",
+                    "background": "#fbf9fa",
+                    "surface-container-high": "#e9e8e9",
+                    "primary-fixed-dim": "#b5c8df",
+                    "on-primary-fixed-variant": "#36485b",
+                    "secondary-container": "#cce2fc",
+                    "tertiary-container": "#4e381c",
+                    "on-tertiary-fixed": "#291802",
+                    "on-secondary-container": "#50657b",
+                    "surface-dim": "#dbd9db",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#2C3E50", /* Updated to match user request precisely while staying in range */
+                    "surface-variant": "#e4e2e3",
+                    "surface": "#fbf9fa",
+                    "surface-container-highest": "#e4e2e3",
+                    "surface-container-low": "#f5f3f4",
+                    "on-secondary-fixed-variant": "#34495e",
+                    "inverse-on-surface": "#f2f0f2",
+                    "surface-bright": "#fbf9fa",
+                    "secondary-fixed": "#cfe5ff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#d1e4fb",
+                    "on-background": "#1b1c1d",
+                    "tertiary": "#362308",
+                    "inverse-primary": "#b5c8df",
+                    "outline-variant": "#c4c6cd",
+                    "tertiary-fixed": "#ffddb7",
+                    "secondary-fixed-dim": "#b3c9e2",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#4e6073",
+                    "on-surface-variant": "#43474c",
+                    "on-primary-fixed": "#091d2e",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#c1a17d",
+                    "on-surface": "#1b1c1d",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#74777d",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "base": "4px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "table-cell-x": "12px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "table-cell-y": "8px"
+            },
+            "fontFamily": {
+                    "data-mono": ["JetBrains Mono"],
+                    "label-caps": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "title-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbf9fa;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .otp-input:focus {
+            outline: none;
+            border-color: #2C3E50;
+            box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
+        }
+        .bento-decoration {
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-md overflow-hidden relative">
+<!-- Atmospheric Background Decoration -->
+<div class="absolute inset-0 bento-decoration opacity-40 pointer-events-none"></div>
+<div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-secondary-container/20 rounded-full blur-[100px] pointer-events-none"></div>
+<main class="w-full max-w-[440px] z-10">
+<!-- Brand Header -->
+<div class="flex flex-col items-center mb-xl">
+<div class="w-12 h-12 bg-primary rounded flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-white text-[28px]" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary">Activia-Trace</h1>
+</div>
+<!-- Verification Card -->
+<section class="bg-surface-container-lowest border border-outline-variant p-xl shadow-sm rounded-lg">
+<header class="text-center mb-xl">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-sm">Verificación de dos pasos</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] mx-auto">
+                    Ingresa el código de 6 dígitos enviado a tu correo
+                </p>
+</header>
+<form class="space-y-xl" id="verification-form">
+<!-- Code Input Group -->
+<div class="flex justify-between gap-xs sm:gap-sm" id="otp-container">
+<input class="otp-input w-12 h-14 sm:w-14 sm:h-16 text-center text-headline-md font-bold text-primary bg-surface border border-outline-variant rounded-lg transition-all" inputmode="numeric" maxlength="1" pattern="\d*" type="number"/>
+<input class="otp-input w-12 h-14 sm:w-14 sm:h-16 text-center text-headline-md font-bold text-primary bg-surface border border-outline-variant rounded-lg transition-all" inputmode="numeric" maxlength="1" pattern="\d*" type="number"/>
+<input class="otp-input w-12 h-14 sm:w-14 sm:h-16 text-center text-headline-md font-bold text-primary bg-surface border border-outline-variant rounded-lg transition-all" inputmode="numeric" maxlength="1" pattern="\d*" type="number"/>
+<input class="otp-input w-12 h-14 sm:w-14 sm:h-16 text-center text-headline-md font-bold text-primary bg-surface border border-outline-variant rounded-lg transition-all" inputmode="numeric" maxlength="1" pattern="\d*" type="number"/>
+<input class="otp-input w-12 h-14 sm:w-14 sm:h-16 text-center text-headline-md font-bold text-primary bg-surface border border-outline-variant rounded-lg transition-all" inputmode="numeric" maxlength="1" pattern="\d*" type="number"/>
+<input class="otp-input w-12 h-14 sm:w-14 sm:h-16 text-center text-headline-md font-bold text-primary bg-surface border border-outline-variant rounded-lg transition-all" inputmode="numeric" maxlength="1" pattern="\d*" type="number"/>
+</div>
+<div class="space-y-md">
+<button class="w-full py-md bg-primary-container text-white font-title-sm text-title-sm rounded-lg hover:bg-primary transition-all active:scale-[0.98] flex items-center justify-center gap-sm" type="submit">
+<span>Verificar</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<div class="flex flex-col items-center gap-sm">
+<button class="font-body-sm text-body-sm text-secondary hover:text-primary transition-colors flex items-center gap-xs" type="button">
+<span class="material-symbols-outlined text-[16px]">refresh</span>
+                            Reenviar código
+                        </button>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:underline" href="#">
+                            Volver al inicio de sesión
+                        </a>
+</div>
+</div>
+</form>
+</section>
+<!-- Footer Info -->
+<footer class="mt-xl text-center">
+<p class="font-label-caps text-label-caps text-outline uppercase tracking-widest flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                Secure Academic Portal
+            </p>
+</footer>
+</main>
+<!-- Side Decoration (Visual Balance) -->
+<div class="hidden lg:block fixed right-xl bottom-xl">
+<div class="bg-surface-container-high border border-outline-variant p-md rounded-xl flex items-center gap-md">
+<img class="w-16 h-16 rounded-lg object-cover" data-alt="A clean, minimalist high-tech workspace with a laptop open showing a clean dashboard. The lighting is soft morning light, creating a professional and calm atmosphere. The colors are predominantly whites and grays with a touch of deep blue to match the Activia-Trace brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFgnRtgm_Gh1V2k7jmY2N0qO3OkD9OdCtwdeZxUh9rs91m8ru6_-RbqX8TIrF0U5G7b2_X52d4m9KTlbxC8T1U3nhS2PUAbzJiVtAzVozNVc_GqpH5OGNvGKA0O9F37Cf32EVPyZ8kVZ6oCjPB5vtNrQ_oeOXp15H3YvYwYiAT5smvsAMZZTSfAsf5Z0eUQO0UW-IECdT4I12aeuH0N2JmU04xVcn9XHe6Kq7XM0MTxtrVNG5AemTzr5f69qZZBAewHerStlWa4Ns"/>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Asistencia Académica</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Soporte disponible 24/7</p>
+</div>
+</div>
+</div>
+<script>
+        // OTP Auto-focus and logic
+        const inputs = document.querySelectorAll('.otp-input');
+        
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length > 1) {
+                    e.target.value = e.target.value.slice(0, 1);
+                }
+                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+
+            // Paste logic
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text').slice(0, inputs.length).split('');
+                pasteData.forEach((char, i) => {
+                    if (inputs[i] && /^\d+$/.test(char)) {
+                        inputs[i].value = char;
+                    }
+                });
+                if (pasteData.length > 0) {
+                    const nextIndex = Math.min(pasteData.length, inputs.length - 1);
+                    inputs[nextIndex].focus();
+                }
+            });
+        });
+
+        // Form submission animation
+        document.getElementById('verification-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const button = e.target.querySelector('button[type="submit"]');
+            button.disabled = true;
+            button.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+            
+            setTimeout(() => {
+                button.classList.replace('bg-primary-container', 'bg-green-600');
+                button.innerHTML = '<span class="material-symbols-outlined">check_circle</span> <span>Verificado</span>';
+            }, 1500);
+        });
+    </script>
+</body></html>

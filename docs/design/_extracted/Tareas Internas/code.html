@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activia-Trace | Task Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e4e2e3",
+                    "surface-dim": "#dbd9db",
+                    "outline": "#74777d",
+                    "on-surface-variant": "#43474c",
+                    "background": "#fbf9fa",
+                    "primary": "#162839",
+                    "on-secondary-fixed": "#051d30",
+                    "on-secondary-container": "#50657b",
+                    "on-primary-fixed-variant": "#36485b",
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#f2f0f2",
+                    "surface-tint": "#4e6073",
+                    "surface-container-high": "#e9e8e9",
+                    "primary-container": "#2c3e50",
+                    "surface-container-highest": "#e4e2e3",
+                    "on-surface": "#1b1c1d",
+                    "surface-container": "#efedef",
+                    "secondary-fixed-dim": "#b3c9e2",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#5a4225",
+                    "surface": "#fbf9fa",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-container": "#c1a17d",
+                    "secondary-fixed": "#cfe5ff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#091d2e",
+                    "on-error-container": "#93000a",
+                    "inverse-surface": "#303032",
+                    "tertiary-fixed-dim": "#e3c19b",
+                    "tertiary-container": "#4e381c",
+                    "on-background": "#1b1c1d",
+                    "secondary": "#4b6076",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#d1e4fb",
+                    "on-secondary-fixed-variant": "#34495e",
+                    "tertiary-fixed": "#ffddb7",
+                    "primary-fixed-dim": "#b5c8df",
+                    "on-primary-container": "#96a9be",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#b5c8df",
+                    "surface-bright": "#fbf9fa",
+                    "tertiary": "#362308",
+                    "on-tertiary-fixed": "#291802",
+                    "secondary-container": "#cce2fc",
+                    "surface-container-low": "#f5f3f4",
+                    "outline-variant": "#c4c6cd",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "table-cell-x": "12px",
+                    "base": "4px",
+                    "table-cell-y": "8px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "display-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f7f8fa;
+            color: #1b1c1d;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            font-size: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .status-chip {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- Side Navigation Bar -->
+<aside class="w-60 h-screen fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col py-md px-sm z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Activia-Trace</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-70">Academic Management</p>
+</div>
+<button class="mx-md mb-lg py-sm px-md bg-primary text-on-primary rounded-lg flex items-center justify-center gap-2 font-medium hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+<span class="font-body-md text-body-md">New Task</span>
+</button>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-body-md text-body-md">Tasks</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">forum</span>
+<span class="font-body-md text-body-md">Communications</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">groups</span>
+<span class="font-body-md text-body-md">Teams</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">payments</span>
+<span class="font-body-md text-body-md">Settlements</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">analytics</span>
+<span class="font-body-md text-body-md">Notices &amp; Auditing</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1 pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">help_center</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-60 min-h-screen">
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg z-40">
+<div class="flex items-center bg-surface-container-low rounded-full px-md py-xs w-96 border border-outline-variant focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-full ml-xs" placeholder="Search tasks, departments, or staff..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-secondary hover:bg-surface-container rounded-full p-2 transition-all active:scale-95">notifications</button>
+<button class="material-symbols-outlined text-secondary hover:bg-surface-container rounded-full p-2 transition-all active:scale-95">history</button>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female university coordinator in her 40s, wearing a navy blue blazer. She has a warm yet authoritative expression, set against a blurred academic library background with soft, natural lighting that emphasizes a clean, high-end corporate B2B software aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq3TB3KPX8u71d7Vb0ky0-aiNlcDcv1lftQ_Z9oHnwD8smMOuHnyYls9GzIZzHyOJ2ff3r_sEyRaqmp8WyFESyKwX3tSuoX8xoG7jVprIrc3ItFxKVvZsABk4p-eGm0NkDGXGgMtwFGWUch03MlQ39DiFXMPB9W-2WoXH015roEQANDenrhjVJtIZ8RaGK2LkF7vSJiY83hnQaFGAF_iBzZFBGW0fk4eaCnlEN-kSA--FAf7vDtDYkzZk2V_zy2guvooGNxktMnxA"/>
+</div>
+</div>
+</header>
+<!-- Task Content -->
+<div class="pt-24 px-lg pb-lg">
+<!-- Content Header -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<div class="flex items-center gap-xs text-body-sm text-secondary mb-xs">
+<span>Department</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span>Curriculum Development</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-primary">Workflow Management</h2>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-low p-xs rounded-lg border border-outline-variant">
+<button class="px-md py-xs bg-surface-container-lowest shadow-sm rounded-md font-medium text-body-sm flex items-center gap-xs" id="listViewBtn">
+<span class="material-symbols-outlined text-sm">list</span>
+                        List
+                    </button>
+<button class="px-md py-xs text-secondary hover:bg-surface-container rounded-md font-medium text-body-sm flex items-center gap-xs" id="boardViewBtn">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+                        Board
+                    </button>
+</div>
+</div>
+<!-- Filters Bar -->
+<div class="flex items-center gap-md mb-lg overflow-x-auto pb-xs">
+<div class="flex items-center gap-xs">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Status:</span>
+<button class="px-md py-xs rounded-full bg-primary text-on-primary text-body-sm font-medium">All Tasks</button>
+<button class="px-md py-xs rounded-full bg-surface-container-high text-on-surface-variant text-body-sm font-medium hover:bg-surface-container-highest">Open</button>
+<button class="px-md py-xs rounded-full bg-surface-container-high text-on-surface-variant text-body-sm font-medium hover:bg-surface-container-highest">In Progress</button>
+<button class="px-md py-xs rounded-full bg-surface-container-high text-on-surface-variant text-body-sm font-medium hover:bg-surface-container-highest">Completed</button>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-xs">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Group By:</span>
+<select class="bg-transparent border-none text-body-sm font-medium focus:ring-0 text-primary cursor-pointer">
+<option>Context</option>
+<option>Assignee</option>
+<option>Deadline</option>
+</select>
+</div>
+<button class="ml-auto flex items-center gap-xs text-body-sm text-secondary font-medium hover:text-primary">
+<span class="material-symbols-outlined">filter_list</span>
+                    More Filters
+                </button>
+</div>
+<!-- Dashboard Layout (Bento Grid Style) -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Main Task List Column -->
+<div class="col-span-12 lg:col-span-8 space-y-md">
+<!-- Task Group: Curriculum Review -->
+<div>
+<div class="flex items-center gap-sm mb-sm px-xs">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">folder_open</span>
+<h3 class="font-title-sm text-title-sm text-primary">Curriculum Review 2024</h3>
+<span class="bg-surface-container text-on-surface-variant text-xs px-2 py-0.5 rounded-full">4 tasks</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<!-- Task Item 1 -->
+<div class="group flex items-center gap-md p-md border-b border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer" onclick="openTaskDetail('Finalize Syllabus for CS101')">
+<div class="w-2 flex-shrink-0 self-stretch bg-amber-400 rounded-full opacity-60 group-hover:opacity-100"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-title-sm text-title-sm text-on-surface group-hover:text-primary transition-colors">Finalize Syllabus for CS101</h4>
+<span class="status-chip bg-amber-100 text-amber-800">In Progress</span>
+</div>
+<div class="flex items-center gap-xl">
+<div class="flex items-center gap-xs">
+<div class="w-6 h-6 rounded-full bg-secondary-fixed flex items-center justify-center text-[10px] font-bold text-on-secondary-fixed">JD</div>
+<span class="text-body-sm text-secondary">Dr. John Doe</span>
+</div>
+<div class="flex items-center gap-xs text-body-sm text-secondary">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+<span>Oct 14, 2023</span>
+</div>
+<div class="flex items-center gap-xs text-body-sm text-secondary">
+<span class="material-symbols-outlined text-sm">chat_bubble</span>
+<span>12</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Task Item 2 -->
+<div class="group flex items-center gap-md p-md border-b border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-2 flex-shrink-0 self-stretch bg-primary rounded-full opacity-20 group-hover:opacity-100"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-title-sm text-title-sm text-on-surface">Upload Accreditation Documents</h4>
+<span class="status-chip bg-surface-container-highest text-on-surface-variant">Open</span>
+</div>
+<div class="flex items-center gap-xl">
+<div class="flex items-center gap-xs">
+<div class="w-6 h-6 rounded-full bg-tertiary-fixed flex items-center justify-center text-[10px] font-bold text-on-tertiary-fixed">SA</div>
+<span class="text-body-sm text-secondary">Sarah Adams</span>
+</div>
+<div class="flex items-center gap-xs text-body-sm text-secondary">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+<span>Oct 20, 2023</span>
+</div>
+<div class="flex items-center gap-xs text-body-sm text-secondary">
+<span class="material-symbols-outlined text-sm">chat_bubble</span>
+<span>0</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Task Item 3 -->
+<div class="group flex items-center gap-md p-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-2 flex-shrink-0 self-stretch bg-emerald-500 rounded-full opacity-40 group-hover:opacity-100"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-title-sm text-title-sm text-on-surface opacity-60 line-through">Draft Faculty Handbook</h4>
+<span class="status-chip bg-emerald-100 text-emerald-800">Completed</span>
+</div>
+<div class="flex items-center gap-xl opacity-60">
+<div class="flex items-center gap-xs">
+<div class="w-6 h-6 rounded-full bg-surface-variant flex items-center justify-center text-[10px] font-bold text-on-surface-variant">EM</div>
+<span class="text-body-sm text-secondary">Emily Miller</span>
+</div>
+<div class="flex items-center gap-xs text-body-sm text-secondary">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+<span>Oct 05, 2023</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Task Group: Student Admissions -->
+<div>
+<div class="flex items-center gap-sm mb-sm px-xs pt-lg">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">folder_shared</span>
+<h3 class="font-title-sm text-title-sm text-primary">Student Admissions Q4</h3>
+<span class="bg-surface-container text-on-surface-variant text-xs px-2 py-0.5 rounded-full">2 tasks</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="group flex items-center gap-md p-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-2 flex-shrink-0 self-stretch bg-amber-400 rounded-full opacity-60 group-hover:opacity-100"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-title-sm text-title-sm text-on-surface">Review International Applications</h4>
+<span class="status-chip bg-amber-100 text-amber-800">In Progress</span>
+</div>
+<div class="flex items-center gap-xl">
+<div class="flex items-center gap-xs">
+<div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-[10px] font-bold text-on-primary-container">RH</div>
+<span class="text-body-sm text-secondary">Robert Huang</span>
+</div>
+<div class="flex items-center gap-xs text-body-sm text-secondary">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+<span>Oct 18, 2023</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar (Activity & Detail Preview) -->
+<div class="col-span-12 lg:col-span-4 space-y-lg">
+<!-- Task Detail Panel (Self-contained widget) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl flex flex-col h-full sticky top-24 transition-all duration-300" id="taskDetailPanel">
+<div class="p-lg border-b border-outline-variant">
+<div class="flex justify-between items-start mb-md">
+<span class="status-chip bg-amber-100 text-amber-800" id="detailStatus">In Progress</span>
+<div class="flex gap-xs">
+<button class="material-symbols-outlined text-secondary hover:text-primary">more_horiz</button>
+<button class="material-symbols-outlined text-secondary hover:text-error">delete</button>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm" id="detailTitle">Finalize Syllabus for CS101</h3>
+<p class="text-body-md text-on-surface-variant leading-relaxed">Please review the latest AI ethics module added to the intro course. Need approval from the departmental head before Monday's board meeting.</p>
+<div class="mt-lg grid grid-cols-2 gap-md">
+<div>
+<p class="font-label-caps text-label-caps text-secondary mb-xs">ASSIGNEE</p>
+<div class="flex items-center gap-xs">
+<div class="w-7 h-7 rounded-full bg-secondary-fixed flex items-center justify-center text-xs font-bold text-on-secondary-fixed">JD</div>
+<span class="text-body-sm font-medium">Dr. John Doe</span>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-secondary mb-xs">DEADLINE</p>
+<div class="flex items-center gap-xs text-body-sm text-error">
+<span class="material-symbols-outlined text-sm">event_busy</span>
+<span class="font-medium">Oct 14, 2023</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment Thread -->
+<div class="flex-1 p-lg bg-surface-container-lowest overflow-y-auto max-h-[400px] custom-scrollbar">
+<h4 class="font-label-caps text-label-caps text-secondary mb-md uppercase">Comments (3)</h4>
+<div class="space-y-lg">
+<div class="flex gap-md">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center text-xs text-white">CP</div>
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="text-body-sm font-bold text-primary">Coordinator Paul</span>
+<span class="text-[11px] text-secondary">2h ago</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">I've attached the latest guidelines from the board. Please ensure sections 4.2 and 4.3 are updated accordingly.</p>
+</div>
+</div>
+<div class="flex gap-md">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex-shrink-0 flex items-center justify-center text-xs text-on-secondary-fixed font-bold">JD</div>
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="text-body-sm font-bold text-primary">Dr. John Doe</span>
+<span class="text-[11px] text-secondary">45m ago</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Acknowledged. Working on section 4.2 now. Should have it ready by EOD.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment Input -->
+<div class="p-md border-t border-outline-variant bg-surface-container-low">
+<div class="flex items-center gap-sm bg-surface-container-lowest border border-outline-variant rounded-lg p-xs pr-sm">
+<input class="bg-transparent border-none focus:ring-0 text-body-sm flex-1 ml-sm" placeholder="Add a comment..." type="text"/>
+<button class="material-symbols-outlined text-primary bg-primary-container/10 p-1.5 rounded-md hover:bg-primary hover:text-white transition-all">send</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for New Task (Hidden on detailed view if needed) -->
+<button class="fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all group lg:hidden">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        function openTaskDetail(title) {
+            const panel = document.getElementById('taskDetailPanel');
+            const titleEl = document.getElementById('detailTitle');
+            
+            // Animation effect
+            panel.style.transform = 'translateY(10px)';
+            panel.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                titleEl.textContent = title;
+                panel.style.transform = 'translateY(0)';
+                panel.style.opacity = '1';
+            }, 150);
+        }
+
+        // Toggle View Logic (Mock)
+        document.getElementById('boardViewBtn').addEventListener('click', () => {
+            alert('Switching to Board View - Kanban board rendering logic would execute here.');
+        });
+
+        // Search Bar Focus Effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('bg-surface-container-lowest');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('bg-surface-container-lowest');
+        });
+    </script>
+</body></html>

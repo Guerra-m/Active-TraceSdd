@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tenant Settings | Academia ERP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb7",
+                    "on-secondary-fixed": "#051d30",
+                    "surface-bright": "#fbf9fa",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#5a4225",
+                    "primary-fixed": "#d1e4fb",
+                    "on-background": "#1b1c1d",
+                    "surface-container-low": "#f5f3f4",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#1b1c1d",
+                    "surface-container": "#efedef",
+                    "tertiary-fixed-dim": "#e3c19b",
+                    "secondary": "#4b6076",
+                    "outline": "#74777d",
+                    "on-tertiary-container": "#c1a17d",
+                    "surface-dim": "#dbd9db",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#34495e",
+                    "on-secondary-container": "#50657b",
+                    "outline-variant": "#c4c6cd",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#cce2fc",
+                    "on-tertiary-fixed": "#291802",
+                    "inverse-on-surface": "#f2f0f2",
+                    "tertiary": "#362308",
+                    "surface-tint": "#4e6073",
+                    "surface-container-high": "#e9e8e9",
+                    "on-primary-container": "#96a9be",
+                    "tertiary-container": "#4e381c",
+                    "on-primary-fixed-variant": "#36485b",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e4e2e3",
+                    "surface-container-highest": "#e4e2e3",
+                    "on-primary-fixed": "#091d2e",
+                    "primary-container": "#2c3e50",
+                    "primary": "#162839",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#303032",
+                    "secondary-fixed": "#cfe5ff",
+                    "inverse-primary": "#b5c8df",
+                    "secondary-fixed-dim": "#b3c9e2",
+                    "primary-fixed-dim": "#b5c8df",
+                    "surface": "#fbf9fa",
+                    "on-surface-variant": "#43474c",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "lg": "24px",
+                    "table-cell-y": "8px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "table-cell-x": "12px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F7F8FA;
+            font-family: 'Inter', sans-serif;
+            color: #1b1c1d;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c4c6cd;
+            border-radius: 10px;
+        }
+        .card-shadow {
+            border: 1px solid #E2E8F0;
+        }
+    </style>
+</head>
+<body class="bg-background">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-60 bg-primary dark:bg-primary-container flex flex-col py-lg border-r border-outline-variant z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Academia ERP</h1>
+<p class="font-body-sm text-body-sm text-on-primary-fixed-variant opacity-70">Admin Portal</p>
+</div>
+<nav class="flex-1 px-sm space-y-xs overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-body-md text-body-md">Academic</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Users</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Finances</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Auditing</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-md pt-md border-t border-on-primary-fixed-variant/20">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container text-sm">person</span>
+</div>
+<div class="overflow-hidden">
+<p class="font-body-sm text-body-sm text-on-primary truncate">Admin User</p>
+<p class="text-[10px] text-on-primary-fixed-variant uppercase tracking-wider">Super Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] flex justify-between items-center h-16 px-lg ml-60 bg-surface border-b border-outline-variant z-40">
+<div class="flex items-center gap-md">
+<span class="font-title-sm text-title-sm text-primary">Tenant Settings</span>
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-body-sm text-body-sm">Configuration</span>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-lg text-body-sm font-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent w-64 transition-all" placeholder="Search settings..." type="text"/>
+</div>
+<div class="flex items-center gap-md text-on-surface-variant">
+<button class="hover:text-primary transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:text-primary transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-60 pt-16 min-h-screen">
+<div class="p-lg max-w-7xl mx-auto">
+<!-- Breadcrumbs & Header -->
+<div class="mb-lg">
+<nav class="flex items-center gap-2 text-on-surface-variant mb-base">
+<span class="font-body-sm text-body-sm">Administration</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-body-sm text-body-sm text-primary font-medium">Tenant Settings</span>
+</nav>
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg text-primary">Global Configuration</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your institution's core identity, academic standards, and security protocols.</p>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-title-sm text-title-sm flex items-center gap-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-lg">save</span>
+                        Save All Changes
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Navigation Rail (Sidebar Tabs) -->
+<div class="col-span-3">
+<div class="bg-surface-container-lowest rounded-xl card-shadow p-sm space-y-base sticky top-20">
+<a class="flex items-center justify-between p-md rounded-lg bg-secondary-container text-on-secondary-container transition-all" href="#general">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined">corporate_fare</span>
+<span class="font-title-sm text-title-sm">General</span>
+</div>
+<span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</a>
+<a class="flex items-center justify-between p-md rounded-lg hover:bg-surface-container transition-all text-on-surface-variant" href="#communications">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined">mail</span>
+<span class="font-title-sm text-title-sm">Communications</span>
+</div>
+</a>
+<a class="flex items-center justify-between p-md rounded-lg hover:bg-surface-container transition-all text-on-surface-variant" href="#grading">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined">grade</span>
+<span class="font-title-sm text-title-sm">Grading Scales</span>
+</div>
+</a>
+<a class="flex items-center justify-between p-md rounded-lg hover:bg-surface-container transition-all text-on-surface-variant" href="#security">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined">security</span>
+<span class="font-title-sm text-title-sm">Security &amp; Privacy</span>
+</div>
+</a>
+<div class="pt-sm mt-sm border-t border-outline-variant px-md">
+<p class="font-label-caps text-label-caps text-outline uppercase mb-sm">External Integration</p>
+<a class="flex items-center gap-md p-md rounded-lg hover:bg-surface-container transition-all text-on-surface-variant opacity-60" href="#">
+<span class="material-symbols-outlined">api</span>
+<span class="font-title-sm text-title-sm">API Access</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Settings Content -->
+<div class="col-span-9 space-y-lg">
+<!-- Section: General -->
+<section class="bg-surface-container-lowest rounded-xl card-shadow overflow-hidden" id="general">
+<div class="p-lg border-b border-outline-variant bg-surface-bright/50">
+<h3 class="font-headline-md text-headline-md text-primary">General Identity</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Basic information about your institution used for reports and public branding.</p>
+</div>
+<div class="p-lg grid grid-cols-2 gap-xl">
+<div class="space-y-md">
+<label class="block">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-base uppercase">Institution Name</span>
+<input class="w-full p-md border border-outline-variant rounded-lg font-body-md focus:ring-2 focus:ring-primary focus:border-transparent" type="text" value="St. Edwards Technical University"/>
+</label>
+<label class="block">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-base uppercase">Acronym</span>
+<input class="w-full p-md border border-outline-variant rounded-lg font-body-md focus:ring-2 focus:ring-primary focus:border-transparent" type="text" value="SETU"/>
+</label>
+<label class="block">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-base uppercase">Timezone</span>
+<select class="w-full p-md border border-outline-variant rounded-lg font-body-md focus:ring-2 focus:ring-primary focus:border-transparent">
+<option>(GMT-05:00) Eastern Time (US &amp; Canada)</option>
+<option>(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+<option>(GMT+00:00) UTC</option>
+</select>
+</label>
+</div>
+<div class="flex flex-col items-center justify-center border-2 border-dashed border-outline-variant rounded-xl bg-surface p-xl group hover:border-primary transition-colors cursor-pointer">
+<div class="w-32 h-32 bg-surface-container rounded-full flex items-center justify-center mb-md overflow-hidden relative">
+<div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-white opacity-0 group-hover:opacity-100">edit</span>
+</div>
+<span class="material-symbols-outlined text-5xl text-outline-variant group-hover:text-primary">school</span>
+</div>
+<p class="font-title-sm text-title-sm text-primary mb-xs">Change Institution Logo</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center">PNG or SVG, recommended 512x512px</p>
+</div>
+</div>
+</section>
+<!-- Section: Communication Templates -->
+<section class="bg-surface-container-lowest rounded-xl card-shadow overflow-hidden" id="communications">
+<div class="p-lg border-b border-outline-variant">
+<h3 class="font-headline-md text-headline-md text-primary">Communication Templates</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Default system emails and notification styles.</p>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-md font-label-caps text-label-caps text-outline uppercase">Template Name</th>
+<th class="p-md font-label-caps text-label-caps text-outline uppercase">Target Audience</th>
+<th class="p-md font-label-caps text-label-caps text-outline uppercase">Last Updated</th>
+<th class="p-md font-label-caps text-label-caps text-outline uppercase text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">email</span>
+<span class="font-body-md text-body-md font-medium">Admission Offer Letter</span>
+</div>
+</td>
+<td class="p-md font-body-sm text-body-sm">Prospective Students</td>
+<td class="p-md font-data-mono text-data-mono">2023-10-12</td>
+<td class="p-md text-right">
+<button class="text-primary hover:underline font-body-sm text-body-sm">Edit Template</button>
+</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-lowest transition-colors">
+<td class="p-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+<span class="font-body-md text-body-md font-medium">Tuition Overdue Warning</span>
+</div>
+</td>
+<td class="p-md font-body-sm text-body-sm">Guardians &amp; Students</td>
+<td class="p-md font-data-mono text-data-mono">2023-11-05</td>
+<td class="p-md text-right">
+<button class="text-primary hover:underline font-body-sm text-body-sm">Edit Template</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">badge</span>
+<span class="font-body-md text-body-md font-medium">New Faculty Onboarding</span>
+</div>
+</td>
+<td class="p-md font-body-sm text-body-sm">Staff Members</td>
+<td class="p-md font-data-mono text-data-mono">2023-09-28</td>
+<td class="p-md text-right">
+<button class="text-primary hover:underline font-body-sm text-body-sm">Edit Template</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Section: Grading Scales -->
+<section class="bg-surface-container-lowest rounded-xl card-shadow overflow-hidden" id="grading">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Grading Scales</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Standardized evaluation rules for all faculties.</p>
+</div>
+<button class="border border-outline-variant px-md py-sm rounded-lg font-title-sm text-title-sm flex items-center gap-xs hover:bg-surface transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+                                Add Scale
+                            </button>
+</div>
+<div class="p-lg grid grid-cols-2 gap-lg">
+<!-- GPA Scale Card -->
+<div class="p-md border border-outline-variant rounded-lg bg-surface-container-low/20">
+<div class="flex justify-between items-start mb-md">
+<div>
+<span class="inline-block bg-tertiary-fixed text-on-tertiary-fixed-variant px-xs py-0.5 rounded text-[10px] font-bold uppercase mb-xs">Primary</span>
+<h4 class="font-title-sm text-title-sm text-primary">4.0 GPA Standard</h4>
+</div>
+<span class="material-symbols-outlined text-outline">drag_handle</span>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span>A (90-100)</span>
+<span class="font-bold">4.00</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span>B (80-89)</span>
+<span class="font-bold">3.00</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span>C (70-79)</span>
+<span class="font-bold">2.00</span>
+</div>
+<div class="pt-sm border-t border-outline-variant flex gap-md">
+<button class="text-primary font-body-sm text-body-sm">View all 8 tiers</button>
+<button class="text-outline font-body-sm text-body-sm">Duplicate</button>
+</div>
+</div>
+</div>
+<!-- Percentage Scale Card -->
+<div class="p-md border border-outline-variant rounded-lg bg-surface-container-low/20">
+<div class="flex justify-between items-start mb-md">
+<div>
+<span class="inline-block bg-outline-variant text-on-surface-variant px-xs py-0.5 rounded text-[10px] font-bold uppercase mb-xs">Medical Faculty</span>
+<h4 class="font-title-sm text-title-sm text-primary">Pass/Fail Weighted</h4>
+</div>
+<span class="material-symbols-outlined text-outline">drag_handle</span>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span>Pass (75-100)</span>
+<span class="font-bold">CR</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span>Fail (0-74)</span>
+<span class="font-bold">F</span>
+</div>
+<div class="pt-sm border-t border-outline-variant flex gap-md">
+<button class="text-primary font-body-sm text-body-sm">View all tiers</button>
+<button class="text-outline font-body-sm text-body-sm">Duplicate</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Security & Approvals -->
+<section class="bg-surface-container-lowest rounded-xl card-shadow overflow-hidden mb-xl" id="security">
+<div class="p-lg border-b border-outline-variant">
+<h3 class="font-headline-md text-headline-md text-primary">Security &amp; Approvals</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Protocol enforcement for administrative tasks.</p>
+</div>
+<div class="p-lg space-y-lg">
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="flex gap-md">
+<div class="mt-1 w-10 h-10 rounded bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined">authenticator</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Enforce Multi-Factor Authentication</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Require MFA for all staff accounts with grade modification permissions.</p>
+</div>
+</div>
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary" onclick="this.classList.toggle('bg-primary'); this.classList.toggle('bg-outline-variant')">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex gap-md">
+<div class="mt-1 w-10 h-10 rounded bg-secondary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">rule</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Dual-Approval Grade Submission</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Final semester grades require approval from both the lecturer and department head.</p>
+</div>
+</div>
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-outline-variant">
+<span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex gap-md">
+<div class="mt-1 w-10 h-10 rounded bg-tertiary-container/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">history</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Extended Audit Log Retention</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Retain detailed user action logs for 7 years instead of the default 2 years.</p>
+</div>
+</div>
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Footer Utility -->
+<footer class="mt-auto border-t border-outline-variant bg-surface-container-low py-md px-lg">
+<div class="max-w-7xl mx-auto flex justify-between items-center text-on-surface-variant">
+<p class="font-body-sm text-body-sm">Environment: <span class="font-bold text-primary">Production (v4.8.2)</span></p>
+<div class="flex gap-lg">
+<a class="font-body-sm text-body-sm hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm hover:text-primary transition-colors" href="#">System Health</a>
+<a class="font-body-sm text-body-sm hover:text-primary transition-colors" href="#">API Docs</a>
+</div>
+</div>
+</footer>
+</main>
+<script>
+        // Smooth scroll implementation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active state in sidebar
+                    document.querySelectorAll('#general, #communications, #grading, #security').forEach(section => {
+                        // Logic for visually active tabs can go here
+                    });
+                }
+            });
+        });
+
+        // Simple toggle logic for the demo
+        const toggles = document.querySelectorAll('button[role="switch"]');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const dot = toggle.querySelector('span');
+                const isActive = dot.classList.contains('translate-x-5');
+                if(isActive) {
+                    dot.classList.remove('translate-x-5');
+                    dot.classList.add('translate-x-0');
+                    toggle.classList.remove('bg-primary');
+                    toggle.classList.add('bg-outline-variant');
+                } else {
+                    dot.classList.remove('translate-x-0');
+                    dot.classList.add('translate-x-5');
+                    toggle.classList.remove('bg-outline-variant');
+                    toggle.classList.add('bg-primary');
+                }
+            });
+        });
+    </script>
+</body></html>

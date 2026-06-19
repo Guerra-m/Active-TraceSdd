@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#1b1c1d",
+                        "primary-fixed": "#d1e4fb",
+                        "tertiary-fixed": "#ffddb7",
+                        "on-secondary-fixed": "#051d30",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#fbf9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5a4225",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dbd9db",
+                        "on-secondary-container": "#50657b",
+                        "on-secondary-fixed-variant": "#34495e",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c4c6cd",
+                        "surface-container-low": "#f5f3f4",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#1b1c1d",
+                        "surface-container": "#efedef",
+                        "tertiary-fixed-dim": "#e3c19b",
+                        "secondary": "#4b6076",
+                        "on-tertiary-container": "#c1a17d",
+                        "outline": "#74777d",
+                        "surface-container-high": "#e9e8e9",
+                        "on-primary-container": "#96a9be",
+                        "tertiary-container": "#4e381c",
+                        "on-primary-fixed-variant": "#36485b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e4e2e3",
+                        "on-primary-fixed": "#091d2e",
+                        "surface-variant": "#e4e2e3",
+                        "secondary-container": "#cce2fc",
+                        "on-tertiary-fixed": "#291802",
+                        "inverse-on-surface": "#f2f0f2",
+                        "tertiary": "#362308",
+                        "surface-tint": "#4e6073",
+                        "on-surface-variant": "#43474c",
+                        "error-container": "#ffdad6",
+                        "background": "#fbf9fa",
+                        "primary-container": "#2c3e50",
+                        "primary": "#162839",
+                        "inverse-surface": "#303032",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b5c8df",
+                        "secondary-fixed": "#cfe5ff",
+                        "primary-fixed-dim": "#b5c8df",
+                        "secondary-fixed-dim": "#b3c9e2",
+                        "surface": "#fbf9fa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "table-cell-y": "8px",
+                        "sm": "8px",
+                        "table-cell-x": "12px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Background: Professor View (Disabled/Blur Context) -->
+<div class="flex h-screen w-screen opacity-50 grayscale pointer-events-none">
+<!-- SideNavBar Anchor -->
+<aside class="w-60 h-screen fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col py-md px-sm">
+<div class="mb-xl px-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary">Activia-Trace</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Academic Management</p>
+</div>
+<nav class="flex-1 space-y-base">
+<div class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container font-medium rounded-lg">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm text-on-surface-variant">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-body-md">Communications</span>
+</div>
+</nav>
+</aside>
+<!-- TopAppBar Anchor -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 border-b border-outline-variant bg-surface-container-lowest flex justify-between items-center px-lg ml-60">
+<div class="flex items-center bg-surface-container-low px-md py-xs rounded-full w-96 border border-outline-variant">
+<span class="material-symbols-outlined text-outline">search</span>
+<span class="ml-sm text-outline font-body-sm">Search academic records...</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined p-2 hover:bg-surface-container rounded-full">notifications</span>
+<span class="material-symbols-outlined p-2 hover:bg-surface-container rounded-full">history</span>
+<div class="w-8 h-8 rounded-full bg-primary-fixed"></div>
+</div>
+</header>
+<!-- Main Content Placeholder (Student List/Grades) -->
+<main class="ml-60 pt-16 w-full p-lg overflow-auto">
+<div class="mb-lg">
+<h1 class="font-display-lg text-display-lg text-primary">Professor Overview: CS-402</h1>
+<p class="text-on-surface-variant">Department of Computer Science & Engineering</p>
+</div>
+<div class="grid grid-cols-3 gap-lg">
+<div class="col-span-2 bg-surface-container-lowest border border-outline-variant p-md rounded-lg h-[400px]"></div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg h-[400px]"></div>
+</div>
+</main>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-on-background/40 backdrop-blur-sm p-xl">
+<!-- Composition Modal Canvas -->
+<div class="bg-surface shadow-2xl border border-outline-variant rounded-xl w-full max-w-6xl h-full max-h-[800px] flex overflow-hidden animate-in fade-in zoom-in duration-300">
+<!-- Left Side: Composition Form -->
+<div class="flex-[1.2] flex flex-col border-r border-outline-variant bg-surface-container-lowest">
+<!-- Header -->
+<header class="h-16 px-lg flex items-center justify-between border-b border-outline-variant bg-surface">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">edit_square</span>
+<h2 class="font-title-sm text-title-sm text-primary">New Academic Notice</h2>
+</div>
+<button class="text-on-surface-variant hover:bg-surface-container-high rounded-full p-1 transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</header>
+<!-- Form Scrollable Content -->
+<form class="flex-1 overflow-y-auto p-lg space-y-lg custom-scrollbar">
+<!-- Recipient Field -->
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">RECIPIENT</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-md flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-body-md">person_search</span>
+</div>
+<input class="w-full pl-xl pr-md py-sm bg-surface border border-outline-variant focus:border-primary-container focus:ring-1 focus:ring-primary-container rounded-lg font-body-md transition-all outline-none" placeholder="Search by student name or ID..." type="text" value="Julian Vane (CS-402 Section B)"/>
+</div>
+</div>
+<!-- Subject Field -->
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">SUBJECT</label>
+<input class="w-full px-md py-sm bg-surface border border-outline-variant focus:border-primary-container focus:ring-1 focus:ring-primary-container rounded-lg font-body-md transition-all outline-none" placeholder="e.g., Midterm Project Feedback" type="text"/>
+</div>
+<!-- Body Editor Toolbar -->
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">MESSAGE BODY</label>
+<div class="border border-outline-variant rounded-lg bg-surface overflow-hidden">
+<div class="flex items-center gap-xs px-sm py-xs bg-surface-container-low border-b border-outline-variant">
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">format_bold</span></button>
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">format_italic</span></button>
+<div class="w-[1px] h-4 bg-outline-variant mx-xs"></div>
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">format_list_bulleted</span></button>
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">link</span></button>
+<div class="w-[1px] h-4 bg-outline-variant mx-xs"></div>
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">attachment</span></button>
+</div>
+<textarea class="w-full h-64 p-md font-body-md border-none focus:ring-0 resize-none outline-none" id="message-body" placeholder="Type your academic feedback or announcement here...">Dear Julian,
+
+Following up on your submission for the Distributed Systems project. Your implementation of the consensus algorithm showed great promise, but we need to discuss the fault-tolerance edge cases.
+
+Best regards,
+Prof. Activia</textarea>
+</div>
+</div>
+<!-- Metadata Tags -->
+<div class="flex flex-wrap gap-sm">
+<div class="flex items-center gap-xs bg-secondary-fixed-dim text-on-secondary-fixed text-body-sm px-sm py-xs rounded-full">
+<span class="material-symbols-outlined text-[14px]">label</span>
+                            Course Notice
+                        </div>
+<div class="flex items-center gap-xs bg-surface-container-high text-on-surface-variant text-body-sm px-sm py-xs rounded-full cursor-pointer hover:bg-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[14px]">add</span>
+                            Add Category
+                        </div>
+</div>
+</form>
+<!-- Footer Actions -->
+<footer class="h-20 px-lg flex items-center justify-between border-t border-outline-variant bg-surface">
+<div class="flex items-center gap-md">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary" type="checkbox"/>
+<span class="text-body-sm text-on-surface-variant group-hover:text-on-surface">Mark as urgent</span>
+</label>
+</div>
+<div class="flex items-center gap-md">
+<button class="px-lg py-sm font-title-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors">Cancel</button>
+<button class="px-xl py-sm font-title-sm bg-primary text-on-primary hover:bg-primary-container rounded-lg transition-all flex items-center gap-sm shadow-lg active:scale-95">
+                            Send Message
+                            <span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</footer>
+</div>
+<!-- Right Side: Live Preview (Student View) -->
+<div class="flex-1 bg-surface-container flex flex-col">
+<header class="h-16 px-lg flex items-center border-b border-outline-variant bg-surface-container-high">
+<span class="font-label-caps text-label-caps text-on-surface-variant">STUDENT VIEW PREVIEW</span>
+</header>
+<div class="flex-1 p-xl flex items-center justify-center">
+<!-- Phone Frame / Preview Container -->
+<div class="w-full max-w-[320px] aspect-[9/16] bg-white rounded-[40px] border-[8px] border-primary shadow-2xl relative overflow-hidden flex flex-col">
+<!-- Student UI Mockup -->
+<div class="h-6 w-full flex justify-between items-center px-lg mt-md">
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-primary/20"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary/20"></div>
+</div>
+<div class="text-[10px] font-bold text-primary/40">12:00</div>
+</div>
+<div class="px-md py-lg flex-1">
+<div class="mb-lg">
+<span class="bg-primary/5 text-primary text-[10px] font-bold px-2 py-1 rounded">INBOX</span>
+<h3 class="text-primary font-bold text-lg mt-base">New Academic Message</h3>
+<p class="text-on-surface-variant text-[12px]">From Prof. Activia</p>
+</div>
+<div class="bg-surface-container-low rounded-xl p-md border border-outline-variant/30">
+<p class="text-[13px] leading-relaxed text-on-surface" id="preview-text">
+                                    Dear Julian,
+
+Following up on your submission for the Distributed Systems project. Your implementation of the consensus algorithm showed great promise, but we need to discuss the fault-tolerance edge cases.
+
+Best regards,
+Prof. Activia
+                                </p>
+</div>
+<div class="mt-xl flex flex-col gap-sm">
+<div class="h-10 w-full bg-primary rounded-lg flex items-center justify-center text-on-primary text-[12px] font-medium">Reply to Professor</div>
+<div class="h-10 w-full border border-outline-variant rounded-lg flex items-center justify-center text-on-surface-variant text-[12px]">Mark as Read</div>
+</div>
+</div>
+<div class="h-12 w-full flex justify-center items-center gap-xl pb-base border-t border-outline-variant/10">
+<span class="material-symbols-outlined text-outline text-[20px]">home</span>
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">mail</span>
+<span class="material-symbols-outlined text-outline text-[20px]">school</span>
+</div>
+</div>
+</div>
+<!-- Hint / Meta -->
+<div class="p-lg bg-surface-container-highest/50 border-t border-outline-variant">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-on-primary-container">info</span>
+<p class="text-body-sm text-on-surface-variant italic">
+                            Students will receive this message as an in-app notification and an email copy sent to their institutional address.
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+        // Simple micro-interaction for the live preview
+        const textarea = document.getElementById('message-body');
+        const previewText = document.getElementById('preview-text');
+
+        textarea.addEventListener('input', (e) => {
+            previewText.innerText = e.target.value || 'Type your message to see a preview...';
+        });
+
+        // Handle Escape to "Close" (Visual feedback only for this demo)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                console.log('Modal closing action triggered');
+            }
+        });
+    </script>
+</body></html>

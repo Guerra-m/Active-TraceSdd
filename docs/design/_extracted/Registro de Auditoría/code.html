@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Audit Logs | Academia ERP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb7",
+                    "on-secondary-fixed": "#051d30",
+                    "surface-bright": "#fbf9fa",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#5a4225",
+                    "primary-fixed": "#d1e4fb",
+                    "on-background": "#1b1c1d",
+                    "surface-container-low": "#f5f3f4",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#1b1c1d",
+                    "surface-container": "#efedef",
+                    "tertiary-fixed-dim": "#e3c19b",
+                    "secondary": "#4b6076",
+                    "outline": "#74777d",
+                    "on-tertiary-container": "#c1a17d",
+                    "surface-dim": "#dbd9db",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#34495e",
+                    "on-secondary-container": "#50657b",
+                    "outline-variant": "#c4c6cd",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#cce2fc",
+                    "on-tertiary-fixed": "#291802",
+                    "inverse-on-surface": "#f2f0f2",
+                    "tertiary": "#362308",
+                    "surface-tint": "#4e6073",
+                    "surface-container-low": "#f5f3f4",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e4e2e3",
+                    "surface-container-highest": "#e4e2e3",
+                    "on-primary-fixed": "#091d2e",
+                    "primary-container": "#2c3e50",
+                    "primary": "#162839",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#303032",
+                    "secondary-fixed": "#cfe5ff",
+                    "inverse-primary": "#b5c8df",
+                    "secondary-fixed-dim": "#b3c9e2",
+                    "primary-fixed-dim": "#b5c8df",
+                    "surface": "#fbf9fa",
+                    "on-surface-variant": "#43474c",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "lg": "24px",
+                    "table-cell-y": "8px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "table-cell-x": "12px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "data-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F7F8FA;
+            color: #1B1C1D;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .zebra-stripe:nth-child(even) {
+            background-color: #F1F5F9;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-60 bg-primary border-r border-outline-variant flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Academia ERP</h1>
+<p class="text-on-primary-fixed-variant opacity-70 text-body-sm">Admin Portal</p>
+</div>
+<nav class="flex-1 px-sm space-y-xs">
+<!-- Navigation Items Mapping -->
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">school</span>
+<span>Academic</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Users</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Finances</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Auditing</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-fixed-variant hover:bg-primary-container hover:text-on-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="px-md mt-auto pt-lg border-t border-primary-container">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container text-sm">person</span>
+</div>
+<div class="overflow-hidden">
+<p class="text-on-primary font-medium text-body-sm truncate">Admin User</p>
+<p class="text-on-primary-fixed-variant text-xs truncate">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-60 h-screen flex flex-col bg-background">
+<!-- Top Navigation Shell -->
+<header class="flex justify-between items-center h-16 px-lg border-b border-outline-variant bg-surface sticky top-0 z-40">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs text-on-surface-variant font-body-sm">
+<span>Auditing</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-medium">Audit Logs</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-md">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg pl-xl pr-md py-1.5 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-64 transition-all" placeholder="Search logs..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer active:opacity-80 transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer active:opacity-80 transition-colors">help_outline</button>
+</div>
+</header>
+<!-- Content Area -->
+<section class="flex-1 overflow-hidden flex flex-col">
+<!-- Context Header & Filters -->
+<div class="px-lg py-md border-b border-outline-variant bg-surface-container-lowest">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-sm">
+                                System Audit Repository
+                                <span class="material-symbols-outlined text-sm text-on-surface-variant" title="Immutable Ledger">lock</span>
+</h2>
+<p class="text-body-sm text-on-surface-variant">Immutable administrative transaction history across all academic modules.</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-md py-1.5 bg-surface border border-outline-variant rounded-lg text-body-sm font-medium hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-md">download</span>
+                            Export CSV
+                        </button>
+<button class="flex items-center gap-xs px-md py-1.5 bg-primary text-on-primary rounded-lg text-body-sm font-medium hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-md">refresh</span>
+                            Refresh
+                        </button>
+</div>
+</div>
+<!-- Filters Bar -->
+<div class="flex flex-wrap gap-md items-center bg-surface-container-low p-sm rounded-lg border border-outline-variant">
+<div class="flex items-center gap-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">DATE RANGE</span>
+<div class="flex items-center bg-white border border-outline-variant rounded px-2 py-1">
+<input class="border-none bg-transparent text-body-sm focus:ring-0 p-0" type="date"/>
+<span class="mx-1 text-on-surface-variant text-xs">to</span>
+<input class="border-none bg-transparent text-body-sm focus:ring-0 p-0" type="date"/>
+</div>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ACTOR</span>
+<select class="bg-white border border-outline-variant rounded px-2 py-1 text-body-sm focus:ring-primary focus:border-primary">
+<option>All Actors</option>
+<option>adm_stephen_j</option>
+<option>sys_automation</option>
+<option>regist_maria_g</option>
+</select>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">MODULE</span>
+<select class="bg-white border border-outline-variant rounded px-2 py-1 text-body-sm focus:ring-primary focus:border-primary">
+<option>All Modules</option>
+<option>ACAD_RECORDS</option>
+<option>FIN_AUTH</option>
+<option>USER_MGMT</option>
+<option>SYS_CONFIG</option>
+</select>
+</div>
+<button class="ml-auto text-primary font-medium text-body-sm hover:underline flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">filter_alt_off</span>
+                        Clear Filters
+                    </button>
+</div>
+</div>
+<!-- Table Container -->
+<div class="flex-1 overflow-auto custom-scrollbar bg-white">
+<table class="w-full border-collapse min-w-[1000px]">
+<thead class="sticky-header bg-surface-container-highest border-b border-outline-variant shadow-sm">
+<tr>
+<th class="px-table-cell-x py-table-cell-y text-left font-label-caps text-label-caps text-on-surface-variant w-48 uppercase tracking-wider">Timestamp</th>
+<th class="px-table-cell-x py-table-cell-y text-left font-label-caps text-label-caps text-on-surface-variant w-40 uppercase tracking-wider">Actor</th>
+<th class="px-table-cell-x py-table-cell-y text-left font-label-caps text-label-caps text-on-surface-variant w-48 uppercase tracking-wider">Action Code</th>
+<th class="px-table-cell-x py-table-cell-y text-left font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Resource</th>
+<th class="px-table-cell-x py-table-cell-y text-left font-label-caps text-label-caps text-on-surface-variant w-32 uppercase tracking-wider">Result</th>
+<th class="px-table-cell-x py-table-cell-y text-left font-label-caps text-label-caps text-on-surface-variant w-40 uppercase tracking-wider">IP Address</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Log Entry 1 -->
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 14:22:09.431</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">person</span>
+<span class="font-medium text-body-sm">adm_stephen_j</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">FIN_VOID_TXN_041</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">Academic/Finance/Tuition/Inv_77182</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-tighter border border-green-200">SUCCESS</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">192.168.1.104</td>
+</tr>
+<!-- Log Entry 2 -->
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 14:20:44.112</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">robot_2</span>
+<span class="font-medium text-body-sm">sys_automation</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">RECORDS_SYNC_EXT</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">Auth/OAuth/Azure_AD_Sync_Node</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-tighter border border-amber-200">WARNING</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">10.0.0.5</td>
+</tr>
+<!-- Log Entry 3 -->
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 14:15:32.887</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">shield_person</span>
+<span class="font-medium text-body-sm">security_ops_1</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">ACL_DENY_OVERRIDE</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">Academic/Grades/Fall23/Final_Entry</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-bold uppercase tracking-tighter border border-red-200">FAILURE</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">45.23.111.9</td>
+</tr>
+<!-- Log Entry 4 -->
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 14:02:11.002</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">person</span>
+<span class="font-medium text-body-sm">regist_maria_g</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">RECORDS_MOD_STUDENT</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">User/Student/Profile_ID_00992</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-tighter border border-green-200">SUCCESS</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">192.168.1.55</td>
+</tr>
+<!-- Log Entry 5 -->
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 13:55:40.431</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">settings</span>
+<span class="font-medium text-body-sm">adm_stephen_j</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">SYS_BACKUP_INIT</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">System/Storage/Volumes/Vol_Alpha</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-tighter border border-green-200">SUCCESS</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">192.168.1.104</td>
+</tr>
+<!-- More Rows to fill space -->
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 13:42:01.992</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">person</span>
+<span class="font-medium text-body-sm">adm_stephen_j</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">USER_PWD_RESET_REQD</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">User/Staff/Profile_ID_04421</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-tighter border border-green-200">SUCCESS</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">192.168.1.104</td>
+</tr>
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 13:30:15.551</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">robot_2</span>
+<span class="font-medium text-body-sm">sys_automation</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">EMAIL_BATCH_SND_404</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">Comm/SMTP/Relay_Service</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-bold uppercase tracking-tighter border border-red-200">FAILURE</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">127.0.0.1</td>
+</tr>
+<tr class="zebra-stripe hover:bg-secondary-container/10 transition-colors group">
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-on-surface">2023-10-27 13:12:09.112</td>
+<td class="px-table-cell-x py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs text-on-surface-variant">person</span>
+<span class="font-medium text-body-sm">regist_maria_g</span>
+</div>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono text-primary font-medium">ACAD_CRSE_ENROLL</td>
+<td class="px-table-cell-x py-md text-body-sm text-on-surface-variant">Academic/Courses/CS101/Sect_B</td>
+<td class="px-table-cell-x py-md">
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-tighter border border-green-200">SUCCESS</span>
+</td>
+<td class="px-table-cell-x py-md font-data-mono text-data-mono opacity-60">192.168.1.55</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer / Pagination -->
+<footer class="h-12 border-t border-outline-variant bg-surface px-lg flex items-center justify-between">
+<div class="text-body-sm text-on-surface-variant">
+                    Showing <span class="font-medium text-on-surface">1 - 8</span> of <span class="font-medium text-on-surface">2,481</span> entries
+                </div>
+<div class="flex items-center gap-sm">
+<button class="p-1 rounded hover:bg-surface-container-low text-on-surface-variant disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">first_page</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-low text-on-surface-variant disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-xs">
+<span class="w-8 h-8 flex items-center justify-center bg-primary text-on-primary rounded text-xs font-bold">1</span>
+<span class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-low rounded text-xs font-medium cursor-pointer">2</span>
+<span class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-low rounded text-xs font-medium cursor-pointer">3</span>
+<span class="px-2 text-on-surface-variant">...</span>
+<span class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-low rounded text-xs font-medium cursor-pointer">311</span>
+</div>
+<button class="p-1 rounded hover:bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined">last_page</span>
+</button>
+</div>
+</footer>
+</section>
+</main>
+<script>
+        // Simple micro-interaction for rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                // In a real app, this would show detail panel
+                console.log('Log entry details requested');
+                row.classList.add('bg-primary-container/5');
+                setTimeout(() => row.classList.remove('bg-primary-container/5'), 300);
+            });
+        });
+
+        // Search highlight simulation
+        const searchInput = document.querySelector('input[placeholder="Search logs..."]');
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(val) ? '' : 'none';
+            });
+        });
+    </script>
+</body></html>

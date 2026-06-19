@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #fbf9fa; /* background */
+    color: #1b1c1d;            /* on-background */
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Scrollbar estilo design system */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f5f3f4; }
+  ::-webkit-scrollbar-thumb { background: #c4c6cd; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #74777d; }
+}
