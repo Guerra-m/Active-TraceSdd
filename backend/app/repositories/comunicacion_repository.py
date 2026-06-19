@@ -162,6 +162,21 @@ class ComunicacionRepository(BaseRepository[LoteComunicacion]):
             c.updated_at = datetime.now(timezone.utc)
             await self._session.flush()
 
+    async def list_mis_mensajes(self, ep_ids: list[UUID], limit: int = 50) -> list[Comunicacion]:
+        """Mensajes recibidos cuyo entrada_padron_id está en ep_ids."""
+        if not ep_ids:
+            return []
+        stmt = (
+            select(Comunicacion)
+            .where(Comunicacion.tenant_id == self._tenant_id)
+            .where(Comunicacion.deleted_at.is_(None))
+            .where(Comunicacion.entrada_padron_id.in_(ep_ids))
+            .order_by(Comunicacion.created_at.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
     async def cancelar_por_lote(self, lote_id: UUID) -> int:
         """Cancela todos los mensajes Pendiente de un lote. Retorna count."""
         stmt = (

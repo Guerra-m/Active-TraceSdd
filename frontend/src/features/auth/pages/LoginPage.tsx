@@ -9,12 +9,32 @@ import { useAuth } from '@/features/auth/context/AuthContext'
 import type { AuthUser } from '@/features/auth/context/AuthContext'
 
 const DEV_USERS = [
-  { rol: 'Admin',       email: 'admin@trace.dev',    password: 'admin123'   },
-  { rol: 'Profesor',    email: 'profesor@trace.dev', password: 'profesor123' },
-  { rol: 'Tutor',       email: 'tutor@trace.dev',    password: 'tutor123'   },
-  { rol: 'Coordinador', email: 'coord@trace.dev',    password: 'coord123'   },
-  { rol: 'Nexo',        email: 'nexo@trace.dev',     password: 'nexo123'    },
-  { rol: 'Finanzas',    email: 'finanzas@trace.dev', password: 'fin123'     },
+  { group: 'Staff',
+    users: [
+      { rol: 'Admin',            email: 'admin@trace.dev',                  password: 'admin123'      },
+      { rol: 'Coordinador',      email: 'coord@trace.dev',                  password: 'coord123'      },
+      { rol: 'Finanzas',         email: 'finanzas@trace.dev',               password: 'fin123'        },
+    ]
+  },
+  { group: 'Docentes · ALGO1',
+    users: [
+      { rol: 'García (Profesor)',   email: 'rgarcia@trace.dev',             password: 'garcia123'     },
+      { rol: 'Martínez (Tutor)',    email: 'cmartinez@trace.dev',           password: 'cmartinez123'  },
+    ]
+  },
+  { group: 'Docentes · BD1',
+    users: [
+      { rol: 'Silva (Profesor)',    email: 'asilva@trace.dev',              password: 'silva123'      },
+      { rol: 'López (Tutor)',       email: 'blopez@trace.dev',              password: 'blopez123'     },
+    ]
+  },
+  { group: 'Alumnos · ALGO1',
+    users: [
+      { rol: 'Benitez (al día)',         email: 'facundo.benitez@alumno.utn.edu.ar',    password: 'alumno123' },
+      { rol: 'Morales (atrasada)',        email: 'valentina.morales@alumno.utn.edu.ar',  password: 'alumno123' },
+      { rol: 'Vargas (muy atrasada)',     email: 'florencia.vargas@alumno.utn.edu.ar',   password: 'alumno123' },
+    ]
+  },
 ]
 
 const loginSchema = z.object({
@@ -51,6 +71,28 @@ export function LoginPage() {
   const fillCredentials = (email: string, password: string) => {
     setValue('email', email)
     setValue('password', password)
+  }
+
+  const quickLogin = async (email: string, password: string) => {
+    setApiError(null)
+    setIsSubmitting(true)
+    try {
+      const response = await api.post<LoginResponse>('/auth/login', { email, password })
+      const result = response.data
+      if (result.requires_2fa && result.temp_token) {
+        navigate('/login/2fa', { state: { temp_token: result.temp_token } })
+        return
+      }
+      if (result.access_token && result.user && result.permissions) {
+        if (result.refresh_token) setRefreshToken(result.refresh_token)
+        setAuth({ user: result.user, permissions: result.permissions, accessToken: result.access_token, asignacion: null })
+        navigate('/dashboard', { replace: true })
+      }
+    } catch {
+      setApiError('Error al iniciar sesión rápida.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const onSubmit = async (data: LoginFormData) => {
@@ -230,26 +272,32 @@ export function LoginPage() {
         {import.meta.env.DEV && (
           <div className="mt-6 rounded-lg border border-dashed border-outline-variant bg-surface-container-low p-4">
             <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.05em] text-outline">
-              Usuarios de prueba
+              Usuarios de prueba — click para ingresar
             </p>
-            <div className="space-y-1.5">
-              {DEV_USERS.map((u) => (
-                <button
-                  key={u.email}
-                  type="button"
-                  onClick={() => fillCredentials(u.email, u.password)}
-                  className="w-full rounded-md bg-surface-container-lowest px-3 py-2 text-left transition-colors hover:bg-surface-container"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-on-surface">{u.rol}</span>
-                    <span className="text-[10px] text-outline">click para rellenar</span>
+            <div className="space-y-3">
+              {DEV_USERS.map((group) => (
+                <div key={group.group}>
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.05em] text-outline/60">
+                    {group.group}
+                  </p>
+                  <div className="space-y-1">
+                    {group.users.map((u) => (
+                      <button
+                        key={u.email}
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={() => quickLogin(u.email, u.password)}
+                        className="w-full rounded-md bg-surface-container-lowest px-3 py-2 text-left transition-colors hover:bg-surface-container disabled:opacity-50"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-on-surface">{u.rol}</span>
+                          <span className="font-mono text-[10px] text-outline">{u.password}</span>
+                        </div>
+                        <span className="font-mono text-[10px] text-on-surface-variant">{u.email}</span>
+                      </button>
+                    ))}
                   </div>
-                  <div className="mt-0.5 flex items-center gap-3">
-                    <span className="font-mono text-xs text-on-surface-variant">{u.email}</span>
-                    <span className="text-outline">·</span>
-                    <span className="font-mono text-xs text-on-surface-variant">{u.password}</span>
-                  </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>

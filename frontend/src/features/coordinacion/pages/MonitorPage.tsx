@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
+import { useAuth } from '@/features/auth/context/AuthContext'
 import { useMonitor } from '../hooks/useMonitor'
 import type { MonitorFiltros } from '../types'
 
@@ -105,8 +106,14 @@ function AlumnosBar({ total, al_dia, atrasados }: AlumnosBarProps) {
 // ─── MonitorContent ───────────────────────────────────────────────────────────
 
 function MonitorContent() {
+  const { asignacion, isLoadingAsignacion } = useAuth()
   const [filtros, setFiltros] = useState<MonitorFiltros | undefined>(undefined)
-  const { data, isLoading, isError } = useMonitor(filtros)
+  const { data, isLoading, isError } = useMonitor(
+    filtros,
+    asignacion?.asignacionId,
+    asignacion?.materiaId,
+    !isLoadingAsignacion,
+  )
 
   const {
     register,

@@ -42,3 +42,13 @@ class CalificacionResponse(BaseModel):
     aprobado: bool
     nombre_alumno: str | None
     apellidos_alumno: str | None
+
+
+class MiCalificacionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    actividad: str
+    nota_numerica: Decimal | None
+    nota_textual: str | None
+    aprobado: bool
+    materia_nombre: str | None

@@ -3,7 +3,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Send, X, PenSquare, Info } from 'lucide-react'
-import { useEnviarComunicacion, useLotesComunicacion } from '../hooks/useComunicaciones'
+import { useEnviarComunicacion, useLotesComunicacion, useAprobarLote } from '../hooks/useComunicaciones'
+import { useAuth } from '@/features/auth/context/AuthContext'
 import type { EstadoLote } from '../types'
 
 interface ComunicacionesPageProps {
@@ -43,9 +44,12 @@ export function ComunicacionesPage({ asignacionId, materiaId }: ComunicacionesPa
     defaultValues: { criterio: 'atrasados' },
   })
 
+  const { permissions } = useAuth()
+  const puedeAprobar = permissions.includes('comunicacion:aprobar')
   const cuerpoValue = watch('cuerpo_template', '')
 
   const enviar = useEnviarComunicacion()
+  const aprobar = useAprobarLote()
   const { data: lotes, refetch: refetchLotes } = useLotesComunicacion()
 
   const sinContexto = !asignacionId || !materiaId
@@ -244,6 +248,9 @@ export function ComunicacionesPage({ asignacionId, materiaId }: ComunicacionesPa
                           <th className="px-4 py-3 text-left text-label-caps font-label-caps text-on-surface-variant uppercase">Enviados</th>
                           <th className="px-4 py-3 text-left text-label-caps font-label-caps text-on-surface-variant uppercase">Errores</th>
                           <th className="px-4 py-3 text-left text-label-caps font-label-caps text-on-surface-variant uppercase">Fecha</th>
+                          {puedeAprobar && (
+                            <th className="px-4 py-3 text-left text-label-caps font-label-caps text-on-surface-variant uppercase">Acción</th>
+                          )}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-outline-variant">
@@ -260,6 +267,20 @@ export function ComunicacionesPage({ asignacionId, materiaId }: ComunicacionesPa
                             <td className="px-4 py-3 text-on-surface-variant">
                               {new Date(lote.created_at).toLocaleDateString('es-AR')}
                             </td>
+                            {puedeAprobar && (
+                              <td className="px-4 py-3">
+                                {lote.estado === 'PendienteAprobacion' && (
+                                  <button
+                                    type="button"
+                                    disabled={aprobar.isPending}
+                                    onClick={() => aprobar.mutate(lote.id)}
+                                    className="rounded-lg bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                                  >
+                                    Aprobar
+                                  </button>
+                                )}
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>

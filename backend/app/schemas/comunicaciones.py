@@ -63,3 +63,15 @@ class LoteComunicacionResponse(BaseModel):
     materia_id: UUID | None
     aprobado_at: datetime | None
     created_at: datetime
+
+
+class MiMensajeResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", from_attributes=True)
+
+    id: UUID
+    asunto: str
+    cuerpo: str
+    estado: str
+    materia_id: UUID | None
+    enviado_at: datetime | None
+    created_at: datetime

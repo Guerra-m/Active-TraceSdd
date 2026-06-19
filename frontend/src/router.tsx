@@ -1,4 +1,7 @@
+import React from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { useAuth } from '@/features/auth/context/AuthContext'
+import { Spinner } from '@/shared/components/Spinner'
 import { RequireAuth } from '@/shared/components/RequireAuth'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
@@ -31,9 +34,30 @@ import { UsuariosAdminPage } from '@/features/admin/pages/UsuariosAdminPage'
 import { AuditoriaPage } from '@/features/admin/pages/AuditoriaPage'
 import { ComisionesPage } from '@/features/coordinacion/pages/ComisionesPage'
 
-// IDs del docente admin seeded (Programacion I - Cohorte 2024-A)
-const DEFAULT_ASIGNACION_ID = '094c9029-321d-41a4-8f00-9f99437c0581'
-const DEFAULT_MATERIA_ID    = '9a1ac748-7387-49dd-a1dd-4f06c2d2181b'
+// Fallback para ADMIN/roles sin asignación propia (asignación del admin seeded)
+const FALLBACK_ASIGNACION_ID = '8c17bf88-6eac-45c5-aff8-1bf59a17d9d0'
+const FALLBACK_MATERIA_ID    = 'e4ebc2e4-2c3d-408f-8994-f465bb8adc02'
+
+type WithAsignacionProps = { asignacionId: string; materiaId: string }
+
+function ProfesorRoute({ Page }: { Page: React.ComponentType<WithAsignacionProps> }) {
+  const { asignacion, isLoadingAsignacion } = useAuth()
+
+  if (isLoadingAsignacion && !asignacion) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
+
+  return (
+    <Page
+      asignacionId={asignacion?.asignacionId ?? FALLBACK_ASIGNACION_ID}
+      materiaId={asignacion?.materiaId ?? FALLBACK_MATERIA_ID}
+    />
+  )
+}
 
 export const router = createBrowserRouter([
   // Rutas públicas
@@ -57,37 +81,19 @@ export const router = createBrowserRouter([
       { path: 'alumnos', element: <AlumnosPage /> },
       { path: 'materias', element: <MateriasPage /> },
       { path: 'comisiones', element: <ComisionesPage /> },
-      { path: 'comunicacion', element: <ComunicacionesPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} /> },
+      { path: 'comunicacion', element: <ProfesorRoute Page={ComunicacionesPage} /> },
       // Alias de rutas cortas → páginas ya implementadas
       { path: 'encuentros', element: <EncuentrosAdminPage /> },
       { path: 'liquidaciones', element: <LiquidacionesPage /> },
       { path: 'auditoria', element: <AuditoriaPage /> },
       { path: 'usuarios', element: <UsuariosAdminPage /> },
       // Módulo académico docente (C-22)
-      {
-        path: 'profesor/atrasados',
-        element: <AtrasadosPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
-      },
-      {
-        path: 'profesor/importar',
-        element: <ImportacionPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
-      },
-      {
-        path: 'profesor/umbral',
-        element: <UmbralPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
-      },
-      {
-        path: 'profesor/entregas',
-        element: <EntregasPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
-      },
-      {
-        path: 'profesor/comunicaciones',
-        element: <ComunicacionesPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
-      },
-      {
-        path: 'profesor/monitor',
-        element: <MonitorPage asignacionId={DEFAULT_ASIGNACION_ID} materiaId={DEFAULT_MATERIA_ID} />,
-      },
+      { path: 'profesor/atrasados',      element: <ProfesorRoute Page={AtrasadosPage} /> },
+      { path: 'profesor/importar',       element: <ProfesorRoute Page={ImportacionPage} /> },
+      { path: 'profesor/umbral',         element: <ProfesorRoute Page={UmbralPage} /> },
+      { path: 'profesor/entregas',       element: <ProfesorRoute Page={EntregasPage} /> },
+      { path: 'profesor/comunicaciones', element: <ProfesorRoute Page={ComunicacionesPage} /> },
+      { path: 'profesor/monitor',        element: <ProfesorRoute Page={MonitorPage} /> },
       // Módulo coordinación (C-23)
       { path: 'equipos', element: <EquiposPage /> },
       { path: 'avisos', element: <AvisosPage /> },
