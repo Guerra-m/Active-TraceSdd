@@ -4,9 +4,15 @@ import type { MonitorFiltros } from '../types'
 
 export const MONITOR_KEY = 'coordinacion-monitor'
 
-export function useMonitor(filtros?: MonitorFiltros) {
+export function useMonitor(
+  filtros?: MonitorFiltros,
+  asignacionId?: string,
+  materiaId?: string,
+  enabled = true,
+) {
   return useQuery({
-    queryKey: [MONITOR_KEY, filtros],
-    queryFn: () => fetchMonitor(filtros),
+    queryKey: [MONITOR_KEY, filtros, asignacionId, materiaId],
+    queryFn: () => fetchMonitor(filtros, asignacionId, materiaId),
+    enabled,
   })
 }

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useEnviarComunicacion, useLotesComunicacion } from '../hooks/useComunicaciones'
+import { useEnviarComunicacion, useLotesComunicacion, useAprobarLote } from '../hooks/useComunicaciones'
+import { useAuth } from '@/features/auth/context/AuthContext'
 import type { EstadoLote } from '../types'
 
 interface ComunicacionesPageProps {
@@ -41,7 +42,11 @@ export function ComunicacionesPage({ asignacionId, materiaId }: ComunicacionesPa
     defaultValues: { criterio: 'atrasados' },
   })
 
+  const { permissions } = useAuth()
+  const puedeAprobar = permissions.includes('comunicacion:aprobar')
+
   const enviar = useEnviarComunicacion()
+  const aprobar = useAprobarLote()
   const { data: lotes, refetch: refetchLotes } = useLotesComunicacion()
 
   const sinContexto = !asignacionId || !materiaId
@@ -203,6 +208,9 @@ export function ComunicacionesPage({ asignacionId, materiaId }: ComunicacionesPa
                         <th className="px-4 py-2 text-left font-medium text-text-muted">Enviados</th>
                         <th className="px-4 py-2 text-left font-medium text-text-muted">Errores</th>
                         <th className="px-4 py-2 text-left font-medium text-text-muted">Fecha</th>
+                        {puedeAprobar && (
+                          <th className="px-4 py-2 text-left font-medium text-text-muted">Acción</th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-surface-subtle">
@@ -219,6 +227,20 @@ export function ComunicacionesPage({ asignacionId, materiaId }: ComunicacionesPa
                           <td className="px-4 py-2 text-text">
                             {new Date(lote.created_at).toLocaleDateString('es-AR')}
                           </td>
+                          {puedeAprobar && (
+                            <td className="px-4 py-2">
+                              {lote.estado === 'PendienteAprobacion' && (
+                                <button
+                                  type="button"
+                                  disabled={aprobar.isPending}
+                                  onClick={() => aprobar.mutate(lote.id)}
+                                  className="rounded-lg bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                                >
+                                  Aprobar
+                                </button>
+                              )}
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>

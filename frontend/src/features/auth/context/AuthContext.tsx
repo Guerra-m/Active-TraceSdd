@@ -11,15 +11,23 @@ export interface AuthUser {
   tenant_id: string
 }
 
+export interface AsignacionInfo {
+  asignacionId: string
+  materiaId: string
+}
+
 export interface AuthState {
   user: AuthUser | null
   permissions: string[]
   accessToken: string | null
+  asignacion: AsignacionInfo | null
 }
 
 interface AuthContextValue extends AuthState {
   setAuth: (state: AuthState) => void
   logout: () => Promise<void>
+  setAsignacion: (a: AsignacionInfo | null) => void
+  isLoadingAsignacion: boolean
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -46,17 +54,41 @@ interface RefreshResponse {
   permissions: string[]
 }
 
+async function fetchMiAsignacion(): Promise<AsignacionInfo | null> {
+  try {
+    const { data } = await api.get<{ id: string; materia_id: string | null }[]>('/asignaciones/me')
+    const activa = data.find((a) => a.materia_id)
+    if (!activa) return null
+    return { asignacionId: activa.id, materiaId: activa.materia_id! }
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     permissions: [],
     accessToken: null,
+    asignacion: null,
   })
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingAsignacion, setIsLoadingAsignacion] = useState(false)
+
+  const setAsignacion = useCallback((a: AsignacionInfo | null) => {
+    setAuthState((prev) => ({ ...prev, asignacion: a }))
+  }, [])
 
   const setAuth = useCallback((state: AuthState) => {
     setAuthState(state)
     setAccessToken(state.accessToken)
+    if (state.user && state.accessToken) {
+      setIsLoadingAsignacion(true)
+      fetchMiAsignacion().then((a) => {
+        setAuthState((prev) => ({ ...prev, asignacion: a }))
+        setIsLoadingAsignacion(false)
+      })
+    }
   }, [])
 
   const logout = useCallback(async () => {
@@ -103,6 +135,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             user: data.user,
             permissions: data.permissions,
             accessToken: data.access_token,
+            asignacion: null,
           })
         }
       } catch {
@@ -130,7 +163,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider value={{ ...authState, setAuth, logout }}>
+    <AuthContext.Provider value={{ ...authState, setAuth, logout, setAsignacion, isLoadingAsignacion }}>
       {children}
     </AuthContext.Provider>
   )

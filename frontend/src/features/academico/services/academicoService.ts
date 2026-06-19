@@ -123,3 +123,10 @@ export async function fetchLotesComunicacion(): Promise<LoteComunicacionResponse
   const { data } = await api.get<LoteComunicacionResponse[]>('/comunicaciones/lotes')
   return data
 }
+
+export async function aprobarLote(loteId: string): Promise<LoteComunicacionResponse> {
+  const { data } = await api.post<LoteComunicacionResponse>(
+    `/comunicaciones/lotes/${loteId}/aprobar`,
+  )
+  return data
+}

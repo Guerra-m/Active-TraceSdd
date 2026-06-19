@@ -25,6 +25,7 @@ from app.repositories.calificacion_repository import CalificacionRepository
 from app.repositories.umbral_materia_repository import UmbralMateriaRepository
 from app.schemas.calificaciones import (
     ImportarCalificacionesResponse,
+    MiCalificacionResponse,
     UmbralMateriaRequest,
     UmbralMateriaResponse,
 )
@@ -36,6 +37,91 @@ _VALORES_APROBATORIOS_DEFAULT = ["Satisfactorio", "Supera lo esperado"]
 router = APIRouter(prefix="/api/v1", tags=["calificaciones"])
 
 _PERM = Depends(require_permission("calificaciones:importar"))
+
+
+@router.get(
+    "/calificaciones/mis-calificaciones",
+    response_model=list[MiCalificacionResponse],
+)
+async def mis_calificaciones(
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[MiCalificacionResponse]:
+    """Calificaciones del alumno autenticado, con nombre de materia incluido.
+
+    Resuelve el alumno por email (auto-link a entrada_padron si no está linkeado).
+    No requiere permiso especial — solo autenticación.
+    """
+    from sqlalchemy import select
+    from app.models.entrada_padron import EntradaPadron
+    from app.models.calificacion import Calificacion
+    from app.models.materia import Materia
+    from app.core.encryption import decrypt
+
+    # Fast path: entradas ya linkeadas
+    fast_stmt = (
+        select(EntradaPadron)
+        .where(EntradaPadron.tenant_id == current_user.tenant_id)
+        .where(EntradaPadron.usuario_id == current_user.id)
+        .where(EntradaPadron.deleted_at.is_(None))
+    )
+    fast_result = await db.execute(fast_stmt)
+    eps = list(fast_result.scalars().all())
+
+    # Slow path: siempre buscamos EPs sin linkear que coincidan por email
+    # (garantiza que encontramos EPs con cals aunque los linkeados estén vacíos)
+    try:
+        user_email = decrypt(current_user.email_encrypted).lower().strip()
+        scan_stmt = (
+            select(EntradaPadron)
+            .where(EntradaPadron.tenant_id == current_user.tenant_id)
+            .where(EntradaPadron.deleted_at.is_(None))
+            .where(EntradaPadron.usuario_id.is_(None))
+        )
+        scan_result = await db.execute(scan_stmt)
+        unlinked_eps = scan_result.scalars().all()
+
+        newly_linked = False
+        for ep in unlinked_eps:
+            try:
+                if decrypt(ep.email_encrypted).lower().strip() == user_email:
+                    ep.usuario_id = current_user.id
+                    eps.append(ep)
+                    newly_linked = True
+            except Exception:
+                continue
+
+        if newly_linked:
+            await db.commit()
+    except Exception:
+        pass
+
+    if not eps:
+        return []
+
+    ep_ids = [ep.id for ep in eps]
+
+    cal_stmt = (
+        select(Calificacion, Materia.nombre.label("materia_nombre"))
+        .outerjoin(Materia, Calificacion.materia_id == Materia.id)
+        .where(Calificacion.tenant_id == current_user.tenant_id)
+        .where(Calificacion.deleted_at.is_(None))
+        .where(Calificacion.entrada_padron_id.in_(ep_ids))
+        .order_by(Materia.nombre, Calificacion.actividad)
+    )
+    cal_result = await db.execute(cal_stmt)
+    rows = cal_result.all()
+
+    return [
+        MiCalificacionResponse(
+            actividad=row.Calificacion.actividad,
+            nota_numerica=row.Calificacion.nota_numerica,
+            nota_textual=row.Calificacion.nota_textual,
+            aprobado=row.Calificacion.aprobado,
+            materia_nombre=row.materia_nombre,
+        )
+        for row in rows
+    ]
 
 
 async def _check_asignacion_scope(

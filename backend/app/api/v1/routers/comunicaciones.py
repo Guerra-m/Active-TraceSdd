@@ -24,6 +24,7 @@ from app.schemas.comunicaciones import (
     CrearLoteRequest,
     CrearLotePorCriterioRequest,
     LoteComunicacionResponse,
+    MiMensajeResponse,
     PreviewRequest,
     PreviewResponse,
 )
@@ -38,6 +39,70 @@ router = APIRouter(prefix="/api/v1", tags=["comunicaciones"])
 
 _PERM_ENVIAR = Depends(require_permission("comunicacion:enviar"))
 _PERM_APROBAR = Depends(require_permission("comunicacion:aprobar"))
+
+
+@router.get(
+    "/comunicaciones/mis-mensajes",
+    response_model=list[MiMensajeResponse],
+)
+async def mis_mensajes(
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[MiMensajeResponse]:
+    """Mensajes recibidos por el alumno autenticado.
+
+    Primer acceso: escanea EntradaPadron por email (descifrado) y auto-linkea usuario_id.
+    Accesos siguientes: lookup directo por usuario_id (fast path).
+    No requiere permiso especial — solo estar autenticado.
+    """
+    from sqlalchemy import select
+    from app.models.entrada_padron import EntradaPadron
+    from app.core.encryption import decrypt
+
+    # Fast path: entrada_padron ya linkeadas al usuario
+    fast_stmt = (
+        select(EntradaPadron)
+        .where(EntradaPadron.tenant_id == current_user.tenant_id)
+        .where(EntradaPadron.usuario_id == current_user.id)
+        .where(EntradaPadron.deleted_at.is_(None))
+    )
+    fast_result = await db.execute(fast_stmt)
+    eps = list(fast_result.scalars().all())
+
+    # Slow path: siempre buscamos EPs sin linkear que coincidan por email
+    try:
+        user_email = decrypt(current_user.email_encrypted).lower().strip()
+        scan_stmt = (
+            select(EntradaPadron)
+            .where(EntradaPadron.tenant_id == current_user.tenant_id)
+            .where(EntradaPadron.deleted_at.is_(None))
+            .where(EntradaPadron.usuario_id.is_(None))
+        )
+        scan_result = await db.execute(scan_stmt)
+        unlinked_eps = scan_result.scalars().all()
+
+        newly_linked = False
+        for ep in unlinked_eps:
+            try:
+                if decrypt(ep.email_encrypted).lower().strip() == user_email:
+                    ep.usuario_id = current_user.id
+                    eps.append(ep)
+                    newly_linked = True
+            except Exception:
+                continue
+
+        if newly_linked:
+            await db.commit()
+    except Exception:
+        pass
+
+    if not eps:
+        return []
+
+    ep_ids = [ep.id for ep in eps]
+    repo = ComunicacionRepository(db, tenant_id=current_user.tenant_id)
+    mensajes = await repo.list_mis_mensajes(ep_ids)
+    return [MiMensajeResponse.model_validate(m) for m in mensajes]
 
 
 @router.post(

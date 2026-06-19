@@ -55,6 +55,17 @@ def _to_response(a: Asignacion) -> AsignacionResponse:
     )
 
 
+@router.get("/asignaciones/me", response_model=list[AsignacionResponse])
+async def get_mis_asignaciones(
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[AsignacionResponse]:
+    """Asignaciones vigentes del usuario autenticado. Solo requiere estar logueado."""
+    repo = AsignacionRepository(db, tenant_id=current_user.tenant_id)
+    items = await repo.list_filtrado(usuario_id=current_user.id)
+    return [_to_response(a) for a in items]
+
+
 @router.get("/asignaciones", response_model=list[AsignacionResponse])
 async def list_asignaciones(
     usuario_id: UUID | None = Query(default=None),

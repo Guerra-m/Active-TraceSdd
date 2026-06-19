@@ -1,14 +1,17 @@
 import { api } from '@/shared/services/api'
 import type { MonitorMetrics, MonitorFiltros } from '../types'
 
-// Usa la asignación seeded del docente admin (Programacion I - Cohorte 2024-A)
-const DEFAULT_ASIGNACION_ID = '094c9029-321d-41a4-8f00-9f99437c0581'
-const DEFAULT_MATERIA_ID = '9a1ac748-7387-49dd-a1dd-4f06c2d2181b'
+// Asignación seeded del admin (Programación I · Cohorte 2024-A) — fallback para COORDINADOR/ADMIN
+const DEFAULT_ASIGNACION_ID = '8c17bf88-6eac-45c5-aff8-1bf59a17d9d0'
+const DEFAULT_MATERIA_ID = 'e4ebc2e4-2c3d-408f-8994-f465bb8adc02'
 
-export async function fetchMonitor(filtros?: MonitorFiltros): Promise<MonitorMetrics> {
-  const { data } = await api.get<MonitorMetrics>(
-    `/analisis/monitor/${DEFAULT_ASIGNACION_ID}/${DEFAULT_MATERIA_ID}`,
-    { params: filtros },
-  )
+export async function fetchMonitor(
+  filtros?: MonitorFiltros,
+  asignacionId?: string,
+  materiaId?: string,
+): Promise<MonitorMetrics> {
+  const aid = asignacionId ?? DEFAULT_ASIGNACION_ID
+  const mid = materiaId ?? DEFAULT_MATERIA_ID
+  const { data } = await api.get<MonitorMetrics>(`/analisis/monitor/${aid}/${mid}`, { params: filtros })
   return data
 }
