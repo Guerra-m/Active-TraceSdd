@@ -1,74 +1,81 @@
-// ─── Estructura académica ─────────────────────────────────────────────────────
+// ─── Carreras ─────────────────────────────────────────────────────────────────
+
+export type EstadoCarrera = 'Activa' | 'Inactiva'
+export type EstadoMateria = 'Activa' | 'Inactiva'
 
 export interface Carrera {
   id: string
-  nombre: string
-  codigo: string
-  activa: boolean
   tenant_id: string
+  codigo: string
+  nombre: string
+  estado: EstadoCarrera
+  created_at: string
+  updated_at: string
 }
 
 export interface CreateCarreraPayload {
   nombre: string
   codigo: string
-  activa?: boolean
 }
 
 export interface UpdateCarreraPayload {
-  nombre?: string
-  codigo?: string
-  activa?: boolean
+  nombre: string
+  codigo: string
 }
+
+export interface SetEstadoCarreraPayload {
+  estado: EstadoCarrera
+}
+
+// ─── Cohortes ─────────────────────────────────────────────────────────────────
 
 export interface Cohorte {
   id: string
-  carrera_id: string
-  carrera_nombre: string
-  anio: number
-  periodo: string
-  activa: boolean
   tenant_id: string
+  carrera_id: string
+  nombre: string
+  anio: number
+  vig_desde: string
+  vig_hasta: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface CreateCohortePayload {
   carrera_id: string
+  nombre: string
   anio: number
-  periodo: string
-  activa?: boolean
+  vig_desde: string
+  vig_hasta?: string | null
 }
 
-export interface UpdateCohortePayload {
-  carrera_id?: string
-  anio?: number
-  periodo?: string
-  activa?: boolean
-}
+// ─── Materias ─────────────────────────────────────────────────────────────────
 
 export interface Materia {
   id: string
-  nombre: string
-  codigo: string
-  carrera_id: string
-  carrera_nombre: string
-  grupo_plus: string | null
-  activa: boolean
   tenant_id: string
+  codigo: string
+  nombre: string
+  estado: EstadoMateria
+  grupo_plus: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface CreateMateriaPayload {
   nombre: string
   codigo: string
-  carrera_id: string
-  grupo_plus?: string
-  activa?: boolean
+  grupo_plus?: string | null
 }
 
 export interface UpdateMateriaPayload {
-  nombre?: string
-  codigo?: string
-  carrera_id?: string
+  nombre: string
+  codigo: string
   grupo_plus?: string | null
-  activa?: boolean
+}
+
+export interface SetEstadoMateriaPayload {
+  estado: EstadoMateria
 }
 
 // ─── Usuarios Admin ───────────────────────────────────────────────────────────

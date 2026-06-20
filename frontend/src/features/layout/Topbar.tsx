@@ -1,4 +1,5 @@
 import { Menu, PanelLeftClose, Bell, History, LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthContext'
 
 interface TopbarProps {
@@ -8,6 +9,7 @@ interface TopbarProps {
 
 export function Topbar({ onMenuClick, sidebarOpen }: TopbarProps) {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <header className="h-16 border-b border-outline-variant bg-surface-container-lowest flex justify-between items-center px-6 shrink-0 z-40">
@@ -36,13 +38,15 @@ export function Topbar({ onMenuClick, sidebarOpen }: TopbarProps) {
       {/* Right: icon actions + user */}
       <div className="flex items-center gap-4">
         <button
+          onClick={() => navigate('/avisos')}
           aria-label="Notificaciones"
           className="hover:bg-surface-container rounded-full p-2 text-on-surface-variant transition-colors active:scale-95"
         >
           <Bell className="h-5 w-5" />
         </button>
         <button
-          aria-label="Historial"
+          onClick={() => navigate('/admin/auditoria')}
+          aria-label="Historial de auditoría"
           className="hover:bg-surface-container rounded-full p-2 text-on-surface-variant transition-colors active:scale-95"
         >
           <History className="h-5 w-5" />

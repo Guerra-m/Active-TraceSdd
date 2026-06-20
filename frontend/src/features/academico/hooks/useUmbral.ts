@@ -16,6 +16,7 @@ export function useActualizarUmbral(asignacionId: string, materiaId: string) {
     mutationFn: (payload: UmbralPayload) => putUmbral(asignacionId, materiaId, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['umbral', asignacionId, materiaId] })
+      void queryClient.invalidateQueries({ queryKey: ['mis-calificaciones'] })
     },
   })
 }

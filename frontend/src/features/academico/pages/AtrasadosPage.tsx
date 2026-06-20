@@ -1,5 +1,20 @@
 import { Download, Mail, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAtrasados, useRanking, useNotasFinales } from '../hooks/useAtrasados'
+
+function exportarCSV(rows: { apellidos: string; nombre: string; faltantes: string[]; reprobadas: string[] }[]) {
+  const header = 'Apellido,Nombre,Actividades Faltantes,Estado'
+  const body = rows.map(r =>
+    `"${r.apellidos}","${r.nombre}","${r.faltantes.join('; ')}","${r.reprobadas.length > 0 ? 'Reprobadas' : 'Pendiente'}"`
+  ).join('\n')
+  const blob = new Blob([header + '\n' + body], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `atrasados_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 interface AtrasadosPageProps {
   asignacionId: string
@@ -32,6 +47,7 @@ function Avatar({ nombre, apellidos, index }: { nombre: string; apellidos: strin
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function AtrasadosPage({ asignacionId, materiaId }: AtrasadosPageProps) {
+  const navigate = useNavigate()
   const { data: resp, isLoading: loadingAtrasados, isError: errorAtrasados } = useAtrasados(asignacionId, materiaId)
   const { data: rankingResp } = useRanking(asignacionId, materiaId)
   const { data: notasResp } = useNotasFinales(asignacionId, materiaId)
@@ -59,11 +75,18 @@ export function AtrasadosPage({ asignacionId, materiaId }: AtrasadosPageProps) {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-[14px] font-medium hover:bg-surface-container-low transition-colors">
+          <button
+            onClick={() => exportarCSV(atrasados)}
+            disabled={atrasados.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-[14px] font-medium hover:bg-surface-container-low transition-colors disabled:opacity-50"
+          >
             <Download className="h-5 w-5" />
             Exportar reporte
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg text-[14px] font-medium hover:opacity-90 transition-all">
+          <button
+            onClick={() => navigate('/profesor/comunicaciones')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg text-[14px] font-medium hover:opacity-90 transition-all"
+          >
             <Mail className="h-5 w-5" />
             Recordatorio masivo
           </button>
@@ -148,7 +171,10 @@ export function AtrasadosPage({ asignacionId, materiaId }: AtrasadosPageProps) {
                           )}
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-container text-on-primary-container rounded-lg text-[13px] font-medium hover:opacity-80 transition-all">
+                          <button
+                            onClick={() => navigate('/profesor/comunicaciones')}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-container text-on-primary-container rounded-lg text-[13px] font-medium hover:opacity-80 transition-all"
+                          >
                             <Mail className="h-4 w-4" />
                             Recordatorio
                           </button>

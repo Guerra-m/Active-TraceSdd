@@ -3,23 +3,25 @@ import {
   fetchCarreras,
   createCarrera,
   updateCarrera,
+  patchCarreraEstado,
   deleteCarrera,
   fetchCohortes,
   createCohorte,
-  updateCohorte,
   deleteCohorte,
   fetchMaterias,
   createMateria,
   updateMateria,
+  patchMateriaEstado,
   deleteMateria,
 } from '../services/estructuraService'
 import type {
   CreateCarreraPayload,
   UpdateCarreraPayload,
+  SetEstadoCarreraPayload,
   CreateCohortePayload,
-  UpdateCohortePayload,
   CreateMateriaPayload,
   UpdateMateriaPayload,
+  SetEstadoMateriaPayload,
 } from '../types'
 
 export const CARRERAS_KEY = 'admin-carreras'
@@ -49,6 +51,15 @@ export function useUpdateCarrera() {
   })
 }
 
+export function usePatchCarreraEstado() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: SetEstadoCarreraPayload }) =>
+      patchCarreraEstado(id, payload),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: [CARRERAS_KEY] }),
+  })
+}
+
 export function useDeleteCarrera() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -67,15 +78,6 @@ export function useCreateCohorte() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: CreateCohortePayload) => createCohorte(payload),
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: [COHORTES_KEY] }),
-  })
-}
-
-export function useUpdateCohorte() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateCohortePayload }) =>
-      updateCohorte(id, payload),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: [COHORTES_KEY] }),
   })
 }
@@ -107,6 +109,15 @@ export function useUpdateMateria() {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateMateriaPayload }) =>
       updateMateria(id, payload),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: [MATERIAS_KEY] }),
+  })
+}
+
+export function usePatchMateriaEstado() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: SetEstadoMateriaPayload }) =>
+      patchMateriaEstado(id, payload),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: [MATERIAS_KEY] }),
   })
 }

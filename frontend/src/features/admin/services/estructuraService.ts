@@ -3,12 +3,13 @@ import type {
   Carrera,
   CreateCarreraPayload,
   UpdateCarreraPayload,
+  SetEstadoCarreraPayload,
   Cohorte,
   CreateCohortePayload,
-  UpdateCohortePayload,
   Materia,
   CreateMateriaPayload,
   UpdateMateriaPayload,
+  SetEstadoMateriaPayload,
 } from '../types'
 
 // ─── Carreras ─────────────────────────────────────────────────────────────────
@@ -28,6 +29,11 @@ export async function updateCarrera(id: string, payload: UpdateCarreraPayload): 
   return data
 }
 
+export async function patchCarreraEstado(id: string, payload: SetEstadoCarreraPayload): Promise<Carrera> {
+  const { data } = await api.patch<Carrera>(`/admin/carreras/${id}/estado`, payload)
+  return data
+}
+
 export async function deleteCarrera(id: string): Promise<void> {
   await api.delete(`/admin/carreras/${id}`)
 }
@@ -41,11 +47,6 @@ export async function fetchCohortes(): Promise<Cohorte[]> {
 
 export async function createCohorte(payload: CreateCohortePayload): Promise<Cohorte> {
   const { data } = await api.post<Cohorte>('/admin/cohortes', payload)
-  return data
-}
-
-export async function updateCohorte(id: string, payload: UpdateCohortePayload): Promise<Cohorte> {
-  const { data } = await api.put<Cohorte>(`/admin/cohortes/${id}`, payload)
   return data
 }
 
@@ -67,6 +68,11 @@ export async function createMateria(payload: CreateMateriaPayload): Promise<Mate
 
 export async function updateMateria(id: string, payload: UpdateMateriaPayload): Promise<Materia> {
   const { data } = await api.put<Materia>(`/admin/materias/${id}`, payload)
+  return data
+}
+
+export async function patchMateriaEstado(id: string, payload: SetEstadoMateriaPayload): Promise<Materia> {
+  const { data } = await api.patch<Materia>(`/admin/materias/${id}/estado`, payload)
   return data
 }
 

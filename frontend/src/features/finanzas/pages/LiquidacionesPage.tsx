@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useNavigate } from 'react-router-dom'
 import {
   Wallet,
   Gift,
@@ -19,6 +20,22 @@ import {
 } from 'lucide-react'
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
+
+const PAGE_SIZE_LIQ = 10
+
+function exportarLiquidacionesCSV(rows: { usuario_id: string; base: number; plus: number; total: number; estado: string; tipo: string }[]) {
+  const header = 'Usuario ID,Base,Plus,Total,Estado,Tipo'
+  const body = rows.map(r =>
+    `"${r.usuario_id}",${r.base},${r.plus},${r.total},"${r.estado}","${r.tipo}"`
+  ).join('\n')
+  const blob = new Blob([header + '\n' + body], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `liquidaciones_${new Date().toISOString().slice(0, 7)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 import {
   useLiquidaciones,
   useLiquidacionKPIs,
@@ -346,9 +363,11 @@ function CalcularModal({ onClose }: { onClose: () => void }) {
 const DEFAULT_PERIODO = new Date().toISOString().slice(0, 7)
 
 function LiquidacionesContent() {
+  const navigate = useNavigate()
   const [filtros, setFiltros] = useState<LiquidacionFiltros>({ periodo: DEFAULT_PERIODO })
   const [showCalcular, setShowCalcular] = useState(false)
   const [tabActivo, setTabActivo] = useState<'all' | 'General' | 'NEXO' | 'Facturantes'>('all')
+  const [page, setPage] = useState(0)
 
   const { data, isLoading, isError } = useLiquidaciones(filtros)
   const { data: kpis } = useLiquidacionKPIs(filtros)
@@ -374,6 +393,8 @@ function LiquidacionesContent() {
     if (tabActivo === 'Facturantes') return l.excluido_por_factura
     return !l.es_nexo && !l.excluido_por_factura
   })
+  const totalPages = Math.max(1, Math.ceil(itemsFiltrados.length / PAGE_SIZE_LIQ))
+  const pagedItems = itemsFiltrados.slice(page * PAGE_SIZE_LIQ, (page + 1) * PAGE_SIZE_LIQ)
 
   if (isLoading) {
     return (
@@ -412,9 +433,19 @@ function LiquidacionesContent() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 border border-[#74777d] bg-white text-primary rounded font-medium flex items-center gap-2 hover:bg-[#f5f3f4] transition-colors text-sm">
+          <button
+            onClick={() => exportarLiquidacionesCSV(itemsFiltrados.map(l => ({
+              usuario_id: l.usuario_id,
+              base: l.monto_base,
+              plus: l.monto_plus,
+              total: l.total,
+              estado: l.estado,
+              tipo: l.es_nexo ? 'NEXO' : l.excluido_por_factura ? 'Facturante' : 'General',
+            })))}
+            className="px-4 py-2 border border-[#74777d] bg-white text-primary rounded font-medium flex items-center gap-2 hover:bg-[#f5f3f4] transition-colors text-sm"
+          >
             <Download className="w-4 h-4" />
-            Exportar PDF
+            Exportar CSV
           </button>
           <button
             onClick={() => setShowCalcular(true)}
@@ -530,7 +561,7 @@ function LiquidacionesContent() {
               </tr>
             </thead>
             <tbody>
-              {itemsFiltrados.map((liq, i) => (
+              {pagedItems.map((liq, i) => (
                 <LiquidacionRow
                   key={liq.id}
                   liquidacion={liq}
@@ -551,22 +582,22 @@ function LiquidacionesContent() {
 
         <div className="p-4 bg-white border-t border-[#c4c6cd] flex justify-between items-center">
           <p className="text-xs text-[#43474c]">
-            Mostrando {itemsFiltrados.length} de {items.length} liquidaciones
+            Mostrando {pagedItems.length} de {itemsFiltrados.length} liquidaciones
           </p>
           <div className="flex gap-1">
-            <button className="p-1 hover:bg-[#efedef] rounded transition-colors">
+            <button onClick={() => setPage(0)} disabled={page === 0} className="p-1 hover:bg-[#efedef] rounded transition-colors disabled:opacity-40">
               <ChevronFirst className="w-4 h-4 text-[#43474c]" />
             </button>
-            <button className="p-1 hover:bg-[#efedef] rounded transition-colors">
+            <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} className="p-1 hover:bg-[#efedef] rounded transition-colors disabled:opacity-40">
               <ChevronLeft className="w-4 h-4 text-[#43474c]" />
             </button>
             <span className="px-3 flex items-center text-xs font-medium text-[#1b1c1d]">
-              Página 1
+              Página {page + 1} de {totalPages}
             </span>
-            <button className="p-1 hover:bg-[#efedef] rounded transition-colors">
+            <button onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} className="p-1 hover:bg-[#efedef] rounded transition-colors disabled:opacity-40">
               <ChevronRight className="w-4 h-4 text-[#43474c]" />
             </button>
-            <button className="p-1 hover:bg-[#efedef] rounded transition-colors">
+            <button onClick={() => setPage(totalPages - 1)} disabled={page >= totalPages - 1} className="p-1 hover:bg-[#efedef] rounded transition-colors disabled:opacity-40">
               <ChevronLast className="w-4 h-4 text-[#43474c]" />
             </button>
           </div>
@@ -581,7 +612,10 @@ function LiquidacionesContent() {
             <p className="text-[#96a9be] text-sm mb-4">
               El próximo período comienza automáticamente. Asegurate de procesar todos los reclamos.
             </p>
-            <button className="text-sm font-bold flex items-center gap-1 hover:underline">
+            <button
+              onClick={() => navigate('/setup-cuatrimestre')}
+              className="text-sm font-bold flex items-center gap-1 hover:underline"
+            >
               Ver calendario <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -593,11 +627,11 @@ function LiquidacionesContent() {
             Generá desglose detallado para auditoría o cumplimiento impositivo.
           </p>
           <div className="flex gap-3">
-            <button className="text-primary font-bold text-sm hover:underline">
+            <button onClick={() => navigate('/admin/auditoria')} className="text-primary font-bold text-sm hover:underline">
               Formularios impositivos
             </button>
             <div className="w-px h-4 bg-[#c4c6cd]" />
-            <button className="text-primary font-bold text-sm hover:underline">
+            <button onClick={() => navigate('/admin/auditoria')} className="text-primary font-bold text-sm hover:underline">
               Logs de auditoría
             </button>
           </div>

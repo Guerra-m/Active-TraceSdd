@@ -9,6 +9,7 @@ import {
   useCrearSlot,
   useUpdateEncuentro,
 } from '../hooks/useEncuentrosAdmin'
+import { useMaterias } from '@/features/admin/hooks/useEstructura'
 import type { EncuentroAdmin, EncuentroEstado } from '../types'
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
@@ -143,6 +144,7 @@ function EditEncuentroModal({
 
 function SlotModal({ onClose }: { onClose: () => void }) {
   const slotMutation = useCrearSlot()
+  const { data: materias } = useMaterias()
   const {
     register,
     handleSubmit,
@@ -202,16 +204,21 @@ function SlotModal({ onClose }: { onClose: () => void }) {
               )}
             </div>
 
-            {/* ID Materia */}
+            {/* Materia */}
             <div className="space-y-1">
               <label className="block text-label-caps font-label-caps text-on-surface-variant uppercase" htmlFor="sl-materia">
-                ID MATERIA
+                MATERIA
               </label>
-              <input
+              <select
                 id="sl-materia"
                 {...register('materia_id')}
                 className="w-full border border-outline-variant rounded-lg p-3 focus:ring-1 focus:ring-primary focus:border-primary bg-surface text-body-md"
-              />
+              >
+                <option value="">Seleccioná una materia...</option>
+                {(materias ?? []).map((m) => (
+                  <option key={m.id} value={m.id}>{m.nombre} ({m.codigo})</option>
+                ))}
+              </select>
               {errors.materia_id && (
                 <p role="alert" className="text-sm text-error">{errors.materia_id.message}</p>
               )}

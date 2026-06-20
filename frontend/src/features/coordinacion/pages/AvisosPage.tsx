@@ -340,9 +340,13 @@ function AvisoModal({
 function AvisosContent() {
   const [showModal, setShowModal] = useState(false)
   const [editTarget, setEditTarget] = useState<Aviso | null>(null)
+  const [mostrarArchivados, setMostrarArchivados] = useState(false)
 
   const { data, isLoading, isError } = useAvisos()
-  const items = data ?? []
+  const todosLosItems = data ?? []
+  const items = mostrarArchivados
+    ? todosLosItems.filter((a) => !a.activo)
+    : todosLosItems.filter((a) => a.activo)
 
   if (isLoading) {
     return (
@@ -378,9 +382,16 @@ function AvisosContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="px-4 py-2 border border-outline rounded-lg text-[13px] font-medium hover:bg-surface-container transition-all">
+          <button
+            onClick={() => setMostrarArchivados((v) => !v)}
+            className={`px-4 py-2 border rounded-lg text-[13px] font-medium transition-all ${
+              mostrarArchivados
+                ? 'border-primary bg-primary-container text-on-primary-container'
+                : 'border-outline hover:bg-surface-container'
+            }`}
+          >
             <Archive className="h-4 w-4 inline mr-1.5" />
-            Archivados
+            {mostrarArchivados ? 'Ver activos' : 'Archivados'}
           </button>
           <button
             onClick={() => {
@@ -396,7 +407,9 @@ function AvisosContent() {
 
       {/* Notice list */}
       {items.length === 0 ? (
-        <p className="text-[14px] text-on-surface-variant">No hay avisos publicados.</p>
+        <p className="text-[14px] text-on-surface-variant">
+          {mostrarArchivados ? 'No hay avisos archivados.' : 'No hay avisos publicados.'}
+        </p>
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {items.map((aviso) => (

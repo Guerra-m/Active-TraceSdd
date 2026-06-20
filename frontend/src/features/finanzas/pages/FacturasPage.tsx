@@ -14,6 +14,22 @@ import {
   MoreVertical,
   ChevronRight,
 } from 'lucide-react'
+
+const PAGE_SIZE_FAC = 10
+
+function exportarFacturasCSV(rows: { id: string; usuario_id: string; periodo: string; monto: number; estado: string }[]) {
+  const header = 'ID,Usuario ID,Período,Monto,Estado'
+  const body = rows.map(r =>
+    `"${r.id}","${r.usuario_id}","${r.periodo}",${r.monto},"${r.estado}"`
+  ).join('\n')
+  const blob = new Blob([header + '\n' + body], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `facturas_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
 import { useFacturas, useCreateFactura, useAbonarFactura } from '../hooks/useFacturas'
@@ -315,6 +331,8 @@ function FacturasContent() {
   const [filtros, setFiltros] = useState<FacturaFiltros>({})
   const [showNueva, setShowNueva] = useState(false)
   const [abonarId, setAbonarId] = useState<string | null>(null)
+  const [showFiltros, setShowFiltros] = useState(false)
+  const [page, setPage] = useState(0)
 
   const { data, isLoading, isError } = useFacturas(filtros)
   const items = data ?? []
@@ -330,6 +348,9 @@ function FacturasContent() {
       ...(formData.estado ? { estado: formData.estado } : {}),
     })
   }
+
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE_FAC))
+  const pagedItems = items.slice(page * PAGE_SIZE_FAC, (page + 1) * PAGE_SIZE_FAC)
 
   const totalPendiente = items
     .filter((f) => f.estado === 'Pendiente')
@@ -373,11 +394,20 @@ function FacturasContent() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="flex items-center gap-1 border border-[#c4c6cd] px-4 py-2 rounded-lg font-medium text-sm text-secondary hover:bg-[#efedef] transition-colors">
+          <button
+            onClick={() => setShowFiltros((v) => !v)}
+            className={`flex items-center gap-1 border px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              showFiltros ? 'border-primary bg-primary/5 text-primary' : 'border-[#c4c6cd] text-secondary hover:bg-[#efedef]'
+            }`}
+          >
             <Filter className="w-4 h-4" />
             <span>Filtrar</span>
           </button>
-          <button className="flex items-center gap-1 border border-[#c4c6cd] px-4 py-2 rounded-lg font-medium text-sm text-secondary hover:bg-[#efedef] transition-colors">
+          <button
+            onClick={() => exportarFacturasCSV(items.map(f => ({ id: f.id, usuario_id: f.usuario_id, periodo: f.periodo, monto: f.monto, estado: f.estado })))}
+            disabled={items.length === 0}
+            className="flex items-center gap-1 border border-[#c4c6cd] px-4 py-2 rounded-lg font-medium text-sm text-secondary hover:bg-[#efedef] transition-colors disabled:opacity-50"
+          >
             <FileDown className="w-4 h-4" />
             <span>Exportar CSV</span>
           </button>
@@ -440,7 +470,7 @@ function FacturasContent() {
       </div>
 
       {/* Filtros */}
-      <form
+      {showFiltros && <form
         onSubmit={handleSubmit(onFiltrar)}
         className="flex flex-wrap gap-4 rounded-lg border border-[#c4c6cd] bg-[#f5f3f4] p-4"
       >
@@ -497,7 +527,7 @@ function FacturasContent() {
             Filtrar
           </button>
         </div>
-      </form>
+      </form>}
 
       {/* Tabla */}
       <div className="bg-white border border-[#c4c6cd] rounded-xl overflow-hidden">
@@ -542,7 +572,7 @@ function FacturasContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#c4c6cd]">
-                {items.map((f) => (
+                {pagedItems.map((f) => (
                   <FacturaRow key={f.id} factura={f} onAbonar={(id) => setAbonarId(id)} />
                 ))}
               </tbody>
@@ -553,16 +583,26 @@ function FacturasContent() {
         {/* Footer paginación */}
         <div className="px-6 py-4 border-t border-[#c4c6cd] flex justify-between items-center bg-white">
           <span className="text-xs text-[#43474c]">
-            Mostrando 1 a {items.length} de {items.length} facturas
+            Mostrando {pagedItems.length} de {items.length} facturas — página {page + 1} de {totalPages}
           </span>
           <div className="flex gap-1">
-            <button className="px-2 py-1 border border-[#c4c6cd] rounded-lg text-xs text-[#43474c] hover:bg-[#efedef] transition-colors opacity-50 cursor-not-allowed">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="px-2 py-1 border border-[#c4c6cd] rounded-lg text-xs text-[#43474c] hover:bg-[#efedef] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Anterior
             </button>
             <button className="px-3 py-1 bg-primary text-white rounded-lg font-medium text-xs">
-              1
+              {page + 1}
             </button>
-            <button className="px-2 py-1 border border-[#c4c6cd] rounded-lg text-xs text-[#43474c] hover:bg-[#efedef] transition-colors">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+              className="px-2 py-1 border border-[#c4c6cd] rounded-lg text-xs text-[#43474c] hover:bg-[#efedef] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Siguiente
             </button>
           </div>

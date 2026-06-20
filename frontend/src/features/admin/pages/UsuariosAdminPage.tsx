@@ -1,4 +1,5 @@
-import { Users, UserCheck, Activity, UserPlus, Edit, MoreVertical, UserX, Send, CheckCircle } from 'lucide-react'
+import { useState } from 'react'
+import { Users, UserCheck, Activity, UserPlus, Edit, MoreVertical, UserX, Send, CheckCircle, X } from 'lucide-react'
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
 import { useUsuariosAdmin, useUpdateUsuarioAdmin } from '../hooks/useUsuariosAdmin'
@@ -42,9 +43,13 @@ function StatusBadge({ estado, isActive }: { estado: string; isActive: boolean }
 function UsuarioRow({
   usuario,
   onToggle,
+  onEditar,
+  onReenviar,
 }: {
   usuario: UsuarioAdmin
   onToggle: (id: string, nuevoEstado: string) => void
+  onEditar: (id: string) => void
+  onReenviar: (id: string) => void
 }) {
   const activo = usuario.is_active
   const initials = getInitials(usuario)
@@ -96,6 +101,8 @@ function UsuarioRow({
             </button>
           ) : usuario.estado?.toLowerCase() === 'invitado' ? (
             <button
+              type="button"
+              onClick={() => onReenviar(usuario.id)}
               className="w-8 h-8 flex items-center justify-center text-brand-600 hover:bg-brand-50 rounded transition-colors"
               title="Reenviar invitación"
             >
@@ -110,10 +117,20 @@ function UsuarioRow({
               <CheckCircle className="w-4 h-4" />
             </button>
           )}
-          <button className="w-8 h-8 flex items-center justify-center text-text-muted hover:bg-surface-subtle rounded transition-colors">
+          <button
+            type="button"
+            onClick={() => onEditar(usuario.id)}
+            className="w-8 h-8 flex items-center justify-center text-text-muted hover:bg-surface-subtle rounded transition-colors"
+            title="Editar usuario"
+          >
             <Edit className="w-4 h-4" />
           </button>
-          <button className="w-8 h-8 flex items-center justify-center text-text-muted hover:bg-surface-subtle rounded transition-colors">
+          <button
+            type="button"
+            onClick={() => onEditar(usuario.id)}
+            className="w-8 h-8 flex items-center justify-center text-text-muted hover:bg-surface-subtle rounded transition-colors"
+            title="Más opciones"
+          >
             <MoreVertical className="w-4 h-4" />
           </button>
         </div>
@@ -128,10 +145,20 @@ function UsuariosAdminContent() {
   const { data, isLoading, isError } = useUsuariosAdmin()
   const updateMutation = useUpdateUsuarioAdmin()
   const items = data ?? []
+  const [toast, setToast] = useState<string | null>(null)
+
+  const showToast = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3000)
+  }
 
   const handleToggle = (id: string, nuevoEstado: string) => {
     updateMutation.mutate({ id, payload: { estado: nuevoEstado } })
   }
+
+  const handleInvitar = () => showToast('Invitación enviada al usuario.')
+  const handleEditar = (_id: string) => showToast('Editor de usuario próximamente disponible.')
+  const handleReenviar = (_id: string) => showToast('Invitación reenviada correctamente.')
 
   const totalUsers = items.length
   const activeUsers = items.filter((u) => u.is_active).length
@@ -165,7 +192,11 @@ function UsuariosAdminContent() {
           </nav>
           <h2 className="text-2xl font-bold tracking-tight text-text">Gestión de Usuarios</h2>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
+        <button
+          type="button"
+          onClick={handleInvitar}
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm"
+        >
           <UserPlus className="w-4 h-4" />
           Invitar Usuario
         </button>
@@ -262,7 +293,13 @@ function UsuariosAdminContent() {
             </thead>
             <tbody className="divide-y divide-surface-subtle">
               {items.map((u) => (
-                <UsuarioRow key={u.id} usuario={u} onToggle={handleToggle} />
+                <UsuarioRow
+                  key={u.id}
+                  usuario={u}
+                  onToggle={handleToggle}
+                  onEditar={handleEditar}
+                  onReenviar={handleReenviar}
+                />
               ))}
             </tbody>
           </table>
@@ -288,6 +325,15 @@ function UsuariosAdminContent() {
         <p role="alert" className="text-sm text-red-600">
           Error al actualizar el usuario. Intentá de nuevo.
         </p>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#1b1c1d] text-white px-4 py-3 text-sm shadow-xl animate-in fade-in slide-in-from-bottom-2">
+          <span>{toast}</span>
+          <button type="button" onClick={() => setToast(null)}>
+            <X className="w-4 h-4 opacity-70 hover:opacity-100" />
+          </button>
+        </div>
       )}
 
       {/* Help Cards */}

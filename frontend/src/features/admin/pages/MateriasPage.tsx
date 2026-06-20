@@ -1,16 +1,19 @@
+import { useNavigate } from 'react-router-dom'
+import { Plus } from 'lucide-react'
 import { RequirePermission } from '@/shared/components/RequirePermission'
 import { Spinner } from '@/shared/components/Spinner'
 import { useMaterias } from '../hooks/useEstructura'
 import type { Materia } from '../types'
 
-function EstadoBadge({ activa }: { activa: boolean }) {
+function EstadoBadge({ estado }: { estado: string }) {
+  const isActiva = estado === 'Activa'
   return (
     <span
       className={`rounded px-2 py-0.5 text-xs font-medium ${
-        activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+        isActiva ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
       }`}
     >
-      {activa ? 'Activa' : 'Inactiva'}
+      {estado}
     </span>
   )
 }
@@ -20,16 +23,16 @@ function MateriaRow({ materia }: { materia: Materia }) {
     <tr className="border-b border-border hover:bg-surface-subtle">
       <td className="p-3 font-mono text-xs text-gray-500">{materia.codigo}</td>
       <td className="p-3 font-medium">{materia.nombre}</td>
-      <td className="p-3 text-sm text-gray-600">{materia.carrera_nombre ?? '—'}</td>
       <td className="p-3 text-sm text-gray-500">{materia.grupo_plus ?? '—'}</td>
       <td className="p-3">
-        <EstadoBadge activa={materia.activa} />
+        <EstadoBadge estado={materia.estado} />
       </td>
     </tr>
   )
 }
 
 function MateriasContent() {
+  const navigate = useNavigate()
   const { data, isLoading, isError } = useMaterias()
 
   if (isLoading) {
@@ -54,7 +57,14 @@ function MateriasContent() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Materias</h1>
-        <span className="text-sm text-gray-500">{items.length} materias</span>
+        <button
+          type="button"
+          onClick={() => navigate('/admin/estructura')}
+          className="flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Nueva materia
+        </button>
       </div>
 
       {items.length === 0 ? (
@@ -66,7 +76,6 @@ function MateriasContent() {
               <tr>
                 <th className="p-3 text-left font-medium text-gray-600">Código</th>
                 <th className="p-3 text-left font-medium text-gray-600">Nombre</th>
-                <th className="p-3 text-left font-medium text-gray-600">Carrera</th>
                 <th className="p-3 text-left font-medium text-gray-600">Grupo plus</th>
                 <th className="p-3 text-left font-medium text-gray-600">Estado</th>
               </tr>
@@ -80,13 +89,6 @@ function MateriasContent() {
         </div>
       )}
 
-      <p className="text-xs text-gray-400">
-        Para crear o editar materias, usá{' '}
-        <a href="/admin/estructura" className="text-blue-600 underline">
-          Estructura académica
-        </a>
-        .
-      </p>
     </div>
   )
 }

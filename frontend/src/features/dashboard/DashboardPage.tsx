@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
   ArrowRight,
@@ -6,18 +6,22 @@ import {
   BookOpen,
   Calendar,
   CheckCircle2,
+  Clock,
   DollarSign,
   Download,
   Inbox,
   MessageSquare,
+  Megaphone,
   Users,
   UserCheck,
 } from 'lucide-react'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import { Spinner } from '@/shared/components/Spinner'
 import { useMonitor } from '@/features/coordinacion/hooks/useMonitor'
+import { useAvisos } from '@/features/coordinacion/hooks/useAvisos'
 import { useMisMensajes } from './hooks/useMisMensajes'
-import { useMisCalificaciones } from './hooks/useMisCalificaciones'
+import { useMisCalificaciones, type MiCalificacion } from './hooks/useMisCalificaciones'
+import { useUmbral } from '@/features/academico/hooks/useUmbral'
 import type { MonitorMetrics } from '@/features/coordinacion/types'
 
 // ─── KPI Card ────────────────────────────────────────────────────────────────
@@ -323,9 +327,29 @@ function KpiSection() {
 
 // ─── Vista alumno ─────────────────────────────────────────────────────────────
 
+const SEVERIDAD_STYLES = {
+  Crítico: { bar: 'bg-red-500', badge: 'bg-red-100 text-red-800', label: 'URGENTE', icon: AlertTriangle, iconColor: 'text-red-600' },
+  Advertencia: { bar: 'bg-amber-400', badge: 'bg-amber-100 text-amber-800', label: 'IMPORTANTE', icon: Clock, iconColor: 'text-amber-600' },
+  Info: { bar: 'bg-blue-400', badge: 'bg-blue-50 text-blue-700', label: 'INFO', icon: Megaphone, iconColor: 'text-blue-500' },
+} as const
+
 function AlumnoDashboard() {
+  const { asignacion } = useAuth()
   const { data: cals, isLoading: loadingCals } = useMisCalificaciones()
   const { data: mensajes, isLoading: loadingMsgs } = useMisMensajes()
+  const { data: todosAvisos, isLoading: loadingAvisos } = useAvisos()
+  const { data: umbralData } = useUmbral(
+    asignacion?.asignacionId ?? '',
+    asignacion?.materiaId ?? '',
+  )
+
+  const umbralPct = umbralData?.umbral_pct ?? 60
+
+  const avisos = (todosAvisos ?? []).filter((a) => a.activo)
+
+  // Correct scale: nota is 0-10, umbral_pct is 0-100. Convert nota to % before comparing.
+  const esAprobado = (c: MiCalificacion): boolean =>
+    c.nota_numerica != null ? c.nota_numerica * 10 >= umbralPct : c.aprobado
 
   // Agrupar calificaciones por materia
   const porMateria = (cals ?? []).reduce<Record<string, typeof cals>>((acc, c) => {
@@ -335,12 +359,56 @@ function AlumnoDashboard() {
   }, {})
 
   const totalCals = cals?.length ?? 0
-  const aprobadas = cals?.filter((c) => c.aprobado).length ?? 0
+  const aprobadas = cals?.filter((c) => esAprobado(c)).length ?? 0
   const desaprobadas = totalCals - aprobadas
   const estaAlDia = totalCals > 0 && desaprobadas === 0
 
   return (
     <div className="space-y-6">
+      {/* Avisos institucionales */}
+      {loadingAvisos ? null : avisos.length > 0 ? (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Megaphone className="h-4 w-4 text-text-muted" />
+            <h2 className="text-sm font-semibold text-text">Avisos institucionales</h2>
+            <span className="ml-auto rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">
+              {avisos.length}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {avisos.map((aviso) => {
+              const sev = SEVERIDAD_STYLES[aviso.severidad] ?? SEVERIDAD_STYLES['Info']
+              const Icon = sev.icon
+              return (
+                <div
+                  key={aviso.id}
+                  className="rounded-xl border border-surface-subtle bg-surface shadow-sm overflow-hidden flex"
+                >
+                  <div className={`w-1 shrink-0 ${sev.bar}`} />
+                  <div className="flex-1 p-4">
+                    <div className="flex items-start gap-3">
+                      <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${sev.iconColor}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider ${sev.badge}`}>
+                            {sev.label}
+                          </span>
+                          <p className="text-sm font-semibold text-text truncate">{aviso.titulo}</p>
+                        </div>
+                        <p className="text-sm text-text-muted whitespace-pre-wrap">{aviso.cuerpo}</p>
+                        <p className="mt-1 text-[11px] text-text-subtle">
+                          {new Date(aviso.inicio_en).toLocaleDateString('es-AR')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      ) : null}
+
       {/* Estado general */}
       {!loadingCals && totalCals > 0 && (
         <div className={`flex items-center gap-3 rounded-xl border p-4 shadow-sm ${
@@ -397,7 +465,7 @@ function AlumnoDashboard() {
                       <td className="px-4 py-2 text-center">
                         {c.nota_numerica == null && !c.nota_textual ? (
                           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">Sin corregir</span>
-                        ) : c.aprobado ? (
+                        ) : esAprobado(c) ? (
                           <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Aprobado</span>
                         ) : (
                           <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Desaprobado</span>
@@ -453,8 +521,25 @@ function AlumnoDashboard() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function DashboardPage() {
-  const { user, permissions } = useAuth()
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const isAlumno = user?.rol === 'ALUMNO'
+
+  const exportarReporte = () => {
+    const rows = [
+      'Sección,Valor',
+      `"Usuario","${user?.nombre ?? ''}"`,
+      `"Rol","${user?.rol ?? ''}"`,
+      `"Fecha","${new Date().toLocaleDateString('es-AR')}"`,
+    ].join('\n')
+    const blob = new Blob([rows], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `reporte_dashboard_${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="space-y-6 pb-8">
@@ -471,11 +556,19 @@ export function DashboardPage() {
           </h2>
         </div>
         <div className="flex gap-2">
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded text-[14px] hover:bg-surface-container transition-colors">
+          <button
+            type="button"
+            onClick={() => navigate('/setup-cuatrimestre')}
+            className="flex items-center gap-1.5 px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded text-[14px] hover:bg-surface-container transition-colors"
+          >
             <Calendar className="h-4 w-4" />
             Cuatrimestre actual
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-primary text-on-primary rounded text-[14px] hover:opacity-90 transition-colors">
+          <button
+            type="button"
+            onClick={exportarReporte}
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-on-primary rounded text-[14px] hover:opacity-90 transition-colors"
+          >
             <Download className="h-4 w-4" />
             Exportar reporte
           </button>

@@ -38,8 +38,28 @@ type SalarioForm = z.infer<typeof salarioSchema>
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+const PAGE_SIZE_SAL = 10
+
 const fmt = (n: number) =>
   n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
+
+function exportarGrillaCSV(
+  base: SalarioBase[],
+  plus: SalarioPlus[],
+) {
+  const rows = [
+    'Tipo,Rol,Monto,Desde,Hasta',
+    ...base.map((s) => `"base","${s.rol}","${s.monto}","${s.desde}","${s.hasta ?? ''}"`),
+    ...plus.map((s) => `"plus","${s.rol}","${s.monto}","${s.desde}","${s.hasta ?? ''}"`),
+  ].join('\n')
+  const blob = new Blob([rows], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `grilla_salarial_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 // ─── Modal Salario ────────────────────────────────────────────────────────────
 
@@ -217,6 +237,10 @@ function SalariosTable({
   onNuevo: () => void
   onEditar: (s: SalarioBase | SalarioPlus) => void
 }) {
+  const [page, setPage] = useState(0)
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE_SAL))
+  const pagedItems = items.slice(page * PAGE_SIZE_SAL, (page + 1) * PAGE_SIZE_SAL)
+
   return (
     <div className="bg-white border border-[#c4c6cd] rounded-xl overflow-hidden shadow-sm">
       <div className="px-6 py-4 border-b border-[#c4c6cd] flex justify-between items-center bg-white">
@@ -259,7 +283,7 @@ function SalariosTable({
                 </tr>
               </thead>
               <tbody>
-                {items.map((s, idx) => (
+                {pagedItems.map((s, idx) => (
                   <tr
                     key={s.id}
                     className={`hover:bg-[#cce2fc]/10 transition-colors group cursor-pointer ${
@@ -309,16 +333,26 @@ function SalariosTable({
           </div>
           <div className="p-4 bg-[#f5f3f4] border-t border-[#c4c6cd] flex justify-between items-center">
             <p className="text-xs text-[#43474c]">
-              Mostrando {items.length} de {items.length} registros
+              Mostrando {pagedItems.length} de {items.length} registros — página {page + 1} de {totalPages}
             </p>
             <div className="flex gap-2">
-              <button className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-white transition-colors">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <ChevronLeft className="w-4 h-4 text-[#43474c]" />
               </button>
               <button className="w-8 h-8 flex items-center justify-center bg-primary text-white rounded text-xs font-medium">
-                1
+                {page + 1}
               </button>
-              <button className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-white transition-colors">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <ChevronRight className="w-4 h-4 text-[#43474c]" />
               </button>
             </div>
@@ -374,9 +408,14 @@ function GrillaSalarialContent() {
           </h1>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-[#c4c6cd] text-primary font-medium rounded hover:bg-[#f5f3f4] transition-colors flex items-center gap-2 text-sm">
+          <button
+            type="button"
+            onClick={() => exportarGrillaCSV(baseItems, plusItems)}
+            disabled={baseItems.length === 0 && plusItems.length === 0}
+            className="px-4 py-2 bg-white border border-[#c4c6cd] text-primary font-medium rounded hover:bg-[#f5f3f4] transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
+          >
             <Download className="w-4 h-4" />
-            Exportar PDF
+            Exportar CSV
           </button>
           <button
             onClick={() => setModal({ tipo: 'base' })}

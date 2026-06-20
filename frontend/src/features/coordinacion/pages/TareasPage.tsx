@@ -11,13 +11,14 @@ import {
   useComentarios,
   useCreateComentario,
 } from '../hooks/useTareas'
+import { useUsuariosAdmin } from '@/features/admin/hooks/useUsuariosAdmin'
 import type { Tarea, TareaEstado } from '../types'
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const createTareaSchema = z.object({
   descripcion: z.string().min(1, 'La descripción es requerida'),
-  asignado_a: z.string().min(1, 'Debe ingresar el ID del usuario'),
+  asignado_a: z.string().min(1, 'Seleccioná un usuario'),
 })
 
 const comentarioSchema = z.object({
@@ -186,6 +187,7 @@ function TareaCard({ tarea }: { tarea: Tarea }) {
 function TareasContent() {
   const { data, isLoading, isError } = useTareas()
   const createMutation = useCreateTarea()
+  const { data: usuarios } = useUsuariosAdmin()
   const [showForm, setShowForm] = useState(false)
   const items = data ?? []
 
@@ -270,14 +272,21 @@ function TareasContent() {
             </div>
             <div className="space-y-1">
               <label className="block text-label-caps font-label-caps text-on-surface-variant uppercase" htmlFor="t-asignado">
-                ASIGNADO A (ID USUARIO)
+                ASIGNADO A
               </label>
-              <input
+              <select
                 id="t-asignado"
                 {...register('asignado_a')}
-                placeholder="uuid del usuario..."
-                className="w-full border border-outline-variant rounded-lg p-3 focus:ring-1 focus:ring-primary focus:border-primary bg-surface text-body-md font-mono"
-              />
+                className="w-full border border-outline-variant rounded-lg p-3 focus:ring-1 focus:ring-primary focus:border-primary bg-surface text-body-md"
+              >
+                <option value="">Seleccioná un usuario...</option>
+                {(usuarios ?? []).map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {[u.nombre, u.apellidos].filter(Boolean).join(' ')}
+                    {u.legajo ? ` (${u.legajo})` : ''}
+                  </option>
+                ))}
+              </select>
               {errors.asignado_a && (
                 <p role="alert" className="text-sm text-error">{errors.asignado_a.message}</p>
               )}

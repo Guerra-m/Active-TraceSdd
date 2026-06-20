@@ -10,6 +10,7 @@ import {
   useImportarAlumnos,
   useMetricasColoquios,
 } from '../hooks/useColoquios'
+import { useMaterias, useCohortes, useCarreras } from '@/features/admin/hooks/useEstructura'
 import type { EvaluacionItem } from '../types'
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
@@ -224,6 +225,10 @@ function EvaluacionCard({ ev }: { ev: EvaluacionItem }) {
 function ColoquiosContent() {
   const { data, isLoading, isError } = useConvocatorias()
   const createMutation = useCreateConvocatoria()
+  const { data: materias } = useMaterias()
+  const { data: cohortes } = useCohortes()
+  const { data: carreras } = useCarreras()
+  const carreraMap = Object.fromEntries((carreras ?? []).map((c) => [c.id, c.nombre]))
   const [showForm, setShowForm] = useState(false)
 
   const {
@@ -311,26 +316,36 @@ function ColoquiosContent() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="block text-label-caps font-label-caps text-on-surface-variant uppercase" htmlFor="materia_id">
-                      ID MATERIA
+                      MATERIA
                     </label>
-                    <input
+                    <select
                       id="materia_id"
                       {...register('materia_id')}
                       className="w-full border border-outline-variant rounded-lg p-3 focus:ring-1 focus:ring-primary bg-surface text-body-md"
-                    />
+                    >
+                      <option value="">Seleccioná una materia...</option>
+                      {(materias ?? []).map((m) => (
+                        <option key={m.id} value={m.id}>{m.nombre} ({m.codigo})</option>
+                      ))}
+                    </select>
                     {errors.materia_id && (
                       <p role="alert" className="text-sm text-error">{errors.materia_id.message}</p>
                     )}
                   </div>
                   <div className="space-y-1">
                     <label className="block text-label-caps font-label-caps text-on-surface-variant uppercase" htmlFor="cohorte_id">
-                      ID COHORTE
+                      COHORTE
                     </label>
-                    <input
+                    <select
                       id="cohorte_id"
                       {...register('cohorte_id')}
                       className="w-full border border-outline-variant rounded-lg p-3 focus:ring-1 focus:ring-primary bg-surface text-body-md"
-                    />
+                    >
+                      <option value="">Seleccioná una cohorte...</option>
+                      {(cohortes ?? []).map((c) => (
+                        <option key={c.id} value={c.id}>{carreraMap[c.carrera_id] ?? 'Carrera'} — {c.nombre} ({c.anio})</option>
+                      ))}
+                    </select>
                     {errors.cohorte_id && (
                       <p role="alert" className="text-sm text-error">{errors.cohorte_id.message}</p>
                     )}

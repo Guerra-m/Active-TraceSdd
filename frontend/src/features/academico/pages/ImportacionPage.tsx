@@ -25,6 +25,7 @@ export function ImportacionPage({ asignacionId, materiaId }: ImportacionPageProp
   const [archivo, setArchivo] = useState<File | null>(null)
   const [resultado, setResultado] = useState<{ filas: number; actividades: string[] } | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [filtroLog, setFiltroLog] = useState<'todos' | 'pendiente' | 'completado'>('todos')
 
   const importar = useImportarCalificaciones()
 
@@ -74,11 +75,33 @@ export function ImportacionPage({ asignacionId, materiaId }: ImportacionPageProp
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 border border-[#c4c6cd] px-4 py-2 rounded-lg bg-white hover:bg-[#efedef] transition-colors text-sm font-medium text-[#1b1c1d]">
+          <button
+            type="button"
+            onClick={() => setFiltroLog(filtroLog === 'todos' ? 'completado' : 'todos')}
+            className="flex items-center gap-2 border border-[#c4c6cd] px-4 py-2 rounded-lg bg-white hover:bg-[#efedef] transition-colors text-sm font-medium text-[#1b1c1d]"
+          >
             <Filter className="w-4 h-4" />
             <span>Filtros</span>
           </button>
-          <button className="flex items-center gap-2 border border-[#c4c6cd] px-4 py-2 rounded-lg bg-white hover:bg-[#efedef] transition-colors text-sm font-medium text-[#1b1c1d]">
+          <button
+            type="button"
+            onClick={() => {
+              if (!resultado) return
+              const rows = [
+                'Archivo,Filas,Actividades,Asignación,Estado',
+                `"${archivo?.name ?? 'calificaciones.xlsx'}","${resultado.filas}","${resultado.actividades.join('; ')}","${asignacionId}","Validado"`,
+              ].join('\n')
+              const blob = new Blob([rows], { type: 'text/csv;charset=utf-8;' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `importacion_${new Date().toISOString().slice(0, 10)}.csv`
+              a.click()
+              URL.revokeObjectURL(url)
+            }}
+            disabled={!resultado}
+            className="flex items-center gap-2 border border-[#c4c6cd] px-4 py-2 rounded-lg bg-white hover:bg-[#efedef] transition-colors text-sm font-medium text-[#1b1c1d] disabled:opacity-50"
+          >
             <Download className="w-4 h-4" />
             <span>Exportar CSV</span>
           </button>
@@ -226,24 +249,27 @@ export function ImportacionPage({ asignacionId, materiaId }: ImportacionPageProp
               <div className="flex items-center gap-4">
                 <h3 className="font-medium text-sm text-primary">Registros de importación</h3>
                 <div className="flex rounded-lg border border-[#c4c6cd] overflow-hidden text-xs">
-                  <button className="px-4 py-1 bg-[#efedef] text-primary font-medium">
-                    Todos
-                  </button>
-                  <button className="px-4 py-1 bg-white text-[#4b6076] border-l border-[#c4c6cd] hover:bg-[#efedef]">
-                    Pendiente
-                  </button>
-                  <button className="px-4 py-1 bg-white text-[#4b6076] border-l border-[#c4c6cd] hover:bg-[#efedef]">
-                    Completado
-                  </button>
+                  {(['todos', 'pendiente', 'completado'] as const).map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setFiltroLog(f)}
+                      className={`px-4 py-1 capitalize border-l border-[#c4c6cd] first:border-l-0 hover:bg-[#efedef] ${
+                        filtroLog === f ? 'bg-[#efedef] text-primary font-medium' : 'bg-white text-[#4b6076]'
+                      }`}
+                    >
+                      {f.charAt(0).toUpperCase() + f.slice(1)}
+                    </button>
+                  ))}
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#74777d]">Página 1 de 1</span>
                 <div className="flex gap-1">
-                  <button className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-[#efedef]">
+                  <button type="button" disabled className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-[#efedef] disabled:opacity-50 disabled:cursor-not-allowed">
                     <ChevronRight className="w-3 h-3 rotate-180 text-[#43474c]" />
                   </button>
-                  <button className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-[#efedef]">
+                  <button type="button" disabled className="w-8 h-8 flex items-center justify-center border border-[#c4c6cd] rounded hover:bg-[#efedef] disabled:opacity-50 disabled:cursor-not-allowed">
                     <ChevronRight className="w-3 h-3 text-[#43474c]" />
                   </button>
                 </div>
@@ -319,7 +345,12 @@ export function ImportacionPage({ asignacionId, materiaId }: ImportacionPageProp
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-[#4b6076] hover:text-primary">
+                        <button
+                          type="button"
+                          onClick={() => setResultado(null)}
+                          title="Eliminar registro"
+                          className="text-[#4b6076] hover:text-primary"
+                        >
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </td>
@@ -354,10 +385,10 @@ export function ImportacionPage({ asignacionId, materiaId }: ImportacionPageProp
                   {resultado ? `1 de 1 registros` : '0 registros'}
                 </span>
                 <div className="flex items-center gap-2">
-                  <button className="p-1 hover:bg-[#efedef] rounded opacity-50 cursor-not-allowed">
+                  <button type="button" disabled className="p-1 hover:bg-[#efedef] rounded disabled:opacity-50 disabled:cursor-not-allowed">
                     <ChevronRight className="w-4 h-4 rotate-180 text-[#43474c]" />
                   </button>
-                  <button className="p-1 hover:bg-[#efedef] rounded opacity-50 cursor-not-allowed">
+                  <button type="button" disabled className="p-1 hover:bg-[#efedef] rounded disabled:opacity-50 disabled:cursor-not-allowed">
                     <ChevronRight className="w-4 h-4 text-[#43474c]" />
                   </button>
                 </div>
@@ -384,10 +415,19 @@ export function ImportacionPage({ asignacionId, materiaId }: ImportacionPageProp
                     <p className="text-xs text-[#50657b] mt-0.5">{errorMsg}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button className="px-4 py-1 border border-[#74777d] text-xs rounded hover:bg-white transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => setErrorMsg(null)}
+                      className="px-4 py-1 border border-[#74777d] text-xs rounded hover:bg-white transition-colors"
+                    >
                       Descartar
                     </button>
-                    <button className="px-4 py-1 bg-primary text-white text-xs rounded hover:opacity-90">
+                    <button
+                      type="button"
+                      onClick={handleImportar}
+                      disabled={importar.isPending}
+                      className="px-4 py-1 bg-primary text-white text-xs rounded hover:opacity-90 disabled:opacity-50"
+                    >
                       Reintentar
                     </button>
                   </div>
